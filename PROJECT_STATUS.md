@@ -1,5 +1,15 @@
 # Joyboy – Projektstatus und Übergabe
 
+## 24.11.2026 – Fehlende Arta-Spiele übernehmen · Schritt 1: Mühle und Dame
+
+**Nutzerentscheidung.** Amir hat am 24.11.2026 entschieden, alle 10 Arta-Spiele zu übernehmen, die in Joyboy fehlen ([Arta](https://github.com/amirhossin27-dev/Arta), 34 Spiele). Reihenfolge, je ein PR, nächster nach Amirs Test: 1) Mühle und Dame, 2) Bewegungs-Würfel (Fitness-Würfel), 3) Farbwechsel (Uno), 4) Wer ist es? (Wer ist wer?), 5) Ballon-Platzen (Amors Pfeile), 6) Schach, 7) Rommé, 8) Fighter, 9) Strike. Fighter und Strike werden kindgerecht umgebaut (eigene Namen, keine Herzen, kein Blut, Comic-Stil). Branch `claude/project-thread-rbbo5i`.
+
+**Schritt 1 umgesetzt.** Mühle und Dame aus dem alten PR #5 (Commit dca2536) auf main nach PR #31 übertragen; Konflikte in README, Tests, `GameDetail.tsx`, `styles.css` und `GameArt.tsx` aufgelöst. Die 16 neuen Tutorial-Sätze mit Joys Stimme (Stimme 4, `scripts/stimme/sprechen.py`) aufgenommen und per Whisper geprüft; das Skript hat dabei 4 nicht mehr benutzte Aufnahmen der alten Schwung-Strecken-Anleitung entfernt. „Zusammen“ zeigt bei Spielen für genau 2 Kinder jetzt „2 Kinder an einem Gerät“ statt „2–2“.
+
+**Geprüft.** TypeScript und 164 App-Tests bestanden. In Chromium (400 × 860, Nachtmodus) Spieldetail, Mühle und Dame gegen Robo mit einigen Zügen angesehen.
+
+**Offen / nächster Schritt.** Amirs Test von Mühle und Dame am Handy, dann Schritt 2 (Bewegungs-Würfel). Online-Partien von Mühle und Dame mit zwei Geräten nicht geprüft.
+
 ## 15.11.2026 – Joy-Kart · Grafiketappe „näher an die Vorlage“
 
 **Nutzerrückmeldung.** Zu zweit „deutlich besser“, Item-Häufigkeit „deutlich besser“. Spielgefühl soll weiter besser werden, die Strecke grafisch überarbeitet und die Spielgrafik insgesamt: „Wir sind noch weit entfernt von der Grafik, die ich haben möchte. Ich will eine ultra-gute Grafik.“ Maßstab bleibt `prototypes/joy-kart/art-reference/coast.webp`. PR #30 ist zusammengeführt; der Branch `claude/determined-hamilton-bm8hnb` wurde vom neuen `main` (2a65ad0) fortgesetzt. [PR #31](https://github.com/amirhossin27-dev/Joyboy/pull/31) gegen main, vom Nutzer mit „go“ beauftragt; Review, GitHub-Prüfungen und Gerätetest stehen aus.

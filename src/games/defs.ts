@@ -3,8 +3,10 @@ import { quizDef } from '../learn/quiz';
 import { traceDef } from '../learn/trace/game';
 import { GAMES, type GameId } from './registry';
 import { c4Def, memoryDef, tttDef } from './rules/classic';
+import { dameDef } from './rules/dame';
 import { ludoDef } from './rules/ludo';
 import { mauDef } from './rules/maumau';
+import { millDef } from './rules/muehle';
 import { battleDef } from './rules/schiffe';
 import { slfDef } from './rules/slf';
 import { wuerfelDef } from './rules/wuerfel';
@@ -47,6 +49,10 @@ export function defFor(id: GameId, robos: boolean[]): GameDef<unknown, unknown> 
       return any(wuerfelDef);
     case 'schiffe':
       return any(battleDef);
+    case 'muehle':
+      return any(millDef);
+    case 'dame':
+      return any(dameDef);
     case 'slf':
       return any(slfDef(robos));
     default:

@@ -15,6 +15,17 @@ async function createSimpleCoastWorld(THREE,c){
   for(let s=start;s<end;s+=step){const j=positions.length/3;for(const [d,l]of[[s,inner],[s,outer],[s+step,inner],[s+step,outer]]){const p=at(d,width(d,l),extra);positions.push(p.x,p.y,p.z);uv.push((l-inner)/4,d/6);if(colored){const col=new THREE.Color(Math.floor(s/2)%2?0xe6dbc0:0xa84632);colors.push(col.r,col.g,col.b);}}indices.push(j,j+1,j+2,j+1,j+3,j+2);}
   const g=geo(new THREE.BufferGeometry());g.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));if(colored)g.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));g.setIndex(indices);g.computeVertexNormals();return kit.add(g,material,root);
  }
+ if(circuit){
+  // Broad rubbered-in wheel paths catch grazing light differently from the coarse shoulders.
+  const wear=texture(256,16,(ctx,w,h)=>{
+   const gradient=ctx.createLinearGradient(0,0,w,0);
+   for(const [x,value] of [[0,245],[.18,225],[.28,150],[.36,207],[.5,234],[.64,207],[.72,150],[.82,225],[1,245]])
+    gradient.addColorStop(x,'rgb('+[value,value,value].join(',')+')');
+   ctx.fillStyle=gradient;ctx.fillRect(0,0,w,h);
+  });
+  wear.colorSpace=THREE.NoColorSpace;wear.repeat.x=1/3;road.roughness=.95;road.roughnessMap=wear;
+  scene.fog.color.setHex(course.cape?0xa1b6c2:0x9daeb9);scene.fog.density=course.cape?.003:.0023;
+ }
  strip(-19,19,stone);strip(-6,6,road,.025);strip(-6.4,-6,curb,.065,true);strip(6,6.4,curb,.065,true);
  // Retaining sides and end caps extend below water: the promenade cannot float.
  for(const side of[-1,1]){
@@ -36,7 +47,7 @@ async function createSimpleCoastWorld(THREE,c){
  for(let s=start;s<end;s+=spacing)for(const side of[-1,1])kit.rod(at(s,side*7.2,1.05).toArray(),at(Math.min(s+spacing,end),side*7.2,1.05).toArray(),.10,stone,root,6);
  const plaster=[0xd8bf91,0xc99e7d,0xe0d0a9].map(c=>mat(c,{bumpMap:artMaps.stone,bumpScale:.018,roughness:.92})),windowMat=mat(0x293c42,{metalness:.2}),leaf=mat(0x345039),treeGeo=geo(new THREE.SphereGeometry(1,10,8)),roofGeo=geo(new THREE.ConeGeometry(1,1,4));roofGeo.rotateY(Math.PI/4);
  const shutters=[mat(0x426967),mat(0x496078),mat(0x64764d)],awning=mat(0xb84937),linen=mat(0xf1ddab);
- for(let n=0;n<28;n++){
+ for(let n=0;n<(course.cape?0:28);n++){
   if(n%6===0||n%6===2)continue;
   const s=circuit?(n<14?end*.025+n*13:end*.69+(n-14)*12):12+n*10,side=n%2?-1:1,p=at(s,side*(12.5+1.3*Math.sin(n*2))),g=new THREE.Group();g.position.copy(p);g.rotation.y=course.frame(s).angle+side*Math.PI/2;root.add(g);const h=5+n%3;
   box(4,h,3,plaster[n%3],g,0,h/2,0);const roof=kit.add(roofGeo,roofMat,g,0,h+.6,0);roof.scale.set(3.1,1.3,2.5);box(4.2,.18,3.2,stone,g,0,h,0);
@@ -62,12 +73,21 @@ async function createSimpleCoastWorld(THREE,c){
  // Low flower beds frame intermittent views over the water; the seaward cliffs
  // overlap the retaining wall and taper down beneath the waterline.
  const crag=geo(new THREE.IcosahedronGeometry(1,1)),lichen=mat(0xa99679,{map:artMaps.stone,roughness:1});
+ if(course.cape){
+  const basalt=mat(0x52636b,{map:artMaps.stone,roughness:.96});
+  for(let n=0;n<74;n++){
+   const s=end*n/74,side=n%3===0?-1:1,p=at(s,side*(31+8*Math.sin(n*1.7)));
+   const stack=kit.add(crag,basalt,root,p.x,-2,p.z);
+   stack.scale.set(4+2*Math.cos(n),9+5*Math.sin(n*2.3),5+2*Math.sin(n));
+   stack.rotation.y=n*1.1;
+  }
+ }
  const blooms=[0xba3656,0xb55782,0xebad52].map(color=>mat(color));
  for(let j=0;j<33;j++){
   const s=circuit?end*(j+.4)/33:j*10-10;if(bridgeAt(s))continue;const side=j%5===0?-1:1,p=at(s,side*((side===1?shoreWidth(s):19)+2*Math.sin(j)));
   const o=kit.add(crag,lichen,root,p.x,-1.5,p.z);
   o.scale.set(5+2*Math.sin(j*.6),4+.6*Math.sin(j),7);o.rotation.y=j*.71;
-  if(j%3===0)continue;
+  if(course.cape||j%3===0)continue;
   const bed=at(s,side*8.6);
   box(1.2,.38,3.3,stone,root,bed.x,bed.y+.18,bed.z);
   const foliage=kit.add(treeGeo,leaf,root,bed.x,bed.y+.47,bed.z);foliage.scale.set(.62,.38,1.65);
@@ -76,14 +96,14 @@ async function createSimpleCoastWorld(THREE,c){
  // Lateen sails sit in the coves below the raceway.
  const sailShape=new THREE.Shape();sailShape.moveTo(0,.3);sailShape.lineTo(0,3.4);sailShape.lineTo(2,.3);sailShape.closePath();
  const sailGeo=geo(new THREE.ShapeGeometry(sailShape)),canvasMat=mat(0xffedc5,{side:THREE.DoubleSide});
- for(const distance of [37,118,202,262]){
+ for(const distance of (course.cape?[]:[37,118,202,262])){
   const shore=at(circuit?distance*end/300:distance,32+4*Math.sin(distance)),boat=new THREE.Group();root.add(boat);
   boat.position.set(shore.x,-1.88,shore.z);boat.rotation.y=distance*.63;
   kit.add(treeGeo,wood,boat,0,0,0).scale.set(2.2,.35,.65);
   box(.09,3.7,.09,wood,boat,0,1.81,0);kit.add(sailGeo,canvasMat,boat,0,.14,0);
  }
  if(circuit){
-  for(const fraction of [.31,.81]){
+  for(const fraction of (course.cape?[.055,.48,.81]:[.31,.81])){
    const s=end*fraction,sign=course.cape?-1:1,landmark=at(s,sign*28),g=new THREE.Group();
    g.position.set(landmark.x,-2.2,landmark.z);g.rotation.y=course.frame(s).angle;root.add(g);
    if(course.cape){
@@ -116,11 +136,46 @@ async function createSimpleCoastWorld(THREE,c){
  for(const sign of [-1,1])box(.18,6,.18,wood,root,finish.x+sign*6.5,finish.y+3,finish.z);
  // Transverse start/finish markings sit above asphalt rather than intersecting it.
  for(const s of(circuit?[0]:[1,299]))for(let x=-5.5;x<6;x++)for(let z=0;z<2;z++){const p=at(s+z*.5,x);box(1,.025,.5,(Math.round(x+.5)+z)%2?stone:dark,root,p.x,p.y+.05,p.z);}
+ if(circuit){
+  // UVs follow distance along the centre line, so arrows point into the bend.
+  const makeDeck=(ramp)=>{
+   const ink=texture(256,512,(ctx,w,h)=>{
+    ctx.fillStyle=ramp?'#4b3d35':'#125364';ctx.fillRect(0,0,w,h);
+    for(let y=0;y<h;y+=24){ctx.fillStyle=ramp?'#786456':'#217183';ctx.fillRect(0,y,w,3);}
+    ctx.fillStyle=ramp?'#ffb858':'#83ffed';
+    for(const x of [6,w-14])ctx.fillRect(x,0,8,h);
+    ctx.lineWidth=11;ctx.strokeStyle=ramp?'#ffd08a':'#abfff1';
+    for(const y of [112,258,404]){ctx.beginPath();ctx.moveTo(42,y+38);ctx.lineTo(128,y-25);ctx.lineTo(214,y+38);ctx.stroke();}
+   });
+   return mat(0xffffff,{map:ink,roughness:.69,side:THREE.DoubleSide});
+  };
+  const decks={ramp:makeDeck(true),boost:makeDeck(false)};
+  for(const zone of course.features){
+   const positions=[],uv=[],indices=[],half=zone.width/2;
+   for(let i=0;i<=8;i++){
+    const t=i/8,s=zone.start+t*zone.length;
+    for(const side of [-1,1]){
+     const p=at(s,zone.lat+side*half,.055+t*zone.height);positions.push(p.x,p.y,p.z);
+     uv.push((side+1)/2,t);
+    }
+    if(i){const j=i*2;indices.push(j-2,j-1,j,j-1,j+1,j);}
+   }
+   const mesh=geo(new THREE.BufferGeometry());mesh.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));mesh.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));mesh.setIndex(indices);mesh.computeVertexNormals();kit.add(mesh,decks[zone.type],root);
+   if(zone.height){
+    const a=zone.start,b=a+zone.length;
+    for(const side of [-1,1]){
+     const l=zone.lat+side*half,pts=[at(a,l,.045),at(b,l,.045),at(b,l,zone.height+.055)];
+     const g=geo(new THREE.BufferGeometry().setFromPoints(pts));g.setIndex(side<0?[2,1,0]:[0,1,2]);g.computeVertexNormals();kit.add(g,wall,root);
+    }
+    const p=at(b,zone.lat,zone.height/2);box(zone.width,zone.height,.12,dark,root,p.x,p.y,p.z).rotation.y=course.frame(b).angle;
+   }
+  }
+ }
  kit.mergeStatic(root);await yieldTask();
  // The reused city rotates internally by PI. Cancel that rotation before translating it.
  const backdrop=new THREE.Group();backdrop.rotation.y=Math.PI;backdrop.position.z=circuit?45:-210;if(circuit)backdrop.scale.setScalar(.59);scene.add(backdrop);
  const seeded=n=>()=>{n=(n*1664525+1013904223)>>>0;return n/4294967296;};
- const coast=await createProductionCoast(THREE,{scene:backdrop,P:{seeded,WALL:8,trackPoint:()=>({x:640,y:640}),locate:()=>({lat:0})},track:{len:0},scale:1,at:()=>new THREE.Vector3(),models:kit,artMaps,materials,texture,yieldTask});
+ const coast=course.cape?null:await createProductionCoast(THREE,{scene:backdrop,P:{seeded,WALL:8,trackPoint:()=>({x:640,y:640}),locate:()=>({lat:0})},track:{len:0},scale:1,at:()=>new THREE.Vector3(),models:kit,artMaps,materials,texture,yieldTask});
  // Explicit QA only: do not put the full transformed-triangle audit on the phone's startup path.
  function inspectGeometry(){
   scene.updateMatrixWorld(true);let backdropCorridorIntrusions=0,backdropTrianglesChecked=0;const v=new THREE.Vector3();
@@ -145,10 +200,23 @@ async function createSimpleCoastWorld(THREE,c){
   });
   return{backdropTrianglesChecked,backdropCorridorIntrusions,corridorSections:corridors.length};
  }
- const waterMat=new THREE.MeshPhysicalMaterial();materials.add(waterMat);lighting.tuneWater(waterMat);const water=kit.add(geo(new THREE.PlaneGeometry(circuit?1400:700,circuit?1400:700)),waterMat,scene,0,-2,-100);water.rotation.x=-Math.PI/2;water.castShadow=false;
+ const waterMat=new THREE.MeshPhysicalMaterial();materials.add(waterMat);lighting.tuneWater(waterMat);if(course.cape)waterMat.color.setHex(0x345668);const water=kit.add(geo(new THREE.PlaneGeometry(circuit?1400:700,circuit?1400:700)),waterMat,scene,0,-2,-100);water.rotation.x=-Math.PI/2;water.castShadow=false;
+ if(circuit){
+  const ripples=texture(128,128,(ctx,w,h)=>{
+   const pixels=ctx.createImageData(w,h);
+   for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+    const a=x*2*Math.PI/w,b=y*2*Math.PI/h,i=(y*w+x)*4;
+    const grey=128+44*Math.sin(5*b+1.7*Math.sin(2*a))+24*Math.cos(9*b-3*a);
+    pixels.data[i]=pixels.data[i+1]=pixels.data[i+2]=grey;pixels.data[i+3]=255;
+   }
+   ctx.putImageData(pixels,0,0);
+  });
+  ripples.colorSpace=THREE.NoColorSpace;ripples.wrapS=ripples.wrapT=THREE.RepeatWrapping;ripples.repeat.set(105,105);
+  waterMat.bumpMap=ripples;waterMat.bumpScale=.09;
+ }
  const pickupMat=mat(0xd6bd7d,{metalness:.65,roughness:.26,emissive:0x876423,emissiveIntensity:.3}),pickupGeo=geo(new THREE.OctahedronGeometry(.48));
- const colors={turbo:0xe9ae39,shield:0x3ec9ed,magnet:0xb379ef,wave:0xf07361};
+ const colors={turbo:0xe9ae39,shield:0x3ec9ed,magnet:0xb379ef,banana:0xffdc32,rocket:0xfc503c,wave:0xf07361};
  const itemMats=circuit?Object.fromEntries(Object.entries(colors).map(([key,color])=>[key,mat(color,{metalness:.3,roughness:.26,emissive:color,emissiveIntensity:.35})])):{};
  const pickups=course.boxes.flatMap((s,row)=>(circuit?course.lanes(row):[-3.5,0,3.5]).map(lat=>{const object=kit.add(pickupGeo,pickupMat,scene);object.position.copy(at(s,lat,1));return{object,s,row};}));
- return{inspectGeometry,update(time,taken,lap=1){coast.update(time);for(const q of pickups){q.object.visible=!taken.has((lap-1)*course.boxes.length+q.row);q.object.rotation.y=time*1.7;if(circuit)q.object.material=itemMats[course.pickupType(q.row,lap-1)];}}, geometry:{roadStart:start,roadEnd:end,halfWidth:6,supportHalfWidth:19,supportBottom:-3,waterY:-2,backdropOffsetZ:backdrop.position.z,backdropRotationY:Math.PI}};
+ return{inspectGeometry,update(time,taken,lap=1){coast?.update(time);if(waterMat.bumpMap)waterMat.bumpMap.offset.y=time*.055;for(const q of pickups){q.object.visible=!taken.has((lap-1)*course.boxes.length+q.row);q.object.rotation.y=time*1.7;if(circuit)q.object.material=itemMats[course.pickupType(q.row,lap-1)];}}, geometry:{roadStart:start,roadEnd:end,halfWidth:6,supportHalfWidth:19,supportBottom:-3,waterY:-2,backdropOffsetZ:backdrop.position.z,backdropRotationY:Math.PI}};
 }

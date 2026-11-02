@@ -59,8 +59,9 @@ function bindDuel(){
 }
 function moveKart(model,k,time,dt){
  const p=course.point(k.s,k.lat),f=course.frame(k.s);
- model.group.position.set(p.x,p.y+.06,p.z);
+ model.group.position.set(p.x,p.y+.06+(k.lift||0),p.z);
  model.group.rotation.y=f.angle-Math.atan2(k.latV,Math.max(3,k.v));
+ model.body.rotation.x=k.grounded?(k.lift>0?-.13:0):-Math.atan2(k.verticalSpeed||0,Math.max(12,k.v));
  model.body.rotation.z=-k.steer*.055;
  model.shieldEffect.visible=k.shield>0;
  model.itemRing.visible=k.magnet>0||k.waveFlash>0;

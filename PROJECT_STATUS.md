@@ -1,5 +1,23 @@
 # Joyboy – Projektstatus und Übergabe
 
+## 02.11.2026 – Beschleunigungsspuren und Sprungrampen
+
+Je Kurs drei umfahrbare Kombinationen pro Runde. Türkise Pfeile beschleunigen ohne Itemverbrauch; die 1,8 m hohe Rampe führt in eine geschwindigkeitsabhängige Flugbahn mit Landung. 3D- und Kompaktansicht verwenden dieselben Streckendaten. Bewegte Wasserstruktur auf beiden Kursen, zusätzliche Felsschichten am Kap. Alle 205 Tests und Produktionsbuild bestanden. In Edge bei 852 × 393 auf beiden Strecken die erste Linie gefahren: bei abgehobenem Kart 202 km/h mit Turbo im Inventar, anschließend wieder Bodenkontakt. WLAN-Port 60500 bis 19:29 Uhr Berlin. Offen: Ablesbarkeit und Laufruhe auf dem physischen iPhone testen.
+
+## 02.11.2026 – Vier Rennitems und eigene Kulisse am Kap
+
+Welle und Magnet aus allen regulären Boxen entfernt. Die Spielanleitung beschreibt Turbo, Schild, Bananenschale und Zielrakete. Sonnenbucht mit warmem Hafen und Burg, Kap mit eigenem umlaufenden Fjordpanorama, Basaltfelsen, kühlem Licht und frühem Leuchtturm. Beide Starts in Edge bei 852 × 393 gefahren und visuell verglichen. Die Fernberge am Kap erscheinen deutlich stilisiert. 147 App- und 56 Node-Tests sowie Produktionsbuild bestanden. WLAN-Port 60499 bis 19:25 Uhr Berlin. Offen: physische Fahrt auf dem iPhone und Feinzeichnung der fernen Felsflächen.
+
+## 02.11.2026 – Robo-Balance, Angriffsitems und weitere Rennkamera
+
+Robo fährt je nach Abstand mit 91 bis 98,5 Prozent des Spielertempos und wartet mindestens drei Rennsekunden mit dem ersten Item. Bananenschalen treffen beim Überfahren der gegnerischen Spur, Zielraketen verfolgen den Rivalen entlang der Strecke. Schilde fangen beide ab. Modelle, Boxfarben und kompakte Anzeige ergänzt. Kamera von 4,9 auf 7,6 m zurückgezogen, höherer Blickpunkt, neue Rauheitsverteilung auf dem Asphalt und atmosphärische Tiefenstaffelung. Funktionstests inklusive Items und vollständiger App-Suite bestanden. Sichtprüfung in Edge bei 852 × 393: Kart und nächste Kurve im Bild, Startmessung 136 km/h Spieler und 125 km/h Robo. PS4-Grafikniveau nicht nachgewiesen, Umgebung und Panorama bleiben stilisiert. WLAN-Fassung auf Port 60498 geprüft, bis 19:12 Uhr (Berlin). Nächster Schritt: Fahrgefühl und Item-Lesbarkeit auf dem echten iPhone prüfen.
+
+## 02.11.2026 – Schnelleres Rennen gegen Robo
+
+Joyboy und die eigenständige PC-Fassung verwenden gegen Robo 38 m/s Reisegeschwindigkeit und 56 m/s im zweisekündigen Turbo. Beide Karts erhalten dasselbe Profil. Beschleunigung, seitliches Lenken und Kamerablickwinkel angepasst. Simulation über drei Runden ohne Items: Sonnenbucht 131,7 s, Kap 136,7 s. 14 Fahrregeltests und Produktionsbuild bestanden. Edge-Prüfung über Arcade → Kap der Winde → Gegen Robo: 137 km/h regulär und 201 km/h kurz nach Turboeinsatz gemessen. Fahrgefühl auf dem iPhone offen. Nächster Schritt: Spurwechsel zur ersten Itembox im Querformat ausprobieren.
+
+WLAN-Test für das iPhone vorbereitet. Die eigenständige Robo-Fassung auf der Sonnenbucht wurde über die LAN-Adresse geprüft (HTTP 200, Computer-Modus aktiv, passende Dateigröße). WLAN-Sitzung auf Port 60497 erneuert und geprüft, bis 19:07 Uhr (Berlin). Physischer Touch-Test steht aus.
+
 ## PR #24 – CI-Testdatei korrigiert
 
 Zwei Serverprüfungen erzeugen nun ihre eigene HTML-Testdatei. Die bisher vorausgesetzte lokale coast-section.html fehlt in einem frischen Checkout.

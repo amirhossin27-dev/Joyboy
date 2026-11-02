@@ -25,19 +25,49 @@ function createKartCircuit(second=false){
  function point(s,lat=0){const f=frame(s);return{x:f.x+lat*f.nx,y:height(s),z:f.z+lat*f.nz,angle:f.angle};}
  const boxes=Array.from({length:10},(_,i)=>Math.round((i+.40)*lapLength/10));
  const lanes=i=>i%3===0?[-3.4,3.4]:i%3===1?[-2,1]:[0,3.4];
- const materials=['wave','shield','magnet','turbo'];
- return {cape:second,name:second?'Kap der Winde':'Sonnenbucht',lapLength,laps,length:laps*lapLength,frame,point,height,boxes,lanes,halfWidth:6,centreBound:4.5,wrap,
+ // A boost and a ramp form a line; the rest of the road stays open.
+ const features=[];
+ const lines=second?[[100,-2.4],[610,2.6],[1230,-2.6]]:[[90,-2.4],[540,2.6],[1100,-2.6]];
+ for(const [start,lat] of lines){
+  features.push({type:'boost',start,lat,length:15,width:3.2,height:0},
+                {type:'ramp',start:start+38,lat,length:13,width:3.2,height:1.8});
+ }
+ const materials=['rocket','shield','banana','turbo','rocket','banana','turbo','shield','banana','turbo'];
+ return {cape:second,name:second?'Kap der Winde':'Sonnenbucht',lapLength,laps,length:laps*lapLength,features,frame,point,height,boxes,lanes,halfWidth:6,centreBound:4.5,wrap,
   pickupType:(row,lap)=>materials[(row+lap+(second?1:0))%materials.length]};
 }
-const KART_ITEMS={turbo:'Turbo',shield:'Schild',magnet:'Magnet',wave:'Welle'};
+const KART_ITEMS={turbo:'Turbo',shield:'Schild',magnet:'Magnet',wave:'Welle',banana:'Bananenschale',rocket:'Zielrakete'};
+function roboPace(gap){
+ // Give a leading player a close chase and leave a passing opportunity when Robo leads.
+ return .91+.075*Math.max(0,Math.min(1,gap/45));
+}
 function resolveKartWaves(racers,previous){
+ function hit(target,item,seconds){
+  if(target.shield>0){target.shield=0;target.blocked=1.2;return;}
+  target.lastHit=item;target.slow=Math.max(target.slow,seconds);
+ }
  for(let i=0;i<2;i++){
-  const source=racers[i],target=racers[1-i];
-  if((source.stats.itemUses.wave||0)<=previous[i]||target.phase!=='running')continue;
+  const source=racers[i],opponent=racers[1-i],owner=source.k,target=opponent.k;
+  if(opponent.phase!=='running')continue;
   const length=source.courseLength;
-  let gap=Math.abs(source.k.s-target.k.s)%length;gap=Math.min(gap,length-gap);
-  if(gap>85)continue;
-  if(target.k.shield>0){target.k.shield=0;target.k.blocked=1.2;}
-  else target.k.slow=2.2;
+  if((source.stats.itemUses.wave||0)>previous[i]){
+   const gap=Math.abs(owner.s-target.s)%length;
+   if(Math.min(gap,length-gap)<=85)hit(target,'wave',2.2);
+  }
+  if(owner.banana){
+   const peel=owner.banana,start=opponent.stepStart??target.s;
+   const crossing=peel.s+Math.ceil((start-peel.s)/length)*length;
+   if((target.lift||0)<.6 && target.s>=crossing && Math.abs(target.lat-peel.lat)<1.25){
+    hit(target,'banana',2.5);owner.banana=null;
+   }else if(owner.s-peel.s>length)owner.banana=null;
+  }
+  if(owner.rocket){
+   const rocket=owner.rocket,dt=opponent.time-(opponent.stepTime??opponent.time);
+   // Home along the shortest road arc, including across the start line.
+   const delta=((target.s-rocket.s)%length+1.5*length)%length-length*.5;
+   const reach=92*dt;
+   if(Math.abs(delta)<=reach+1){hit(target,'rocket',1.8);owner.rocket=null;}
+   else owner.rocket={s:rocket.s+Math.sign(delta)*reach,lat:rocket.lat+(target.lat-rocket.lat)*(1-Math.exp(-5*dt))};
+  }
  }
 }

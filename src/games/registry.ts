@@ -93,9 +93,9 @@ export const GAMES: GameMeta[] = [
     kind: 'duel', robo: true, levels: false,
     tutorial: [
       { say: 'Das Kart gibt selbst Gas. Ziehe links am Lenkpad oder lenke mit den Pfeiltasten.', art: { k: 'pics', items: ['🦊', '🏎️'], caption: 'Links und rechts lenken' } },
-      { say: 'Sammle farbige Boxen. Mit E oder der Item-Taste setzt du Turbo, Schild, Magnet oder Welle ein.', art: { k: 'pics', items: ['⚡', '🏁'], caption: 'Wer nach drei Runden zuerst im Ziel ist, gewinnt' } },
-      { say: 'Die Welle bremst den Gegner im Umkreis von 85 Metern. Der Schild wehrt eine Welle ab und löst eine laufende Bremse.', art: { k: 'pics', items: ['🌊','🛡️'], caption: 'Welle und Schild' } },
-      { say: 'Der Magnet sammelt zwölf Sekunden lang Boxen aus jeder Spur. Turbo gibt dir einen kurzen Geschwindigkeitsschub.', art: { k: 'pics', items: ['🧲','⚡'], caption: 'Magnet und Turbo' } },
+      { say: 'Sammle farbige Boxen. Mit E oder der Item-Taste setzt du Turbo, Schild, Bananenschale oder Zielrakete ein.', art: { k: 'pics', items: ['⚡', '🏁'], caption: 'Wer nach drei Runden zuerst im Ziel ist, gewinnt' } },
+      { say: 'Lege die Bananenschale in deiner Spur ab. Wer hinter dir darüberfährt, wird langsamer. Der Schild fängt einen Treffer ab.', art: { k: 'pics', items: ['🍌','🛡️'], caption: 'Bananenschale und Schild' } },
+      { say: 'Die Zielrakete verfolgt das andere Kart. Mit dem Turbo beschleunigst du zum Überholen.', art: { k: 'pics', items: ['🚀','⚡'], caption: 'Zielrakete und Turbo' } },
     ],
   },
   {

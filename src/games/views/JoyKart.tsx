@@ -83,6 +83,6 @@ export function JoyKart(props: PlayProps) {
     }, 32);
     return () => window.clearInterval(interval);
   }, []);
-  return <iframe ref={frame} title="Joy-Kart · Sonnenküste" src={track + (((props.level === 1 ? 1 : 0) + props.starter) % 2 === 1 ? '#joyboy-kap' : '#joyboy-bucht')} onLoad={() => frame.current?.focus()}
+  return <iframe ref={frame} title="Joy-Kart · Sonnenküste" src={track + (props.seats.some(seat => seat.robo) ? '#joyboy-robo-' : '#joyboy-') + (((props.level === 1 ? 1 : 0) + props.starter) % 2 === 1 ? 'kap' : 'bucht')} onLoad={() => frame.current?.focus()}
     style={{ display: 'block', border: 0, width: '100%', height: '100%', minHeight: 180, background: '#102637' }} />;
 }

@@ -1,4 +1,4 @@
-import { getData, setData, type Counters, type Profile } from './store';
+import { getData, setData, type Counters, type KartCourse, type Profile } from './store';
 import { dayKey, weekKey } from './util';
 
 // ───── Level ─────
@@ -76,6 +76,7 @@ export interface PlayResult {
   /** Mit anderen Kindern gespielt */
   together: boolean;
   logic: boolean;
+  kartLap?: { course: KartCourse; seconds: number };
   /** Solo-Wertung */
   score?: number;
   lowerIsBetter?: boolean;
@@ -102,6 +103,16 @@ export function applyResult(p: Profile, r: PlayResult): { profile: Profile; out:
     newRecord = better;
     if (best === undefined || better) best = r.score;
   }
+  let kartLaps = stat.kartLaps;
+  if (r.game === 'joykart' && r.kartLap && Number.isFinite(r.kartLap.seconds) && r.kartLap.seconds > 0) {
+    const { course, seconds } = r.kartLap;
+    const lap = Math.round(seconds * 100) / 100;
+    const previous = kartLaps?.[course];
+    if (previous === undefined || lap < previous) {
+      kartLaps = { ...kartLaps, [course]: lap };
+      newRecord = previous !== undefined;
+    }
+  }
   const counters: Counters = { ...p.counters };
   if (r.subject && r.correct) counters[r.subject] += r.correct;
   if (r.together) counters.together++;
@@ -120,7 +131,7 @@ export function applyResult(p: Profile, r: PlayResult): { profile: Profile; out:
     week,
     learnDay,
     counters,
-    games: { ...p.games, [r.game]: { played: stat.played + 1, won: stat.won + (r.won ? 1 : 0), best, stars: Math.max(stat.stars, r.stars) } },
+    games: { ...p.games, [r.game]: { ...(kartLaps && { kartLaps }), played: stat.played + 1, won: stat.won + (r.won ? 1 : 0), best, stars: Math.max(stat.stars, r.stars) } },
   };
   const { profile, earned } = withBadges(next);
   return { profile, out: { newRecord, earned, starsGained: gained, levelUp: levelOf(profile.stars).level > levelOf(p.stars).level } };

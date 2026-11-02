@@ -7,7 +7,7 @@ function createCoastSimpleModule(circuit=null,fastRace=false){
  const course=circuit||{length:LENGTH,halfWidth:6,centreBound:BOUND,frame,point,height,boxes:[60,145,235]};
  class SimpleRace{
   constructor(){this.courseLength=course.lapLength||LENGTH;this.reset();}
-  reset(){this.phase='ready';this.previousPhase='running';this.time=0;this.countdown=3;this.accumulator=0;this.queued=false;this.events=[];this.taken=new Set();this.edge=false;this.k={s:0,lat:0,latV:0,v:0,y:course.height(0),steer:0,boost:0,shield:0,magnet:0,slow:0,blocked:0,waveFlash:0,banana:null,rocket:null,lastHit:null,item:'turbo',grounded:true,lift:0,verticalSpeed:0,route:'main',routeProof:null};this.stats={turboUses:0,edgeTouches:0,boxes:0,itemUses:{turbo:0}};}
+  reset(){this.phase='ready';this.previousPhase='running';this.time=0;this.countdown=3;this.accumulator=0;this.queued=false;this.events=[];this.taken=new Set();this.edge=false;this.k={s:0,lat:0,latV:0,v:0,y:course.height(0),steer:0,boost:0,shield:0,magnet:0,slow:0,blocked:0,waveFlash:0,banana:null,rocket:null,lastHit:null,item:'turbo',grounded:true,lift:0,verticalSpeed:0,route:'main',routeProof:null};this.k.gateChain=0;this.stats={lines:0,lapEnds:{},turboUses:0,edgeTouches:0,boxes:0,itemUses:{turbo:0}};}
   begin(){this.reset();this.phase='countdown';}
   pause(){if(!['running','countdown'].includes(this.phase))return;this.previousPhase=this.phase;this.phase='paused';this.accumulator=0;this.queued=false;this.k.latV=0;this.k.steer=0;}
   resume(){if(this.phase==='paused'){this.phase=this.previousPhase;this.accumulator=0;}}
@@ -56,6 +56,20 @@ function createCoastSimpleModule(circuit=null,fastRace=false){
      if(k.grounded && previousLift>k.lift+.15){k.lift=previousLift;k.verticalSpeed=0;k.grounded=false;}
     }
     k.y+=k.lift;
+    for(const gate of course.gates){
+     const mark=offset+gate.s;
+     if(oldS>=mark || k.s<mark)continue;
+     const inside=Math.abs(k.lat-gate.lat)<=gate.halfWidth;
+     k.gateChain=inside && (gate.index===0 || k.gateChain===gate.index)?gate.index+1:0;
+     if(k.gateChain===3){
+      this.stats.lines=(this.stats.lines||0)+1;
+      k.boost=Math.max(k.boost,1.65);
+      k.gateChain=0;
+     }
+    }
+    if(k.s>=(lap+1)*this.courseLength){
+     (this.stats.lapEnds??={})[lap+1]=this.time;
+    }
    }
    for(const [row,mark] of course.boxes.entries()){
     const id=lap*course.boxes.length+row;
@@ -67,7 +81,7 @@ function createCoastSimpleModule(circuit=null,fastRace=false){
    }
    if(k.s>=LENGTH){k.routeProof='main';this.phase='finished';this.events.push('finished');}
   }
-  snapshot(){const k=this.k;return{phase:this.phase,time:this.time,countdown:this.countdown,...k,progress:k.s/LENGTH,speedKmh:Math.round(k.v*3.6),lap:Math.min(course.laps||1,Math.floor(k.s/this.courseLength)+1),lapLength:this.courseLength,totalLaps:course.laps||1,position:course.point(k.s,k.lat),assistedSteering:true,stats:{...this.stats,itemUses:{...this.stats.itemUses}}};}
+  snapshot(){const k=this.k;return{phase:this.phase,time:this.time,countdown:this.countdown,...k,progress:k.s/LENGTH,speedKmh:Math.round(k.v*3.6),lap:Math.min(course.laps||1,Math.floor(k.s/this.courseLength)+1),lapLength:this.courseLength,totalLaps:course.laps||1,position:course.point(k.s,k.lat),assistedSteering:true,stats:{...this.stats,lapEnds:{...this.stats.lapEnds},itemUses:{...this.stats.itemUses}}};}
  }
  return{SimpleRace,course,STEP,SPEED,clamp};
 }

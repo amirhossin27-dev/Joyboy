@@ -406,6 +406,22 @@ describe('Fortschritt', () => {
     expect(levelOf(24).toNext).toBe(1);
   });
 
+  it('merkt sich Kart-Runden je Kurs und zählt erst eine verbesserte Zeit als Rekord', () => {
+    let p = newProfile({ name: 'Fuchs', avatar: 'fuchs', color: '#fea', age: 2 });
+    const race = (course: 'kap' | 'bucht', seconds: number) => {
+      const result = applyResult(p, { profileId: p.id, game: 'joykart', stars: 2, won: false, together: false, logic: false, kartLap: { course, seconds } });
+      p = result.profile;
+      return result.out.newRecord;
+    };
+    expect(race('kap', 43.212)).toBe(false);
+    expect(race('kap', 43.209)).toBe(false);
+    expect(race('bucht', 42.5)).toBe(false);
+    expect(race('kap', 43.1)).toBe(true);
+    expect(race('kap', 44)).toBe(false);
+    expect(p.games.joykart.kartLaps).toEqual({ kap: 43.1, bucht: 42.5 });
+    expect(p.counters.records).toBe(1);
+  });
+
   it('Platzierungen teilen sich bei Gleichstand', () => {
     expect(placesFromScores([10, 20, 20, 5])).toEqual([3, 1, 1, 4]);
   });

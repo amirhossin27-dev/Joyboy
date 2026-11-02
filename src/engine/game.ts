@@ -1,5 +1,5 @@
 import type { AvatarKind } from '../lib/names';
-import type { Level } from '../lib/store';
+import type { KartCourse, Level } from '../lib/store';
 import type { Rnd } from '../lib/util';
 
 /**
@@ -36,6 +36,9 @@ export interface Outcome {
   places: number[];
   /** Punkte je Sitz, falls das Spiel welche zählt */
   scores?: number[];
+  /** Beste Rundenzeit und Bonuslinien der Kartfahrer */
+  kartRoboCourse?: KartCourse;
+  kart?: { bestLap?: number; lines: number }[];
   /** Solo-Wertung für Rekorde */
   solo?: { score: number; failed?: boolean };
   /** Richtige Antworten je Sitz (Lernspiele) und wie viele Fragen jeder hatte */

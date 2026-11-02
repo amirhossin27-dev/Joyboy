@@ -1,5 +1,9 @@
 # Joyboy – Projektstatus und Übergabe
 
+## PR #24 – CI-Testdatei korrigiert
+
+Zwei Serverprüfungen erzeugen nun ihre eigene HTML-Testdatei. Die bisher vorausgesetzte lokale coast-section.html fehlt in einem frischen Checkout.
+
 ## PR #24 – main übernommen
 
 Konflikt in Room.tsx gelöst. Aktuelle Sprachausgabe mit canSpeak sowie Kart-Streckenwahl und Lernfreischaltung kombiniert. Tests und Produktionsbuild des zusammengeführten Stands bestanden.

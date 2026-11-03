@@ -2,7 +2,7 @@
 
 ## 02.11.2026 – Joy-Kart · Horizont, Rückblick und Zielfahrt
 
-Review-Branch `codex/joy-kart-rueckblick` auf dem nach PR #25 aktualisierten `main`. Der Review umfasst beide nachfolgenden Kart-Etappen.
+[PR #26](https://github.com/amirhossin27-dev/Joyboy/pull/26) am 03.11.2026 erstellt. Review-Branch `codex/joy-kart-rueckblick` auf dem nach PR #25 aktualisierten `main`. Der PR umfasst beide nachfolgenden Kart-Etappen.
 
 Beide Kurse verwenden 3690 Pixel breite Horizontstreifen. Gedrückter Rückblickknopf oder R zeigt die Strecke hinter dem Kart. Im Ziel läuft eine rein visuelle Ausrollfahrt mit feststehender Zielzeit bis zur Ergebnisanzeige. Produktionsbuild, 148 App- und 63 Node-Tests bestanden. Edge und WebKit im Handyformat mit beiden 3D-Kursen, Kompaktansicht, Rückblick und Zielfahrt geprüft. Zwei gleichzeitige Touchpunkte und Unterbrechung in Edge geprüft. Spielzimmer mit zwei lokalen Sitzungen bis zur Revanche bestanden. Physische Sicht- und Bedienprüfung am iPhone 15 offen. [Entwicklungsjournal und Fahrbilder](kart_dev.md).
 

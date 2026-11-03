@@ -1,5 +1,15 @@
 # Joyboy – Projektstatus und Übergabe
 
+## 02.11.2026 – Joy-Kart · Horizont, Rückblick und Zielfahrt
+
+[PR #26](https://github.com/amirhossin27-dev/Joyboy/pull/26) am 03.11.2026 erstellt. Review-Branch `codex/joy-kart-rueckblick` auf dem nach PR #25 aktualisierten `main`. Der PR umfasst beide nachfolgenden Kart-Etappen.
+
+Beide Kurse verwenden 3690 Pixel breite Horizontstreifen. Gedrückter Rückblickknopf oder R zeigt die Strecke hinter dem Kart. Im Ziel läuft eine rein visuelle Ausrollfahrt mit feststehender Zielzeit bis zur Ergebnisanzeige. Produktionsbuild, 148 App- und 63 Node-Tests bestanden. Edge und WebKit im Handyformat mit beiden 3D-Kursen, Kompaktansicht, Rückblick und Zielfahrt geprüft. Zwei gleichzeitige Touchpunkte und Unterbrechung in Edge geprüft. Spielzimmer mit zwei lokalen Sitzungen bis zur Revanche bestanden. Physische Sicht- und Bedienprüfung am iPhone 15 offen. [Entwicklungsjournal und Fahrbilder](kart_dev.md).
+
+## 02.11.2026 – Joy-Kart · Bonuslinien und Rundenzeiten
+
+Bonuslinien, Torhinweise, Rundenzeiten und persönliche Profilbestzeiten je Robo-Kurs eingebaut. Beide Kurse mit eigener Brücke und Vegetation, das Kap mit gemaltem Fjordpanorama. Kompaktkamera mit 135 m Voraussicht, Motor- und Ereignistöne in Joyboy, adaptive 3D-Auflösung. 148 App- und 63 Node-Tests sowie Produktionsbuild bestanden. Bilder der ausgelieferten Fassung bei 852 × 283 geprüft. Vollständige Kap-Fahrt im App-Katalog mit gespeicherter Bestzeit und Revanche, zwei gleichzeitige Edge-Touchpunkte und WebKit-Start im iPhone-15-Profil mit Touch-Turbo bestanden. Das Spielzimmer wurde mit zwei getrennten lokalen Apps bis Ergebnis und Revanche geprüft. Physischer iPhone-15-Test und Vergleich der Bildzeiten stehen aus. [Entwicklungsjournal, Start und Prüfpfade](kart_dev.md).
+
 ## 02.11.2026 – Beschleunigungsspuren und Sprungrampen
 
 Je Kurs drei umfahrbare Kombinationen pro Runde. Türkise Pfeile beschleunigen ohne Itemverbrauch; die 1,8 m hohe Rampe führt in eine geschwindigkeitsabhängige Flugbahn mit Landung. 3D- und Kompaktansicht verwenden dieselben Streckendaten. Bewegte Wasserstruktur auf beiden Kursen, zusätzliche Felsschichten am Kap. Alle 205 Tests und Produktionsbuild bestanden. In Edge bei 852 × 393 auf beiden Strecken die erste Linie gefahren: bei abgehobenem Kart 202 km/h mit Turbo im Inventar, anschließend wieder Bodenkontakt. WLAN-Port 60500 bis 19:29 Uhr Berlin. Offen: Ablesbarkeit und Laufruhe auf dem physischen iPhone testen.

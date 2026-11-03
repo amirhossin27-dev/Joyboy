@@ -6,7 +6,8 @@ header,.js-speed,.js-count,.js-controls,.js-overlay{position:absolute}header{top
 button{font:inherit;border:0;background:#ffe297;color:#262f38;padding:12px 20px;border-radius:14px;touch-action:none}button:disabled{opacity:.65}
 .js-controls{bottom:max(14px,env(safe-area-inset-bottom));left:5%;right:5%;display:flex;justify-content:space-between}.js-controls button{min-height:60px}
 .js-count{top:32%;width:100%;text-align:center;font-size:48px}.js-speed{bottom:14px;width:100%;text-align:center;pointer-events:none}[hidden]{display:none!important}
-</style><main id="joy-kart-simple"><canvas></canvas><header>Sonnenküste · Kompakt</header><div class="js-overlay"><div class="panel"><h2>Joy-Kart</h2><p>Der Spielserver ist erreichbar. Links ziehen zum Lenken, rechts Turbo tippen.</p><button data-action="start">Beitreten</button><a href="./3d">Zur 3D-Ansicht</a></div></div><div class="js-controls" hidden><button data-control="pad" aria-label="Lenken">↔ Lenken</button><button data-action="turbo">Turbo</button></div><div class="js-speed" hidden></div><div class="js-count" hidden></div></main><script>
+.js-rear{position:absolute;right:5%;bottom:90px;min-height:44px;padding:5px 12px;display:grid;justify-items:center}.js-rear[aria-pressed=true]{background:#94ffe0}.js-finish-note{position:absolute;top:24%;left:50%;transform:translateX(-50%);background:#172c3d;padding:5px 12px;border-radius:8px}
+</style><main id="joy-kart-simple"><canvas></canvas><header>Sonnenküste · Kompakt</header><div class="js-overlay"><div class="panel"><h2>Joy-Kart</h2><p>Der Spielserver ist erreichbar. Links ziehen zum Lenken, rechts Turbo tippen.</p><button data-action="start">Beitreten</button><a href="./3d">Zur 3D-Ansicht</a></div></div><button class="js-rear" type="button" data-action="rear" aria-label="Rückblick halten (R)" aria-pressed="false" title="Für Rückblick halten · R" hidden><svg width="24" height="16" viewBox="0 0 30 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2h6m-3 0v4"/><rect x="2" y="6" width="26" height="12" rx="5"/><path d="m7 14 4-4"/></svg><small>Rückblick</small></button><div class="js-finish-note" role="status" hidden></div><div class="js-controls" hidden><button data-control="pad" aria-label="Lenken">↔ Lenken</button><button data-action="turbo">Turbo</button></div><div class="js-speed" hidden></div><div class="js-count" hidden></div></main><script>
 const root=document.querySelector('main'),find=q=>root.querySelector(q),keys=new Set(),held=new Map(),clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 function clear(){keys.clear();held.clear();}
 function input(){let s=Number(keys.has('KeyD')||keys.has('ArrowRight'))-Number(keys.has('KeyA')||keys.has('ArrowLeft'));for(const p of held.values())s+=p.value;return clamp(s,-1,1);}
@@ -18,8 +19,8 @@ bindDuel();
 const canvas=find('canvas'),ctx=canvas.getContext('2d');
 /*@@COMPACT_ROAD@@*/
 function paint(){
- drawCompactRoad(canvas,ctx,packet,course);
- const me=packet?.me;
+ const view=renderPacket(performance.now());drawCompactRoad(canvas,ctx,view,course,lookingBack());
+ const me=view?.me;
  if(me){find('.js-speed').textContent='Runde '+me.lap+' / 3 · '+me.speedKmh+' km/h';find('[data-action="turbo"]').textContent=KART_ITEMS[me.item]||'Box sammeln';find('[data-action="turbo"]').disabled=!me.item||me.phase!=='running';}
  requestAnimationFrame(paint);
 }

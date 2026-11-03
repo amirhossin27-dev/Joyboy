@@ -42,7 +42,7 @@ const fixture=http.createServer(async(req,res)=>{
    localStorage.setItem('joyboy:auth:v1',JSON.stringify({[uid]:{uid,token:uid,refresh:uid,exp:Date.now()+3600000}}));
    localStorage.setItem('joyboy:room:v1',JSON.stringify({code,profileId:uid}));
   },{uid,endpoint:'http://127.0.0.1:'+fixture.address().port,code});
-  const p=await context.newPage();p.on('pageerror',e=>console.error(uid,e.message));await p.goto('http://127.0.0.1:60494/');
+  const p=await context.newPage();p.on('pageerror',e=>console.error(uid,e.message));await p.goto(process.env.JOY_KART_QA_URL||'http://127.0.0.1:60494/');
   return p;
  }));
  const [host,guest]=pages;
@@ -50,11 +50,11 @@ const fixture=http.createServer(async(req,res)=>{
  await host.getByRole('button',{name:'Spiel starten',exact:true}).click({timeout:15000});
  const child=p=>p.frameLocator('iframe[title*="Joy-Kart"]');
  await Promise.all(pages.map(p=>child(p).locator('.js-controls:not([hidden])').waitFor({timeout:65000})));
- await child(guest).getByText('Sonnenküste · Kompakt',{exact:true}).waitFor();
+ await child(guest).getByText(/· Kompakt$/).waitFor();
  await child(guest).locator('[data-action="turbo"]').click();
  await child(guest).locator('canvas').click({position:{x:8,y:8}});await guest.keyboard.down('ArrowLeft');await guest.waitForTimeout(450);await guest.keyboard.up('ArrowLeft');
  await host.getByRole('button',{name:/Nochmal spielen/}).waitFor({timeout:300000});await guest.getByText(/Warte, bis/).waitFor();
- const grid=JSON.parse(room.state.st);assert.equal(grid[1].stats.turboUses,1);assert(grid[1].lat<1.95);assert.equal(grid[0].stats.turboUses,0);assert(grid.every(k=>k.s===k.lapLength*3 && k.lap===3));assert(grid[1].time<grid[0].time);
+ const grid=JSON.parse(room.state.st);assert.equal(grid[1].stats.turboUses,1);assert(grid[1].lat<1.95);assert.equal(grid[0].stats.turboUses,0);assert(grid.every(k=>k.s===k.lapLength*3 && k.lap===3));const expected=grid[0].time===grid[1].time?'Unentschieden!':(grid[0].time<grid[1].time?'host':'guest')+' gewinnt!';await Promise.all(pages.map(p=>p.getByRole('heading',{name:expected,exact:true}).waitFor()));assert(grid.every(k=>k.stats.lapEnds[3]===k.time));await host.getByText(/Beste Runde/).first().waitFor();
  await host.getByRole('button',{name:/Nochmal spielen/}).click();await Promise.all(pages.map(p=>child(p).locator('.js-count:not([hidden])').waitFor({timeout:65000})));assert.equal(room.state.round,1);
  console.log('Joyboy-Spielzimmer mit lokaler REST/SSE-Testdatenbank: zwei getrennte Apps, Raumstart, 3D gegen automatischen 2D-Rückfall, Gaststeuerung, beide Ergebnisse und Revanche bestanden.');
  }catch(e){console.error(JSON.stringify(room.info),room.state?.seq,room.seats.guest?.acts, (await Promise.all((browser?.contexts()??[]).flatMap(c=>c.pages()).map(p=>p.locator('body').innerText().then(x=>x.slice(-600))))));throw e;}

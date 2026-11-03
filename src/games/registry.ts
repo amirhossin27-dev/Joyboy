@@ -94,6 +94,7 @@ export const GAMES: GameMeta[] = [
     tutorial: [
       { say: 'Das Kart gibt selbst Gas. Ziehe links am Lenkpad oder lenke mit den Pfeiltasten.', art: { k: 'pics', items: ['🦊', '🏎️'], caption: 'Links und rechts lenken' } },
       { say: 'Sammle farbige Boxen. Mit E oder der Item-Taste setzt du Turbo, Schild, Bananenschale oder Zielrakete ein.', art: { k: 'pics', items: ['⚡', '🏁'], caption: 'Wer nach drei Runden zuerst im Ziel ist, gewinnt' } },
+      { say: 'Fahre durch drei mintgrüne Tore hintereinander. Dafür bekommst du Extraschub. Halte Rückblick oder die Taste R, um hinter dein Kart zu schauen.', art: { k: 'pics', items: ['🏎️','⚡'], caption: 'Drei Tore für Extraschub' } },
       { say: 'Lege die Bananenschale in deiner Spur ab. Wer hinter dir darüberfährt, wird langsamer. Der Schild fängt einen Treffer ab.', art: { k: 'pics', items: ['🍌','🛡️'], caption: 'Bananenschale und Schild' } },
       { say: 'Die Zielrakete verfolgt das andere Kart. Mit dem Turbo beschleunigst du zum Überholen.', art: { k: 'pics', items: ['🚀','⚡'], caption: 'Zielrakete und Turbo' } },
     ],

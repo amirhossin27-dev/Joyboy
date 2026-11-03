@@ -32,8 +32,16 @@ function createKartCircuit(second=false){
   features.push({type:'boost',start,lat,length:15,width:3.2,height:0},
                 {type:'ramp',start:start+38,lat,length:13,width:3.2,height:1.8});
  }
+ // Two slaloms alternate lanes. At top speed each change allows over a second.
+ const gates=(second?[[245,1],[865,-1]]:[[205,-1],[805,1]]).flatMap(([start,side])=>
+  [side,-side,side].map((direction,index)=>({s:start+index*60,lat:direction*2.55,halfWidth:1.75,index})));
+ // Painted dashes trace the approach to the opening, including the lane change.
+ const gateMarks=gates.flatMap((gate,i)=>[32,24,16,8].map(distance=>{
+  const from=gate.index?gates[i-1].lat:gate.lat;
+  return {s:gate.s-distance,lat:gate.lat+(from-gate.lat)*distance/60};
+ }));
  const materials=['rocket','shield','banana','turbo','rocket','banana','turbo','shield','banana','turbo'];
- return {cape:second,name:second?'Kap der Winde':'Sonnenbucht',lapLength,laps,length:laps*lapLength,features,frame,point,height,boxes,lanes,halfWidth:6,centreBound:4.5,wrap,
+ return {cape:second,name:second?'Kap der Winde':'Sonnenbucht',lapLength,laps,length:laps*lapLength,features,gates,gateMarks,frame,point,height,boxes,lanes,halfWidth:6,centreBound:4.5,wrap,
   pickupType:(row,lap)=>materials[(row+lap+(second?1:0))%materials.length]};
 }
 const KART_ITEMS={turbo:'Turbo',shield:'Schild',magnet:'Magnet',wave:'Welle',banana:'Bananenschale',rocket:'Zielrakete'};

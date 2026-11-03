@@ -40,6 +40,44 @@ async function createSimpleCoastWorld(THREE,c){
    const p=at(s);box(14,.85,2.2,stone,root,p.x,p.y-.8,p.z).rotation.y=course.frame(s).angle;
   }
  }
+ if(circuit){
+  const enamel=mat(course.cape?0xa34932:0x327273,{roughness:.58,metalness:.25});
+  const pale=mat(course.cape?0xdbe3df:0xe5c894,{roughness:.72});
+  const cable=mat(0x405663,{metalness:.45,roughness:.52});
+  const towers=[end*.45,end*.54],span=towers[1]-towers[0],sideOffset=7.65;
+  const rod=(a,b,r,m)=>kit.rod(a.toArray(),b.toArray(),r,m,root,6);
+  for(const s of towers){
+   const tower=new THREE.Group(),p=at(s);
+   tower.position.copy(p);tower.rotation.y=course.frame(s).angle;root.add(tower);
+   for(const side of [-1,1]){
+    box(1.3,1.2,2.4,stone,tower,side*sideOffset,.6,0);
+    box(.64,10,1.15,enamel,tower,side*sideOffset,5.9,0);
+    box(.86,.38,1.48,pale,tower,side*sideOffset,10.95,0);
+   }
+   box(2*sideOffset,.48,.92,enamel,tower,0,9.9,0);
+   for(const side of [-1,1])rod(at(s,side*sideOffset,7.2),at(s,side*(sideOffset-2.6),9.75),.21,enamel);
+  }
+  // Follow the curved deck with both cables. All hangers stay beyond the kerbs.
+  for(const side of [-1,1]){
+   let last;
+   for(let i=-5;i<=21;i++){
+    const u=i/16,s=towers[0]+span*u;
+    const y=u<0?10.8+u*26:u>1?10.8-(u-1)*26:4.1+6.7*(2*u-1)**2;
+    const tip=at(s,side*sideOffset,y);
+    if(last)rod(last,tip,.115,cable);
+    if(i%2===0 && i!==0 && i!==16)rod(at(s,side*sideOffset,.5),tip,.055,pale);
+    last=tip;
+   }
+  }
+  const banner=texture(512,96,(ctx,w,h)=>{
+   ctx.fillStyle=course.cape?'#873d30':'#155153';ctx.fillRect(0,0,w,h);
+   ctx.fillStyle='#f4dca2';ctx.fillRect(0,h-7,w,7);
+   ctx.fillStyle='#fff6df';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='bold 51px sans-serif';
+   ctx.fillText(course.cape?'FJORDPASS':'HAFENBRÜCKE',w/2,h*.49);
+  });
+  const sign=kit.add(geo(new THREE.PlaneGeometry(8.7,1.6)),mat(0xffffff,{map:banner,side:THREE.DoubleSide}),root);
+  sign.position.copy(at(towers[0],0,9.3));sign.rotation.y=course.frame(towers[0]).angle+Math.PI;
+ }
  const spacing=circuit?6.5:2.5;
  const railGeo=geo(new THREE.LatheGeometry([new THREE.Vector2(.14,0),new THREE.Vector2(.14,.1),new THREE.Vector2(.07,.2),new THREE.Vector2(.12,.5),new THREE.Vector2(.075,.9),new THREE.Vector2(.15,1)],8)),posts=new THREE.InstancedMesh(railGeo,stone,2*(Math.ceil((end-start)/spacing)+1)),dummy=new THREE.Object3D();let i=0;
  for(let s=start;s<=end;s+=spacing)for(const side of[-1,1]){dummy.position.copy(at(s,side*7.2));dummy.updateMatrix();posts.setMatrixAt(i++,dummy.matrix);}
@@ -66,7 +104,28 @@ async function createSimpleCoastWorld(THREE,c){
   }
   box(.48,1.35,.52,plaster[n%3],g,1.08,h+.86,-.4);box(.64,.12,.68,roofMat,g,1.08,h+1.53,-.4);
  }
- for(let s=4;s<(circuit?end:310);s+=circuit?17:9)for(const side of[-1,1]){if(bridgeAt(s)||(side===1&&s%45<27))continue;const p=at(s,side*(9.4+Math.sin(s)*.6));box(.17,3,.17,wood,root,p.x,p.y+1.5,p.z);for(let tier=0;tier<3;tier++){
+ // Two crossed foliage cards keep branch detail visible as the player passes a tree.
+ let treeCard,foliage;
+ if(artMaps.foliage){
+  treeCard=geo(new THREE.PlaneGeometry(1,1));
+  foliage=new THREE.MeshBasicMaterial({map:artMaps.foliage,alphaTest:.40,side:THREE.DoubleSide,color:0xf0f3ee});
+  materials.add(foliage);
+ }
+ for(let s=4;s<(circuit?end:310);s+=circuit?17:9)for(const side of [-1,1]){
+  if(bridgeAt(s)||(side===1&&s%45<27))continue;
+  const p=at(s,side*(9.4+Math.sin(s)*.6));
+  if(treeCard){
+   const height=(course.cape?5.9:4.9)+1.1*Math.cos(s*.3+side);
+   const image=artMaps.foliage.image,width=height*image.width/image.height;
+   const heading=course.frame(s).angle+.30*Math.sin(s*side);
+   for(const angle of [heading,heading+Math.PI/2]){
+    const card=kit.add(treeCard,foliage,root,p.x,p.y+height/2,p.z);
+    card.scale.set(width,height,1);card.rotation.y=angle;
+   }
+   continue;
+  }
+  box(.17,3,.17,wood,root,p.x,p.y+1.5,p.z);
+  for(let tier=0;tier<3;tier++){
    const crown=kit.add(treeGeo,leaf,root,p.x+.11*Math.sin(s+tier),p.y+1.72+tier*1.12,p.z+.07*Math.cos(tier+s));
    crown.scale.set(.76-tier*.18,1.36-tier*.13,.68-tier*.14);
   }}
@@ -149,6 +208,23 @@ async function createSimpleCoastWorld(THREE,c){
    });
    return mat(0xffffff,{map:ink,roughness:.69,side:THREE.DoubleSide});
   };
+  // Open illuminated arches share a single static material batch on the phone.
+  const archInk=mat(0x70ffe0,{emissive:0x098e80,roughness:.38,side:THREE.DoubleSide});
+  const archGeo=geo(new THREE.TorusGeometry(1,.065,6,24,Math.PI));
+  for(const mark of course.gateMarks){
+   const p=at(mark.s,mark.lat,.069);
+   const dash=box(.23,.018,1.6,archInk,root,p.x,p.y,p.z);
+   dash.rotation.y=course.frame(mark.s).angle;
+  }
+  for(const gate of course.gates){
+   const center=at(gate.s,gate.lat,.08),arch=kit.add(archGeo,archInk,root);
+   arch.position.copy(center);arch.rotation.y=course.frame(gate.s).angle;
+   arch.scale.set(gate.halfWidth,2.9,1);
+   for(const side of [-1,1]){
+    const foot=at(gate.s,gate.lat+side*gate.halfWidth,.13);
+    box(.38,.22,.65,dark,root,foot.x,foot.y,foot.z).rotation.y=arch.rotation.y;
+   }
+  }
   const decks={ramp:makeDeck(true),boost:makeDeck(false)};
   for(const zone of course.features){
    const positions=[],uv=[],indices=[],half=zone.width/2;

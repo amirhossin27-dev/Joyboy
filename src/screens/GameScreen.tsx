@@ -70,7 +70,9 @@ export function GameScreen({ session, net, online }: { session: Session; net?: N
     const results: PlayResult[] = [];
     session.seats.forEach((s, i) => {
       if (!s.profileId) return;
+      const lap = o.kart?.[i]?.bestLap;
       results.push({
+        kartLap: o.kartRoboCourse && lap !== undefined ? { course: o.kartRoboCourse, seconds: lap } : undefined,
         profileId: s.profileId,
         game: meta.id,
         stars: stars[i],
@@ -252,6 +254,8 @@ function ResultCard({
                   <Avatar kind={seats[i].avatar} size={place === 1 ? 54 : 44} bg={seats[i].color} ring={place === 1 ? '#F2C94C' : undefined} />
                   <span>{seats[i].name}</span>
                   <span className="muted small">{scoreText(i)}</span>
+                  {outcome.kart?.[i]?.bestLap !== undefined && <span className="small">Beste Runde {outcome.kart[i].bestLap!.toFixed(2).replace('.', ',')} s</span>}
+                  {outcome.kart && <span className="small">{outcome.kart[i].lines} / 6 Bonuslinien</span>}
                   <span className="block" style={{ height: heights[Math.min(3, place - 1)], background: blockColor[Math.min(3, place - 1)] }}>
                     {place}
                   </span>
@@ -268,6 +272,7 @@ function ResultCard({
               <div className="grow">
                 <b className="display">{s.name}</b>
                 <div className="small muted">
+                  {outcome.kartRoboCourse && result.records[s.profileId]?.newRecord && 'Neue persönliche Rundenbestzeit! '}
                   {result.records[s.profileId]?.levelUp ? 'Neues Level! ' : ''}
                   {result.records[s.profileId]?.earned.map((b) => `Abzeichen: ${b.name}`).join(' · ')}
                 </div>

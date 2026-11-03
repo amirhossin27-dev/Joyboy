@@ -41,6 +41,36 @@ for(const second of [false,true]){
   assert(times[1]<times[0]);console.log(course.name+' – ohne/mit Items: '+times.map(t=>t.toFixed(2)).join(' / ')+' Sekunden');
  });
 }
+for(const cape of [false,true])for(const fast of [false,true]){
+ test((cape?'Cape':'Bay')+' slaloms are steerable and lap timing survives packet cadence, fast='+fast,()=>{
+  const {course,SimpleRace}=build(cape,fast);
+  const race=new SimpleRace();race.begin();
+  let snapshot,boosts=0,lastLines=0;
+  while(race.phase!=='finished' && race.time<250){
+   const pos=course.wrap(race.k.s),gate=course.gates.find(g=>g.s>pos);
+   const target=gate?.lat??0;
+   race.advance(1/30,Math.max(-1,Math.min(1,(target-race.k.lat)*1.5)));
+   if(race.stats.lines>lastLines){lastLines=race.stats.lines;if(race.k.boost>1.5)boosts++;}
+   if(!snapshot && race.snapshot().lap===2)snapshot=race.snapshot();
+  }
+  assert.equal(boosts,6);assert.equal(race.k.item,'turbo');assert.equal(race.stats.turboUses,0);
+  assert.deepEqual(Object.keys(snapshot.stats.lapEnds),['1']);
+  const ends=race.stats.lapEnds;assert.equal(ends[3],race.time);
+  assert(ends[3]>ends[2] && ends[2]>ends[1] && ends[1]>0);
+ });
+}
+test('missing any slalom gate forfeits that bonus and the next line starts clean',()=>{
+ const {course,SimpleRace}=build(false,true);
+ for(const miss of [0,1,2]){
+  const race=new SimpleRace();race.phase='running';race.k.v=38;
+  for(const gate of course.gates){
+   race.k.s=gate.s-.1;race.k.lat=gate.index===miss && gate.s<500?-gate.lat:gate.lat;
+   race.advance(1/60);
+   if(gate.s<500)assert.equal(race.stats.lines,0);
+  }
+  assert.equal(race.stats.lines,1);
+ }
+});
 test('wave hits across the timing line, respects range and consumes a shield',()=>{
  const {SimpleRace,course,resolveKartWaves}=build(false);
  const racers=[new SimpleRace(),new SimpleRace()];

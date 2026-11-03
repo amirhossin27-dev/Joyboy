@@ -18,11 +18,15 @@ export const LEVEL_LABEL: Record<Level, string> = { 0: 'Leicht', 1: 'Mittel', 2:
 
 export const levelForAge = (age: AgeGroup): Level => (age === 0 ? 0 : age === 1 ? 0 : age === 2 ? 1 : 2);
 
+export type KartCourse = 'bucht' | 'kap';
+
 export interface GameStat {
   played: number;
   won: number;
   /** Rekord (Punkte, Züge oder Sekunden – je nach Spiel) */
   best?: number;
+  /** Persönliche Rundenzeiten gegen Robo in Sekunden, je Strecke. */
+  kartLaps?: Partial<Record<KartCourse, number>>;
   /** Beste Wertung 0–3 Sterne */
   stars: number;
 }

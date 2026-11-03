@@ -36,17 +36,51 @@
 @media(max-width:380px){#joy-kart-simple .js-location{font-size:11px}#joy-kart-simple .js-time{font-size:14px}#joy-kart-simple .js-top{gap:6px}#joy-kart-simple .js-toast{font-size:14px;left:20%;right:20%}}
 #joy-kart-simple .js-map{position:absolute;right:max(12px,env(safe-area-inset-right));top:38px;width:clamp(56px,10%,112px);padding:4px;background:#142b3cbd;border-radius:12px;pointer-events:none}
 @media(max-height:340px){#joy-kart-simple .js-map{width:52px;top:29px}}
+#joy-kart-simple .js-top{align-items:center;justify-content:flex-start;gap:8px}
+#joy-kart-simple .js-rank,#joy-kart-simple .js-race-info,#joy-kart-simple .js-line,#joy-kart-simple .js-speed{background:linear-gradient(120deg,#09222bef,#152d39df);box-shadow:0 2px 8px #001b2840;border:1px solid #c9f9ee59}
+#joy-kart-simple .js-rank{display:flex;align-items:center;gap:8px;padding:4px 10px;border-radius:10px;border-left:4px solid #73f4cf}
+#joy-kart-simple .js-place{font-size:26px;line-height:1.2;color:#8dffdb;font-weight:850}
+#joy-kart-simple .js-race-info{display:grid;min-width:110px;padding:3px 10px 6px;line-height:1.15;border-radius:9px;position:relative;overflow:hidden}
+#joy-kart-simple .js-location{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:#bbe0dc;padding:0}
+#joy-kart-simple .js-lap{font-size:14px}
+#joy-kart-simple .js-progress-fill{position:absolute;bottom:0;left:0;right:0;height:3px;background:#73f4cf;transform-origin:left;transform:scaleX(0)}
+#joy-kart-simple .js-time{font-size:12px;margin:0}
+#joy-kart-simple .js-map{top:8px;right:max(12px,calc(var(--js-right) + 8px));border:1px solid #d9fff345;background:#0c2433d9}
+#joy-kart-simple .js-line{position:absolute;top:54px;left:max(12px,calc(var(--js-left) + 8px));pointer-events:none;border-radius:7px;padding:3px 9px;color:#9dffdf;font-size:12px;font-weight:700}
+#joy-kart-simple .js-toast:not(:empty){left:50%;right:auto;transform:translateX(-50%);width:max-content;max-width:68%;padding:4px 14px;border-radius:20px;background:#102737eb;color:#ffedba}
+#joy-kart-simple .js-speed{left:50%;right:auto;transform:translateX(-50%);bottom:max(8px,var(--js-bottom));padding:0 12px;border-radius:12px;font-style:italic;white-space:nowrap}
+@container(min-width:600px){#joy-kart-simple .js-speed{left:auto;right:calc(max(12px,var(--js-right)) + 108px);transform:none}}
+#joy-kart-simple .js-controls button{width:clamp(72px,12cqw,96px);height:clamp(72px,12cqw,96px)}
+#joy-kart-simple .js-pad{background:radial-gradient(ellipse at 50% 40%,#305260e8,#112833db);border:2px solid #c0dfdeae}
+#joy-kart-simple .js-thumb{background:linear-gradient(#e1ffef,#72c8bc);box-shadow:0 2px 5px #071b29}
+#joy-kart-simple .js-turbo{--ink:#ffdc80;color:var(--ink);background:radial-gradient(at 50% 20%,#344b51,#0d2431 80%);border:2px solid var(--ink);gap:0;line-height:1.15}
+#joy-kart-simple .js-turbo[data-item="shield"]{--ink:#81e9ff}
+#joy-kart-simple .js-turbo[data-item="rocket"]{--ink:#ffa28e}
+#joy-kart-simple .js-turbo:disabled{--ink:#b5c4c2}
+#joy-kart-simple .js-item-icon{width:23px;height:23px;justify-self:center;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#joy-kart-simple .js-item-name{font-size:clamp(10px,1.35cqw,13px)}
+#joy-kart-simple .js-turbo small{font-size:10px}
+#joy-kart-simple .js-count{color:#ffe9a4;font-style:italic;font-size:clamp(48px,11cqw,84px);text-shadow:0 3px #173238,0 5px 14px #001b28}
+#joy-kart-simple .js-panel{padding:18px;border:1px solid #96e5d56b;border-radius:16px;background:linear-gradient(140deg,#102b36f5,#122535ef)}
+#joy-kart-simple .js-primary{background:linear-gradient(115deg,#a1ffda,#54dcc3)}
+#joy-kart-simple .js-rear{position:absolute;right:max(12px,calc(var(--js-right) + 8px));bottom:calc(max(10px,var(--js-bottom)) + clamp(72px,12cqw,96px) + 8px);border-radius:13px;display:grid;justify-items:center;align-content:center;gap:1px;padding:3px 9px;background:#102937ed;touch-action:none;user-select:none;-webkit-user-select:none}
+#joy-kart-simple .js-rear small{font-size:10px}
+#joy-kart-simple .js-rear[aria-pressed=true]{background:#a8f5d9;color:#102937}
+#joy-kart-simple .js-finish-note:not([hidden])~.js-toast{display:none}
+#joy-kart-simple .js-finish-note{position:absolute;top:23%;left:50%;transform:translateX(-50%);padding:6px 12px;border-radius:12px;background:#102937ee;color:#ffedba;text-align:center;font-weight:700;pointer-events:none}
 </style>
-<div id="joy-kart-simple" aria-label="Joy-Kart – einfache Küstenprobe">
+<div id="joy-kart-simple" aria-label="Joy-Kart · Küsten-Cup">
  <div class="js-stage">
   <canvas aria-label="Dreidimensionale Küstenstraße mit Fuchskart und durchgehendem Unterbau"></canvas>
   <div class="js-rush" aria-hidden="true"></div>
-  <div class="js-top"><span class="js-location">Sonnenküste · Duell<small>Auto-Gas · Lenkhilfe</small></span><span class="js-time">00:00.00</span><button type="button" data-action="pause" aria-label="Pause" class="cursor-interaction" hidden>Ⅱ</button></div>
-  <div class="js-controls" hidden><button type="button" class="js-pad cursor-interaction" data-control="pad" aria-label="Lenken: halten und nach links oder rechts ziehen"><span class="js-thumb"></span><span class="js-pad-label">Lenken</span></button><button type="button" class="js-turbo cursor-interaction" data-action="turbo">TURBO<small>tippen</small></button></div>
+  <div class="js-top"><div class="js-rank"><b class="js-place">=</b><span class="js-time">Start</span></div><div class="js-race-info"><span class="js-location">Küsten-Cup</span><b class="js-lap">Runde 1 / 3</b><i class="js-progress-fill"></i></div><button type="button" data-action="pause" aria-label="Pause" class="cursor-interaction" hidden>Ⅱ</button></div>
+  <div class="js-line" hidden></div>
+  <button class="js-rear" type="button" data-action="rear" aria-label="Rückblick halten (R)" aria-pressed="false" title="Für Rückblick halten · R" hidden><svg width="24" height="16" viewBox="0 0 30 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2h6m-3 0v4"/><rect x="2" y="6" width="26" height="12" rx="5"/><path d="m7 14 4-4"/></svg><small>Rückblick</small></button><div class="js-finish-note" role="status" hidden></div>
+  <div class="js-controls" hidden><button type="button" class="js-pad cursor-interaction" data-control="pad" aria-label="Lenken: halten und nach links oder rechts ziehen"><span class="js-thumb"></span><span class="js-pad-label">Lenken</span></button><button type="button" class="js-turbo cursor-interaction" data-action="turbo"><svg class="js-item-icon" viewBox="0 0 24 24" aria-hidden="true"><path/></svg><span class="js-item-name">Turbo</span><small class="js-item-hint">Einsetzen</small></button></div>
   <div class="js-speed" hidden><strong>0</strong><small> km/h</small></div>
   <div class="js-count" hidden></div><div class="js-toast" role="status" aria-live="polite"></div>
   <div class="js-overlay"><div class="js-panel"><h2>Joy-Kart</h2><p>Links sanft lenken, rechts dein Item einsetzen.<br>Auto-Gas und Lenkhilfe sind aktiv.</p><div class="js-actions"><button type="button" class="js-primary cursor-interaction" data-action="start">Losfahren</button><button type="button" class="cursor-interaction" data-action="again" hidden>Neu starten</button></div></div></div>
-  <div class="js-loading" role="status" aria-live="polite"><strong>Küstenprobe wird vorbereitet</strong><span>Grafik wird geladen …</span></div><span class="js-live" role="status" aria-live="polite"></span>
+  <div class="js-loading" role="status" aria-live="polite"><strong>Küsten-Cup wird vorbereitet</strong><span>Grafik wird geladen …</span></div><span class="js-live" role="status" aria-live="polite"></span>
  </div>
 </div>
 <script>
@@ -81,7 +115,10 @@ function startComputerRace(){
 function drivePanda(driver,dt,opponent){
  const k=driver.k;
  const distance=course.wrap(k.s),row=course.boxes.findIndex(mark=>mark>distance);
- const lanes=course.lanes(Math.max(0,row)),target=lanes[lanes.length-1];
+ const lanes=course.lanes(Math.max(0,row));
+ // Robo tries the second slalom each lap. The first remains a chance to gain ground.
+ const gate=course.gates.find(g=>g.s>=course.gates[3].s && g.s>distance);
+ const target=gate && gate.s-distance<55?gate.lat:lanes[lanes.length-1];
  if(driver.time>3 && k.item && (k.item==='shield'?k.slow>0||distance%90<6:distance%75<6))driver.queueTurbo();
  driver.advance(dt,clamp((target-k.lat)*.75,-1,1),roboPace(opponent.k.s-k.s));
 }
@@ -94,7 +131,10 @@ function updateComputerRace(dt){
  }
  if(race.k.slow>(packet?.me?.slow||0))toast((KART_ITEMS[race.k.lastHit]||'Item')+' trifft!');
  if(race.k.blocked>(packet?.me?.blocked||0))toast('Abgewehrt!');
- computer.takeEvents();packet={slot:0,round:soloRound,me:race.snapshot(),other:computer.snapshot()};received=performance.now();refreshLobby();
+ const lobbyChanged=packet?.round!==soloRound || packet.me.phase!==race.phase || packet.other.phase!==computer.phase;
+ computer.takeEvents();packet={slot:0,round:soloRound,me:race.snapshot(),other:computer.snapshot()};received=performance.now();
+ if(lobbyChanged)refreshLobby();
+ if(race.phase==='countdown')find('.js-count').textContent=Math.max(1,Math.ceil(race.countdown));
 }
 /*@@DUEL_CLIENT@@*/
 // Sample the same centre line used by collision, distance and lap counting.
@@ -119,6 +159,8 @@ function makeCourseMap(){
  };
 }
 const updateMap=makeCourseMap();
+/*@@RACE_HUD@@*/
+const updateHud=createRaceHud();
 function bindAppRace(){
   const racers=[race,computer];
   let boost=false;
@@ -143,7 +185,7 @@ function bindAppRace(){
     if(old?.phase==='countdown'&&me.phase==='running')toast('LOS!');
     if(old){for(const key of Object.keys(KART_ITEMS))if((me.stats.itemUses[key]||0)>(old.stats.itemUses[key]||0))toast(KART_ITEMS[key]+' aktiviert');}
     if(old&&!old.item&&me.item)toast(KART_ITEMS[me.item]+' bereit');
-    if(old&&me.lap>old.lap)toast('Runde '+me.lap+' / 3');
+
     if(old&&me.slow>old.slow)toast((KART_ITEMS[me.lastHit]||'Item')+' trifft!');if(old&&me.blocked>old.blocked)toast('Abgewehrt!');
     find('.js-overlay').hidden=true;find('.js-controls').hidden=me.phase!=='running';
     find('.js-speed').hidden=false;find('.js-count').hidden=me.phase!=='countdown';
@@ -157,70 +199,37 @@ function useCompact(){
  if(compact)return;compact=true;stopped=false;cancelAnimationFrame(animation);
  const fallback=document.createElement('canvas');canvas.replaceWith(fallback);
  const ctx=fallback.getContext('2d');
- if(!ready){bindDuel();bindAppRace();ready=true;}
+ if(!ready){bindDuel();if(inJoyboy)bindAppRace();ready=true;}
  loading.hidden=true;find('.js-location').textContent=course.name+' · Kompakt';
+ let lastCompact=performance.now();
  function draw(now){
   if(stopped||!root.isConnected)return;
-  drawCompactRoad(fallback,ctx,packet,course);if(now-lastHud>90){updateMap(packet);lastHud=now;}
-  if(packet){
-   const k=packet.me;find('.js-speed strong').textContent=k.speedKmh;find('.js-time').textContent='Runde '+k.lap+' / 3';
-   find('[data-action="turbo"]').textContent=KART_ITEMS[k.item]||'Box sammeln';find('[data-action="turbo"]').disabled=!k.item||k.phase!=='running';stage.style.setProperty('--js-steer',input());
+  if(!inJoyboy && computerMode && soloRound)updateComputerRace(Math.min(.1,(now-lastCompact)/1000));
+  lastCompact=now;
+  const view=renderPacket(now);drawCompactRoad(fallback,ctx,view,course,lookingBack());
+  if(packet&&now-lastHud>75){
+   updateHud(packet,now,view);lastHud=now;
   }
   if(now>toastUntil)find('.js-toast').textContent='';
   animation=requestAnimationFrame(draw);
  }
  animation=requestAnimationFrame(draw);
 }
-if(inJoyboy){
+if(inJoyboy || computerMode){
  const button=document.createElement('button');button.type='button';button.textContent='In Kompaktansicht fahren';
  button.onclick=useCompact;loading.appendChild(button);
 }
-// Periodic terrain and cloud fields give the cape its own full-turn fjord panorama.
-function paintCapeSky(){
- const canvas=document.createElement('canvas');canvas.width=1536;canvas.height=768;
- const ctx=canvas.getContext('2d'),w=canvas.width,h=canvas.height,tau=2*Math.PI;
- const sky=ctx.createLinearGradient(0,0,0,h);
- for(const [y,color] of [[0,'#486981'],[.35,'#84a2ba'],[.51,'#d9e5e3'],[.52,'#8ea9b2'],[1,'#354e60']])sky.addColorStop(y,color);
- ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
- for(let j=0;j<8;j++){
-  ctx.beginPath();
-  for(let x=0;x<=w;x+=2){
-   const a=x*tau/w,y=h*(.32+j*.017+.013*Math.sin(3*a+j)+.007*Math.cos(7*a-j));
-   if(x===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
-  }
-  ctx.lineTo(w,h*.5);ctx.lineTo(0,h*.5);ctx.closePath();
-  ctx.fillStyle='rgba(224,233,232,.15)';ctx.fill();
- }
- for(const [layer,color] of ['#98adbc','#758d9c','#4e6876'].entries()){
-  const ridge=a=>.535-.018*layer-(.075-.009*layer)*Math.abs(Math.sin(3*a+layer)*Math.cos(2*a-layer))-.018*Math.sin(8*a+layer)-.009*Math.cos(21*a-layer)-.003*Math.cos(52*a);
-  for(let x=0;x<w;x++){
-   const a=x*tau/w,y=ridge(a)*h,base=h*(.53+.004*layer+.003*Math.sin(4*a+layer));
-   ctx.fillStyle=color;ctx.fillRect(x,y,1,Math.max(0,base-y));
-   // Broken slate strata catch light at different depths below the ridge.
-   for(let band=0;band<7;band++){
-    const cut=y+(base-y)*(band+.35+.24*Math.sin(19*a+band)+.12*Math.cos(53*a-band))/7;
-    if(cut>=y && cut<base){
-     ctx.fillStyle='rgba(30,52,66,'+(.05+.055*(1+Math.sin(a*17+band)))+')';
-     ctx.fillRect(x,cut,1,1+(1+Math.cos(a*31+band))*1.4);
-    }
-   }
-   const depth=Math.max(0,.49*h-y);
-   ctx.fillStyle=ridge(a+.001)>ridge(a)?'rgba(225,238,236,.74)':'rgba(198,217,223,.33)';
-   ctx.fillRect(x,y,1,depth*(.24+.15*Math.cos(29*a+layer)));
-  }
- }
- return canvas;
-}
 const decode=async url=>{const image=new Image();image.src=url;await image.decode();return image;},paintYield=()=>new Promise(resolve=>requestAnimationFrame(()=>resolve()));
 try{
- const [THREE,atlasImage,skyImage]=await Promise.all([import('./three.module.js'),decode(/*@@MATERIAL_ATLAS@@*/),course.cape?paintCapeSky():decode(/*@@SKY_TEXTURE@@*/)]);if(compact)return;mark('download');loadingText.textContent='Fuchs und Kart werden vorbereitet …';await paintYield();
+ const [THREE,atlasImage,skyImage,treeImage]=await Promise.all([import('./three.module.js'),decode(/*@@MATERIAL_ATLAS@@*/),decode(course.cape?/*@@CAPE_TEXTURE@@*/:/*@@SKY_TEXTURE@@*/),decode(course.cape?/*@@SPRUCE_TEXTURE@@*/:/*@@CYPRESS_TEXTURE@@*/)]);if(compact)return;mark('download');loadingText.textContent='Fuchs und Kart werden vorbereitet …';await paintYield();
  if(compact)return;
  const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(60,1,.15,900),materials=new Set(),geometries=new Set(),textures=new Set();
- renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.25));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+ renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});const maxRatio=Math.min(devicePixelRatio,1.25);renderer.setPixelRatio(maxRatio);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
  function texture(w,h,paint){const c=document.createElement('canvas');c.width=w;c.height=h;paint(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;textures.add(t);return t;}
  const part=(x,y)=>{const half=atlasImage.width/2,t=texture(512,512,(c,w,h)=>c.drawImage(atlasImage,x*half,y*half,half,half,0,0,w,h));t.wrapS=t.wrapT=THREE.RepeatWrapping;t.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy());return t;};
  const artMaps={orangeFur:part(0,0),creamFur:part(1,0),asphalt:part(0,1),stone:part(1,1)};artMaps.furNeutral=texture(256,256,(c,w,h)=>{c.drawImage(artMaps.creamFur.image,0,0,w,h);const p=c.getImageData(0,0,w,h);for(let i=0;i<p.data.length;i+=4){const l=205+((p.data[i]+p.data[i+1]+p.data[i+2])/3-128)*.25;p.data[i]=p.data[i+1]=p.data[i+2]=l;}c.putImageData(p,0,0);});for(const t of[artMaps.furNeutral,artMaps.creamFur,artMaps.orangeFur]){t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(3,3);}
- const lighting=createProductionLighting(THREE,{scene,renderer,skyImage,texture,textures,materials,geometries}),kit=createKartModels(THREE,{scene,geometries,materials,texture}),assets=createProductionKarts(THREE,{scene,kit,artMaps,materials,texture}),cars=[assets.makeKart(false),assets.makeKart(true)];mark('fox-kart');loadingText.textContent='Küstenstraße wird aufgebaut …';await paintYield();
+ artMaps.foliage=new THREE.Texture(treeImage);artMaps.foliage.colorSpace=THREE.SRGBColorSpace;artMaps.foliage.needsUpdate=true;textures.add(artMaps.foliage);
+ const lighting=createProductionLighting(THREE,{scene,renderer,skyImage,texture,textures,materials,geometries,horizonStrip:true,sunOffset:course.cape?[78,42,-18]:[59,12,-69]}),kit=createKartModels(THREE,{scene,geometries,materials,texture}),assets=createProductionKarts(THREE,{scene,kit,artMaps,materials,texture}),cars=[assets.makeKart(false),assets.makeKart(true)];mark('fox-kart');loadingText.textContent='Küstenstraße wird aufgebaut …';await paintYield();
  if(compact)return;
  for(const car of cars){
   const shield=kit.add(kit.geometry(new THREE.SphereGeometry(1,18,12)),kit.material(0x63e0ff,{transparent:true,opacity:.20,depthWrite:false}),car.group,0,1,0);
@@ -254,30 +263,53 @@ try{
   }
  }
  if(course.cape){
-  lighting.sun.color.setHex(0xe5efff);lighting.sun.intensity=2.35;
+  lighting.sun.color.setHex(0xfff1da);lighting.sun.intensity=2.35;
   scene.environmentIntensity=.72;
  }
  const world=await createSimpleCoastWorld(THREE,{scene,course,kit,artMaps,materials,texture,lighting,yieldTask:paintYield});mark('coast');loadingText.textContent='Licht wird vorbereitet …';await paintYield();
- const cameraDesired=new THREE.Vector3(),lookDesired=new THREE.Vector3(),look=new THREE.Vector3(),motion=matchMedia('(prefers-reduced-motion: reduce)'),rush=find('.js-rush');let cameraSet=false,frames=0,fps=0,frameWindow=performance.now(),lastFrame=performance.now(),lastCameraAngle=0,maxCameraStep=0,lastDrawS=0,speedVisual=0;
+ const cameraDesired=new THREE.Vector3(),lookDesired=new THREE.Vector3(),look=new THREE.Vector3(),motion=matchMedia('(prefers-reduced-motion: reduce)'),rush=find('.js-rush');let cameraSet=false,lastFrame=performance.now(),lastCameraAngle=0,maxCameraStep=0,lastDrawS=0,speedVisual=0;
+ // Resize only after sustained load; a single startup stall must not blur the track.
+ let frameSeconds=0,frameCount=0,fastWindows=0;
+ function adaptResolution(seconds){
+  if(document.hidden || seconds<=0 || seconds>.3 || packet?.me.phase!=='running'){
+   frameSeconds=0;frameCount=0;fastWindows=0;return;
+  }
+  frameSeconds+=seconds;frameCount++;
+  if(frameSeconds<1.5)return;
+  const fps=frameCount/frameSeconds,ratio=renderer.getPixelRatio();
+  frameCount=0;frameSeconds=0;
+  fastWindows=fps>53?fastWindows+1:0;
+  const floor=Math.min(.8,maxRatio);
+  const next=fps<35?Math.max(floor,ratio-.15):fastWindows>=4?Math.min(maxRatio,ratio+.1):ratio;
+  if(next!==ratio){renderer.setPixelRatio(next);fastWindows=0;}
+ }
  function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}const observer=new ResizeObserver(resize);observer.observe(stage);resize();
- let selfVisual=null,otherVisual=null;
+ let selfVisual=null,otherVisual=null,lastTaken,visibleTaken,wasRear=false,view=null;
  function place(dt,render=true){
-  const slot=packet?.slot||0,me=packet?.me||race.snapshot(), rival=packet?.other;
+  view=renderPacket(performance.now());
+  const rear=lookingBack(),slot=view?.slot||0,me=view?.me||race.snapshot(),rival=view?.other;
   selfVisual=visualState(me,dt,selfVisual);
   const k=selfVisual,p=course.point(k.s,k.lat),f=course.frame(k.s),dx=Math.sin(f.angle),dz=Math.cos(f.angle);
   moveKart(cars[slot],k,me.time,dt);
-  cars[slot].group.visible=cars[slot].shadow.visible=true;
+  cars[slot].group.visible=cars[slot].shadow.visible=!rear;
   cars[1-slot].group.visible=cars[1-slot].shadow.visible=!!rival;
   if(rival){otherVisual=visualState(rival,dt,otherVisual);moveKart(cars[1-slot],otherVisual,rival.time,dt);}
   showHazards(slot,me,rival);showHazards(1-slot,rival,me);
-  world.update(me.time,new Set(me.taken||race.taken),me.lap);
+  if(me.taken!==lastTaken){lastTaken=me.taken;visibleTaken=me.taken?new Set(me.taken):null;}
+  world.update(me.time,visibleTaken||race.taken,me.lap);
   const centre=course.point(k.s,k.lat*.93),ahead=course.point(k.s+17,k.lat*.30);cameraDesired.set(centre.x-dx*7.6,p.y+3.25+(k.lift||0)*.32,centre.z-dz*7.6);lookDesired.set(ahead.x,ahead.y+1.55,ahead.z);
+  if(rear){
+   const mount=course.point(k.s-1.8,k.lat),behind=course.point(k.s-28,k.lat*.35);
+   cameraDesired.set(mount.x,mount.y+2.15+(k.lift||0)*.72,mount.z);
+   lookDesired.set(behind.x,behind.y+1.05,behind.z);
+  }
+  if(wasRear!==rear){cameraSet=false;wasRear=rear;}
   if(k.s<lastDrawS-.1){cameraSet=false;maxCameraStep=0;speedVisual=0;}lastDrawS=k.s;const snapped=!cameraSet;
   if(snapped){camera.position.copy(cameraDesired);look.copy(lookDesired);cameraSet=true;}else{const alpha=1-Math.exp(-dt*9);camera.position.lerp(cameraDesired,alpha);const along=(cameraDesired.x-camera.position.x)*dx+(cameraDesired.z-camera.position.z)*dz;camera.position.x+=dx*along;camera.position.z+=dz*along;look.lerp(lookDesired,alpha);}camera.lookAt(look);
   const angle=Math.atan2(look.x-camera.position.x,look.z-camera.position.z);if(render&&!snapped)maxCameraStep=Math.max(maxCameraStep,Math.abs(Math.atan2(Math.sin(angle-lastCameraAngle),Math.cos(angle-lastCameraAngle))));lastCameraAngle=angle;
   const target=me.phase!=='running'?0:k.boost>0?1:fastRace?.35*clamp(k.v/M.SPEED.cruise,0,1):0;speedVisual=motion.matches?0:speedVisual+(target-speedVisual)*(1-Math.exp(-dt*(target?10:5)));
   const fov=55+speedVisual*8;if(Math.abs(camera.fov-fov)>.001){camera.fov=fov;camera.updateProjectionMatrix();}
-  rush.style.opacity=(me.phase==='running'?speedVisual*.6:0).toFixed(3);
+  rush.style.opacity=(me.phase==='running'&&!rear?speedVisual*.6:0).toFixed(3);
   lighting.update(camera,p.x,p.y,p.z);if(render)renderer.render(scene,camera);
  }
  // Establish the rear view before shader preparation; prewarm turbo's first-use material too.
@@ -291,24 +323,17 @@ try{
  if(inJoyboy)bindAppRace();
  function loop(now){
   if(!root.isConnected||stopped)return;
-  const dt=Math.min(.1,(now-lastFrame)/1000);lastFrame=now;if(!inJoyboy&&computerMode&&soloRound)updateComputerRace(dt);place(dt);
+  const elapsed=(now-lastFrame)/1000;adaptResolution(elapsed);
+  const dt=Math.min(.1,elapsed);lastFrame=now;if(!inJoyboy&&computerMode&&soloRound)updateComputerRace(dt);place(dt);
   if(packet&&now-lastHud>75){
-   updateMap(packet);
-   const k=packet.me,o=packet.other,d=o?k.s-o.s:0;
-   find('.js-location').textContent=course.name+' · Runde '+k.lap+' / 3';
-   find('.js-time').textContent=o?(Math.abs(d)<.5?'Gleichauf':(d>0?'+':'-')+Math.round(Math.abs(d))+' m'):'Solo';
-   find('.js-speed strong').textContent=k.speedKmh;
-   const turbo=find('[data-action="turbo"]');turbo.disabled=!k.item||k.phase!=='running';
-   turbo.innerHTML=(KART_ITEMS[k.item]||'Item')+'<small>'+(k.item?'E · einsetzen':k.shield>0?'geschützt':k.magnet>0?'Magnet aktiv':k.slow>0?'gebremst':'Box sammeln')+'</small>';
-   stage.style.setProperty('--js-steer',input());
-   if(now>toastUntil)find('.js-toast').textContent='';lastHud=now;
+   updateHud(packet,now,view);lastHud=now;
   }
   animation=requestAnimationFrame(loop);
  }
  root.__duelSnapshot=()=>packet&&({slot:packet.slot,me:packet.me,other:packet.other,round:packet.round});
  root.__duelGeometry=world.inspectGeometry;
  lastFrame=performance.now();animation=requestAnimationFrame(loop);
- canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();clear();if(inJoyboy){useCompact();return;}joined=false;stopped=true;cancelAnimationFrame(animation);loading.hidden=false;loadingText.textContent='Grafik unterbrochen. Bitte die Seite neu laden.';});
-}catch(error){if(inJoyboy){renderer?.dispose();useCompact();return;}stopped=true;loading.hidden=false;loading.querySelector('strong').textContent='Küstenprobe konnte nicht starten';loadingText.textContent=error.message;console.error(error);renderer?.dispose();}
+ canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();clear();if(inJoyboy || computerMode){useCompact();return;}joined=false;stopped=true;cancelAnimationFrame(animation);loading.hidden=false;loadingText.textContent='Grafik unterbrochen. Bitte die Seite neu laden.';});
+}catch(error){if(inJoyboy || computerMode){renderer?.dispose();useCompact();return;}stopped=true;loading.hidden=false;loading.querySelector('strong').textContent='Küstenprobe konnte nicht starten';loadingText.textContent=error.message;console.error(error);renderer?.dispose();}
 })();
 </script>

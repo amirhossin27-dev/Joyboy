@@ -1,4 +1,5 @@
 import { useEffect, useState, type CSSProperties } from 'react';
+import { unlockAudio } from '../arcade/engine';
 import type { SeatInfo } from '../engine/game';
 import { isOnlineGame } from '../games/defs';
 import { CATEGORY, GAME_BY_ID, playersText, type GameId, type GameMeta } from '../games/registry';
@@ -141,6 +142,7 @@ export function GameDetail({ id, profile }: { id: GameId; profile: Profile }) {
   const [setup, setSetup] = useState<null | 'together' | 'robo'>(null);
   const [circuit, setCircuit] = useState<Level>(0);
   const stat = profile.games[id];
+  const kartBest = stat?.kartLaps?.[circuit === 1 ? 'kap' : 'bucht'];
   const sub = LEVEL_SUB[id];
   // Erst lernen, dann spielen
   const left = learnLeft(meta, profile, data.settings);
@@ -152,6 +154,7 @@ export function GameDetail({ id, profile }: { id: GameId; profile: Profile }) {
   const start = (seats: SeatInfo[]) => {
     setSetup(null);
     // Das Tutorial kommt nur, wenn man es selbst über „So geht's“ oder das ? öffnet.
+    if (id === 'joykart') unlockAudio();
     nav.play({ game: id, seats, level: id === 'joykart' ? circuit : level });
   };
 
@@ -205,7 +208,7 @@ export function GameDetail({ id, profile }: { id: GameId; profile: Profile }) {
 
       {id === 'joykart' && <div className="field"><span className="field-label">Startstrecke gegen Robo</span><div className="seg">
         {(['Sonnenbucht','Kap der Winde'] as const).map((name,i)=><button key={name} aria-pressed={circuit===i} onClick={()=>setCircuit(i as Level)}>{name}</button>)}
-      </div></div>}
+      </div><small className="muted">{kartBest === undefined ? 'Fahre drei Runden für deine erste persönliche Rundenbestzeit.' : 'Deine beste Runde gegen Robo · ' + kartBest.toFixed(2).replace('.', ',') + ' s'}</small></div>}
       {meta.levels && (
         <div className="field">
           <span className="field-label">Schwierigkeit</span>

@@ -3,10 +3,10 @@ const pw=require(path.join(os.homedir(),'.cache/codex-runtimes/codex-primary-run
 (async()=>{
  const browser=await pw.chromium.launch({executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',chromiumSandbox:true});
  try{
- const page=await browser.newPage({viewport:{width:1100,height:690}}),errors=[];
+ const page=await browser.newPage({viewport:{width:852,height:393}}),errors=[];
  page.on('pageerror',e=>errors.push(e.message));
  await page.addInitScript(()=>{if(window.top===window&&!localStorage.getItem('joyboy:data:v1'))localStorage.setItem('joyboy:data:v1',JSON.stringify({v:1,active:'qa',profiles:[{id:'qa',age:2,avatar:'fuchs',name:'Testfuchs',color:'#fea',stars:0,createdAt:Date.now()}],settings:{sound:false,arcadeAfter:0}}));});
- await page.goto('http://127.0.0.1:60494/');await page.getByRole('button',{name:/Joy-Kart/}).first().click();
+ await page.goto(process.env.JOY_KART_QA_URL||'http://127.0.0.1:60494/');await page.getByRole('button',{name:/Joy-Kart/}).first().click();
  await page.getByRole('button',{name:'Kap der Winde',exact:true}).click();
  await page.getByRole('button',{name:/Gegen Robo/}).click();
  const child=page.frameLocator('iframe[title*="Joy-Kart"]');
@@ -17,12 +17,13 @@ const pw=require(path.join(os.homedir(),'.cache/codex-runtimes/codex-primary-run
  await child.locator('[data-action="turbo"]').filter({hasText:/Schild/i}).waitFor({timeout:25000});
  await page.keyboard.press('KeyE');
  await page.waitForTimeout(350);
- await page.screenshot({path:path.join(folder,'kap-der-winde.png')});
+ await page.screenshot({path:path.join(folder,'kap-bonuslinie-item.png')});
  const snapshot=await child.locator('#joy-kart-simple').evaluate(el=>el.__duelSnapshot());
  assert.equal(snapshot.me.stats.turboUses,1);assert.equal(snapshot.me.stats.itemUses.shield,1);assert.equal(snapshot.me.lapLength,1728);assert(snapshot.me.lat < -2);
  await page.getByRole('button',{name:/Nochmal spielen/}).waitFor({timeout:300000});
+ await page.getByText(/Beste Runde/).first().waitFor();
  const stats=await page.evaluate(()=>JSON.parse(localStorage.getItem('joyboy:data:v1')).profiles[0].games.joykart);
- assert(stats);await page.getByRole('button',{name:/Nochmal spielen/}).click();
+ assert(stats.kartLaps.kap>0 && stats.kartLaps.kap<60);await page.getByRole('button',{name:/Nochmal spielen/}).click();
  await child.locator('.js-count:not([hidden])').waitFor({timeout:60000});assert.deepEqual(errors,[]);
  console.log('App-Katalog → Robo → Turbo und Lenkung → Ergebnis und Profil → Revanche bestanden.');
  }finally{await browser.close();}

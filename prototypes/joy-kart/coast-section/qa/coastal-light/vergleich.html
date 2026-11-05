@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Joy-Kart · Grafikvergleich</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#111b22;color:#f7f2e8;font:16px/1.45 system-ui,sans-serif}
+main{max-width:1320px;margin:auto;padding:20px}h1{font-size:clamp(1.5rem,4vw,2.3rem);margin:0 0 .2rem}p{margin:0 0 1rem;color:#c2d0d6}
+fieldset{border:0;padding:0;margin:1rem 0;display:flex;flex-wrap:wrap;gap:.8rem;align-items:center}select,button{font:inherit;color:inherit;background:#243641;border:1px solid #758c94;border-radius:.5rem;padding:.45em .75em}button[aria-pressed=true]{background:#f5c68e;color:#162429;border-color:#f5c68e}button{cursor:pointer}button:focus-visible,select:focus-visible{outline:3px solid #87d8d0}
+figure{margin:0}img{display:block;max-width:100%;max-height:77vh;object-fit:contain;object-position:top left;border-radius:.4rem}figcaption{margin-top:.5rem;color:#bccad0}
+</style></head><body><main><h1>Joy-Kart · Grafikvergleich</h1>
+<p>Wähle eine Fahransicht und wechsle zwischen beiden Fassungen. Szene, Rennzustand und Bildausschnitt stimmen überein.</p>
+<fieldset><label for="scene">Ansicht</label><select id="scene"><option value="bucht-town">Sonnenbucht · Häuserkurve</option><option value="bucht-phone">Sonnenbucht · Handy-Querformat</option><option value="kap-coast">Kap der Winde · Küstenstraße</option><option value="kap-shore">Kap der Winde · Basaltufer im Handyformat</option><option value="kap-close">Kap der Winde · Kartheck im Hochformat</option></select>
+<button type="button" id="before" aria-pressed="false">Vorher</button><button type="button" id="after" aria-pressed="true">Nachher</button></fieldset>
+<figure><img id="shot" src="final-2026-11-05/after/edge/bucht-town.png" alt="Sonnenbucht nach der Überarbeitung"><figcaption id="caption" aria-live="polite"></figcaption></figure></main>
+<script>
+const scenes=[["Sonnenbucht · Häuserkurve","bucht-town","1280 × 720"],["Sonnenbucht · Handy-Querformat","bucht-phone","852 × 283"],["Kap der Winde · Küstenstraße","kap-coast","1280 × 720"],["Kap der Winde · Basaltufer im Handyformat","kap-shore","852 × 283"],["Kap der Winde · Kartheck im Hochformat","kap-close","390 × 844"]],picker=document.getElementById('scene'),shot=document.getElementById('shot'),caption=document.getElementById('caption');
+let phase='after';
+function show(){
+ const [label,key,size]=scenes[picker.selectedIndex],phaseLabel=phase==='after'?'Nachher':'Vorher';
+ shot.src=(phase==='after'?'final-2026-11-05/':'')+phase+'/edge/'+key+'.png';shot.alt=label+' · '+phaseLabel;
+ caption.textContent=phaseLabel+' · '+size+' · Edge'+' · Renderfaktor 1,0';
+ for(const id of ['before','after'])document.getElementById(id).setAttribute('aria-pressed',String(id===phase));
+}
+picker.onchange=show;
+for(const id of ['before','after'])document.getElementById(id).onclick=()=>{phase=id;show();};
+show();
+</script></body></html>

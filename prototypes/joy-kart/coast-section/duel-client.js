@@ -1,4 +1,4 @@
-const labels=['Fuchs','Panda'];
+const labels=['Fuchs','Panda'],effectMotion=matchMedia('(prefers-reduced-motion: reduce)');
 let packet=null, received=0, token=sessionStorage.getItem(new URL('.',location.href).pathname)||'', pendingBoost=false, pendingReady=false, offline='', joined=false;
 const startButton=find('[data-action="start"]');
 const solo=typeof computerMode!=='undefined' && computerMode;
@@ -118,7 +118,10 @@ function moveKart(model,k,time,dt){
  model.group.position.set(p.x,p.y+.06+(k.lift||0),p.z);
  model.group.rotation.y=f.angle-Math.atan2(k.latV,Math.max(3,k.v));
  model.body.rotation.x=k.grounded?(k.lift>0?-.13:0):-Math.atan2(k.verticalSpeed||0,Math.max(12,k.v));
- model.body.rotation.z=-k.steer*.055;
+ const hit=kartImpact(k),moving=!effectMotion.matches;
+ const slide=moving&&hit.slip?Math.sin(Math.min(1,Math.max(0,hit.age)) * Math.PI*2)*Math.min(1,k.slow)*.52:0;
+ model.group.rotation.y+=slide;
+ model.body.rotation.z=-k.steer*.055+(moving&&hit.burst&&!hit.blocked?Math.sin(hit.age*24)*hit.burst*.11:0);
  model.shieldEffect.visible=k.shield>0;
  model.itemRing.visible=k.magnet>0||k.waveFlash>0;
  if(model.itemRing.visible)model.itemRing.scale.setScalar(k.waveFlash>0?1+6*(1-k.waveFlash):1.65+.15*Math.sin(time*7));

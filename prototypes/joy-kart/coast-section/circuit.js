@@ -50,7 +50,9 @@ function roboPace(gap){
  return .91+.075*Math.max(0,Math.min(1,gap/45));
 }
 function resolveKartWaves(racers,previous){
- function hit(target,item,seconds){
+ function hit(target,item,seconds,time){
+  // Immutable event metadata travels with snapshots, including shielded/repeated hits.
+  target.impact={item,time,blocked:target.shield>0,duration:seconds};
   if(target.shield>0){target.shield=0;target.blocked=1.2;return;}
   target.lastHit=item;target.slow=Math.max(target.slow,seconds);
  }
@@ -60,13 +62,13 @@ function resolveKartWaves(racers,previous){
   const length=source.courseLength;
   if((source.stats.itemUses.wave||0)>previous[i]){
    const gap=Math.abs(owner.s-target.s)%length;
-   if(Math.min(gap,length-gap)<=85)hit(target,'wave',2.2);
+   if(Math.min(gap,length-gap)<=85)hit(target,'wave',2.2,opponent.time);
   }
   if(owner.banana){
    const peel=owner.banana,start=opponent.stepStart??target.s;
    const crossing=peel.s+Math.ceil((start-peel.s)/length)*length;
    if((target.lift||0)<.6 && target.s>=crossing && Math.abs(target.lat-peel.lat)<1.25){
-    hit(target,'banana',2.5);owner.banana=null;
+    hit(target,'banana',2.5,opponent.time);owner.banana=null;
    }else if(owner.s-peel.s>length)owner.banana=null;
   }
   if(owner.rocket){
@@ -74,8 +76,22 @@ function resolveKartWaves(racers,previous){
    // Home along the shortest road arc, including across the start line.
    const delta=((target.s-rocket.s)%length+1.5*length)%length-length*.5;
    const reach=92*dt;
-   if(Math.abs(delta)<=reach+1){hit(target,'rocket',1.8);owner.rocket=null;}
+   if(Math.abs(delta)<=reach+1){hit(target,'rocket',1.8,opponent.time);owner.rocket=null;}
    else owner.rocket={s:rocket.s+Math.sign(delta)*reach,lat:rocket.lat+(target.lat-rocket.lat)*(1-Math.exp(-5*dt))};
   }
  }
+}
+
+// Presentation only: never change the authoritative speed, lane or item timers.
+function kartImpact(k){
+ const age=k?.impact?k.time-k.impact.time:Infinity;
+ return {age,burst:k?.phase==='running'&&age>=0&&age<.7?1-age/.7:0,
+  blocked:!!k?.impact?.blocked,slip:Number.isFinite(age)&&age>=0&&k?.phase==='running'&&k.slow>0&&k.lastHit==='banana'};
+}
+function kartThreat(k,other,course){
+ if(k?.phase!=='running'||!other)return null;
+ const gap=s=>course.wrap(s-k.s+course.lapLength/2)-course.lapLength/2;
+ if(other.rocket){const d=gap(other.rocket.s);if(Math.abs(d)<100)return {kind:'rocket',distance:Math.abs(d),behind:d<0};}
+ if(other.banana){const d=gap(other.banana.s);if(d>=0&&d<34&&Math.abs(k.lat-other.banana.lat)<1.8&&(k.lift||0)<.6)return {kind:'banana',distance:d};}
+ return null;
 }

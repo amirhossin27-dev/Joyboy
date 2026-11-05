@@ -3,6 +3,7 @@ async function createSimpleCoastWorld(THREE,c){
  const {scene,course,kit,artMaps,materials,texture,lighting,yieldTask}=c,{geometry:geo,material:mat}=kit;
  const root=new THREE.Group();scene.add(root);
  const boxGeo=geo(new THREE.BoxGeometry(1,1,1)),box=(w,h,d,m,p,x=0,y=0,z=0)=>{const o=kit.add(boxGeo,m,p,x,y,z);o.scale.set(w,h,d);return o;};
+ const softBox=(w,h,d,m,p,x=0,y=0,z=0)=>kit.add(kit.rounded(w-.05,h-.05,d-.05,Math.min(.12,w/4,h/4)),m,p,x,y,z);
  const at=(s,lat=0,extra=0)=>{const p=course.point(s,lat);return new THREE.Vector3(p.x,p.y+extra,p.z);};
  const stone=mat(0xd8c7a8,{map:artMaps.stone,bumpMap:artMaps.stone,bumpScale:.035}),road=mat(0x8c918c,{map:artMaps.asphalt,bumpMap:artMaps.asphalt,bumpScale:.012}),curb=mat(0xffffff,{vertexColors:true}),wall=mat(0xc4b293,{map:artMaps.stone,bumpMap:artMaps.stone,bumpScale:.04,side:THREE.DoubleSide}),wood=mat(0x75513a),dark=mat(0x263b3d),roofMat=mat(0x9b4b33),gold=mat(0xe6c584,{metalness:.5,roughness:.3});
  // Small headlands carry the seaward houses; between them the wall hugs the road.
@@ -12,19 +13,41 @@ async function createSimpleCoastWorld(THREE,c){
  const width=(s,l)=>Math.abs(l)!==19?l:bridgeAt(s)?Math.sign(l)*8:l<0?-19:circuit?17+2*Math.cos(s/30):shoreWidth(s);
  function strip(inner,outer,material,extra=0,colored=false){
   const positions=[],uv=[],colors=[],indices=[];
-  for(let s=start;s<end;s+=step){const j=positions.length/3;for(const [d,l]of[[s,inner],[s,outer],[s+step,inner],[s+step,outer]]){const p=at(d,width(d,l),extra);positions.push(p.x,p.y,p.z);uv.push((l-inner)/4,d/6);if(colored){const col=new THREE.Color(Math.floor(s/2)%2?0xe6dbc0:0xa84632);colors.push(col.r,col.g,col.b);}}indices.push(j,j+1,j+2,j+1,j+3,j+2);}
-  const g=geo(new THREE.BufferGeometry());g.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));if(colored)g.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));g.setIndex(indices);g.computeVertexNormals();return kit.add(g,material,root);
+  const count=Math.ceil((end-start)/step),ds=(end-start)/count;
+  function vertex(d,l){const p=at(d,width(d,l),extra);positions.push(p.x,p.y,p.z);uv.push((l-inner)/4,d/6);}
+  if(colored){
+   // The kerb changes colour at a segment boundary, so it deliberately keeps split vertices.
+   for(let n=0;n<count;n++){
+    const d=start+n*ds,j=positions.length/3,col=new THREE.Color(Math.floor(d/2)%2?0xe6dbc0:0xa84632);
+    for(const [t,l] of [[d,inner],[d,outer],[d+ds,inner],[d+ds,outer]]){vertex(t,l);colors.push(col.r,col.g,col.b);}
+    indices.push(j,j+1,j+2,j+1,j+3,j+2);
+   }
+  }else{
+   // Shared cross-sections give the same normal on both sides of every road seam.
+   for(let n=0;n<=count;n++){const d=start+n*ds;vertex(d,inner);vertex(d,outer);if(n<count){const j=n*2;indices.push(j,j+1,j+2,j+1,j+3,j+2);}}
+  }
+  const g=geo(new THREE.BufferGeometry());g.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));if(colored)g.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));g.setIndex(indices);g.computeVertexNormals();
+  if(circuit&&!colored){const normal=g.attributes.normal;for(let lane=0;lane<2;lane++){const last=count*2+lane,v=new THREE.Vector3().fromBufferAttribute(normal,lane).add(new THREE.Vector3().fromBufferAttribute(normal,last)).normalize();normal.setXYZ(lane,v.x,v.y,v.z);normal.setXYZ(last,v.x,v.y,v.z);}}
+  return kit.add(g,material,root);
  }
  if(circuit){
-  // Broad rubbered-in wheel paths catch grazing light differently from the coarse shoulders.
+  // Keep the grain in the atlas, compress its contrast for the racing camera.
+  const aggregate=texture(256,256,(ctx,w,h)=>{
+   ctx.fillStyle=course.cape?'#6f7477':'#756e67';ctx.fillRect(0,0,w,h);
+   ctx.globalAlpha=.36;ctx.drawImage(artMaps.asphalt.image,0,0,w,h);
+  });
+  aggregate.wrapS=aggregate.wrapT=THREE.RepeatWrapping;aggregate.repeat.set(1.6,1.6);
+  aggregate.anisotropy=artMaps.asphalt.anisotropy;
+  road.map=aggregate;road.bumpMap=aggregate;road.bumpScale=.006;
+  // Dry wheel paths vary in roughness without reading as bright lane markings.
   const wear=texture(256,16,(ctx,w,h)=>{
    const gradient=ctx.createLinearGradient(0,0,w,0);
-   for(const [x,value] of [[0,245],[.18,225],[.28,150],[.36,207],[.5,234],[.64,207],[.72,150],[.82,225],[1,245]])
+   for(const [x,value] of [[0,251],[.18,248],[.28,227],[.36,244],[.5,250],[.64,244],[.72,227],[.82,248],[1,251]])
     gradient.addColorStop(x,'rgb('+[value,value,value].join(',')+')');
    ctx.fillStyle=gradient;ctx.fillRect(0,0,w,h);
   });
   wear.colorSpace=THREE.NoColorSpace;wear.repeat.x=1/3;road.roughness=.95;road.roughnessMap=wear;
-  scene.fog.color.setHex(course.cape?0xa1b6c2:0x9daeb9);scene.fog.density=course.cape?.003:.0023;
+  scene.fog.color.setHex(course.cape?0x97b5c7:0x9daeb9);scene.fog.density=course.cape?.003:.0023;
  }
  strip(-19,19,stone);strip(-6,6,road,.025);strip(-6.4,-6,curb,.065,true);strip(6,6.4,curb,.065,true);
  // Retaining sides and end caps extend below water: the promenade cannot float.
@@ -79,19 +102,66 @@ async function createSimpleCoastWorld(THREE,c){
   sign.position.copy(at(towers[0],0,9.3));sign.rotation.y=course.frame(towers[0]).angle+Math.PI;
  }
  const spacing=circuit?6.5:2.5;
- const railGeo=geo(new THREE.LatheGeometry([new THREE.Vector2(.14,0),new THREE.Vector2(.14,.1),new THREE.Vector2(.07,.2),new THREE.Vector2(.12,.5),new THREE.Vector2(.075,.9),new THREE.Vector2(.15,1)],8)),posts=new THREE.InstancedMesh(railGeo,stone,2*(Math.ceil((end-start)/spacing)+1)),dummy=new THREE.Object3D();let i=0;
+ const railGeo=geo(new THREE.LatheGeometry([new THREE.Vector2(.14,0),new THREE.Vector2(.14,.1),new THREE.Vector2(.07,.2),new THREE.Vector2(.12,.5),new THREE.Vector2(.075,.9),new THREE.Vector2(.15,1)],12)),posts=new THREE.InstancedMesh(railGeo,stone,2*(Math.ceil((end-start)/spacing)+1)),dummy=new THREE.Object3D();let i=0;
  for(let s=start;s<=end;s+=spacing)for(const side of[-1,1]){dummy.position.copy(at(s,side*7.2));dummy.updateMatrix();posts.setMatrixAt(i++,dummy.matrix);}
  posts.count=i;posts.castShadow=true;posts.receiveShadow=true;posts.computeBoundingSphere();scene.add(posts);
- for(let s=start;s<end;s+=spacing)for(const side of[-1,1])kit.rod(at(s,side*7.2,1.05).toArray(),at(Math.min(s+spacing,end),side*7.2,1.05).toArray(),.10,stone,root,6);
- const plaster=[0xd8bf91,0xc99e7d,0xe0d0a9].map(c=>mat(c,{bumpMap:artMaps.stone,bumpScale:.018,roughness:.92})),windowMat=mat(0x293c42,{metalness:.2}),leaf=mat(0x345039),treeGeo=geo(new THREE.SphereGeometry(1,10,8)),roofGeo=geo(new THREE.ConeGeometry(1,1,4));roofGeo.rotateY(Math.PI/4);
+ for(let s=start;s<end;s+=spacing)for(const side of[-1,1])kit.rod(at(s,side*7.2,1.05).toArray(),at(Math.min(s+spacing,end),side*7.2,1.05).toArray(),.10,stone,root,10);
+ const plaster=[0xd8bf91,0xc99e7d,0xe0d0a9].map(c=>mat(c,{bumpMap:artMaps.stone,bumpScale:.018,roughness:.92})),windowMat=mat(0x293c42,{metalness:.2}),leaf=mat(0x345039),treeGeo=geo(new THREE.SphereGeometry(1,18,12));
+ const roofTiles=texture(128,128,(ctx,w,h)=>{
+  ctx.fillStyle='#c6a08b';ctx.fillRect(0,0,w,h);
+  for(let row=0;row<8;row++)for(let col=-1;col<8;col++){
+   const x=col*18+(row%2)*9,y=row*16;
+   const glaze=ctx.createLinearGradient(x,0,x+18,0);glaze.addColorStop(0,'#805844');glaze.addColorStop(.45,'#e8baa0');glaze.addColorStop(1,'#b08467');ctx.fillStyle=glaze;ctx.fillRect(x,y,17,15);
+  }
+ });roofTiles.wrapS=roofTiles.wrapT=THREE.RepeatWrapping;roofTiles.repeat.set(3,2);roofMat.map=roofTiles;roofMat.bumpMap=roofTiles;roofMat.bumpScale=.025;
+ const roofGeo=geo(new THREE.BufferGeometry()),roofVertices=[[-1,0,-1],[1,0,-1],[1,0,1],[-1,0,1],[-.55,1,0],[.55,1,0]],roofPositions=[],roofUvs=[];
+ for(const id of [0,4,5,0,5,1,1,5,2,2,5,4,2,4,3,3,4,0]){const [x,y,z]=roofVertices[id];roofPositions.push(x,y,z);roofUvs.push((x+1)/2,(z+1)/2);}
+ roofGeo.setAttribute('position',new THREE.Float32BufferAttribute(roofPositions,3));roofGeo.setAttribute('uv',new THREE.Float32BufferAttribute(roofUvs,2));roofGeo.computeVertexNormals();
+ // Bake the soft contact shade into a shared decal. All eaves and shutters use one batch.
+ const facadeShade=texture(64,32,(ctx,w,h)=>{
+  const fade=ctx.createImageData(w,h);
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+   const i=(y*w+x)*4,edge=Math.min(1,x/5,(w-1-x)/5);
+   fade.data.set([63,43,39,Math.round(90*edge*(1-y/(h-1))**2)],i);
+  }
+  ctx.putImageData(fade,0,0);
+ });
+ const shadeMaterial=new THREE.MeshBasicMaterial({map:facadeShade,transparent:true,depthWrite:false});
+ materials.add(shadeMaterial);
+ const facadePlane=geo(new THREE.PlaneGeometry(1,1));
+ function contactShade(parent,x,y,z,w,h){
+  const patch=kit.add(facadePlane,shadeMaterial,parent,x,y,z);patch.scale.set(w,h,1);
+ }
  const shutters=[mat(0x426967),mat(0x496078),mat(0x64764d)],awning=mat(0xb84937),linen=mat(0xf1ddab);
  for(let n=0;n<(course.cape?0:28);n++){
   if(n%6===0||n%6===2)continue;
   const s=circuit?(n<14?end*.025+n*13:end*.69+(n-14)*12):12+n*10,side=n%2?-1:1,p=at(s,side*(12.5+1.3*Math.sin(n*2))),g=new THREE.Group();g.position.copy(p);g.rotation.y=course.frame(s).angle+side*Math.PI/2;root.add(g);const h=5+n%3;
-  box(4,h,3,plaster[n%3],g,0,h/2,0);const roof=kit.add(roofGeo,roofMat,g,0,h+.6,0);roof.scale.set(3.1,1.3,2.5);box(4.2,.18,3.2,stone,g,0,h,0);
-  for(const y of[1.5,3.5])for(const x of[-1,1]){box(.8,1,.05,stone,g,x,y,1.52);box(.6,.8,.06,windowMat,g,x,y,1.56);box(.8,.08,.3,stone,g,x,y-.55,1.63);}
+  softBox(4,h,3,plaster[n%3],g,0,h/2,0);
+  softBox(4.15,.36,3.15,stone,g,0,.18,0);softBox(4.18,.22,3.18,stone,g,0,h-.12,0);
+  const roof=kit.add(roofGeo,roofMat,g,0,h+.04,0);roof.scale.set(2.24,1.15,1.74);
+  kit.rod([-1.24,h+1.20,0],[1.24,h+1.20,0],.075,roofMat,g,12);
+  for(const sign of [-1,1]){
+   const face=new THREE.Group();face.rotation.y=sign===1?0:Math.PI;face.position.z=sign*1.5;g.add(face);
+   contactShade(face,0,h-.44,.052,3.92,.59);
+  }
+  // Side elevations are the main view when driving past; give them recessed panes and cornices too.
+  for(const side of [-1,1]){
+   const facade=new THREE.Group();facade.position.x=side*2;facade.rotation.y=side*Math.PI/2;g.add(facade);
+   contactShade(facade,0,h-.44,.05,2.96,.59);
+   for(const y of [1.6,h-1.26])for(const x of [-.72,.72]){
+    box(.88,1.16,.11,stone,facade,x,y,.025);box(.65,.91,.055,windowMat,facade,x,y,.09);
+    box(.035,.92,.035,linen,facade,x,y,.13);box(.65,.035,.035,linen,facade,x,y-.08,.13);
+    box(1,.12,.30,stone,facade,x,y-.64,.12);
+   }
+   for(const x of [-1.38,1.38])for(let level=0;level<h-.4;level+=.65)box(.24,.28,.12,stone,facade,x,level+.35,.025);
+  }
+  for(const y of[1.5,h-1.26])for(const x of[-1,1]){box(.8,1,.05,stone,g,x,y,1.52);box(.6,.8,.06,windowMat,g,x,y,1.56);box(.8,.08,.3,stone,g,x,y-.55,1.63);}
   box(.8,1.8,.06,dark,g,0,.9,1.55);
-  for(const x of [-1,1])for(const sign of [-1,1])box(.24,.88,.09,shutters[n%3],g,x+sign*.49,3.5,1.59);
+  for(const x of [-1,1])for(const sign of [-1,1]){
+   const sx=x+sign*.49,y=h-1.26;
+   contactShade(g,sx+.04,y-.51,1.55,.31,.23);
+   box(.24,.88,.12,shutters[n%3],g,sx,y,1.61);
+  }
   if(n%3){
    for(let stripe=0;stripe<9;stripe++){
     const shade=box(.32,.09,1.04,stripe%2?linen:awning,g,(stripe-4)*.32,2.6,1.97);
@@ -108,7 +178,7 @@ async function createSimpleCoastWorld(THREE,c){
  let treeCard,foliage;
  if(artMaps.foliage){
   treeCard=geo(new THREE.PlaneGeometry(1,1));
-  foliage=new THREE.MeshBasicMaterial({map:artMaps.foliage,alphaTest:.40,side:THREE.DoubleSide,color:0xf0f3ee});
+  foliage=new THREE.MeshBasicMaterial({map:artMaps.foliage,alphaTest:.40,alphaToCoverage:true,side:THREE.DoubleSide,color:0xf0f3ee});
   materials.add(foliage);
  }
  for(let s=4;s<(circuit?end:310);s+=circuit?17:9)for(const side of [-1,1]){
@@ -131,15 +201,116 @@ async function createSimpleCoastWorld(THREE,c){
   }}
  // Low flower beds frame intermittent views over the water; the seaward cliffs
  // overlap the retaining wall and taper down beneath the waterline.
- const crag=geo(new THREE.IcosahedronGeometry(1,1)),lichen=mat(0xa99679,{map:artMaps.stone,roughness:1});
+ const crag=geo(new THREE.IcosahedronGeometry(1,2)),lichen=mat(0xa99679,{map:artMaps.stone,roughness:1});
  if(course.cape){
   const basalt=mat(0x52636b,{map:artMaps.stone,roughness:.96});
   for(let n=0;n<74;n++){
    const s=end*n/74,side=n%3===0?-1:1,p=at(s,side*(31+8*Math.sin(n*1.7)));
+   if(s>=85&&s<=265&&side===1)continue;
    const stack=kit.add(crag,basalt,root,p.x,-2,p.z);
    stack.scale.set(4+2*Math.cos(n),9+5*Math.sin(n*2.3),5+2*Math.sin(n));
    stack.rotation.y=n*1.1;
   }
+  // One connected headland, sampled in course coordinates so its inner edge stays
+  // under the promenade. Stepped strata, a dark wet toe and broken surf share the shoreline.
+  const rockPos=[],rockColors=[],surfPos=[],surfColors=[];
+  const strata=[0x777d73,0x8b938a,0x545f66,0x747e80,0x49565b,0x34464a,0x293e44];
+  function quad(pos,colors,a,b,c,d,tint){
+   const color=new THREE.Color(tint);
+   for(const v of [a,b,c,c,b,d]){pos.push(v.x,v.y,v.z);colors.push(color.r,color.g,color.b);}
+  }
+  let prev;
+  for(let i=0;i<=56;i++){
+   const s=85+i*3.2,t=i/56,envelope=Math.sin(Math.PI*t)**1.2;
+   const shelf=envelope*(7+11*Math.sin(2*Math.PI*t)**2),edge=18+shelf;
+   const crest=-2.9+envelope*(7+2*Math.cos(s*.11)),ledge=.65*Math.sin(s*.46);
+   const point=(l,y)=>{const p=at(s,l);p.y=y;return p;};
+   const row=[point(15,crest-.7),point(edge-3.8,crest+.3),point(edge-3,crest-.5),
+    point(edge-2.7,crest-1.2),point(edge-1.8+ledge,(crest-3)/2),point(edge-.35,-1.24),point(edge,-1.98),point(edge+.36,-3.2)];
+   const surf=point(edge+.22+envelope*(.55+.35*Math.cos(s*.6)),-1.94);
+   if(prev){
+    for(let j=0;j<row.length-1;j++)quad(rockPos,rockColors,prev.row[j],prev.row[j+1],row[j],row[j+1],strata[j]);
+    if(envelope>.26 && (i%9)<7)quad(surfPos,surfColors,prev.row[6],prev.surf,row[6],surf,i%3===0?0x9ebbb9:0xabc8c5);
+   }
+   prev={row,surf};
+  }
+  // The high road hides the foot of the attached shelf. Detached stacks beyond
+  // it show their shaded, landward faces and their waterline from the driver's seat.
+  function rockStack(s,offset,rx,rz,height,phase){
+   const centre=at(s,offset),angle=course.frame(s).angle+.35,segments=11;
+   const rings=[[-.7,1.06],[.06,1],[.8,.95],[height*.37,.86],[height*.44,.88],
+    [height*.52,.73],[height*.81,.72],[height,.48]];
+   const tints=[0x324c52,0x42595d,0x697979,0x58686b,0x87918b,0x606e70,0x9b9d8f];
+   const lip=[];
+   function rim(j,level){
+    const [rise,radius]=rings[level],a=j*2*Math.PI/segments;
+    const irregular=1+.12*Math.sin(3*a+phase)+.07*Math.sin(5*a-phase);
+    const x=rx*(radius*irregular*Math.cos(a)+rise/height*.21),z=rz*radius*irregular*Math.sin(a);
+    return new THREE.Vector3(centre.x+x*Math.cos(angle)+z*Math.sin(angle),
+     -2+rise*(1+.13*Math.cos(a+phase)+.065*Math.sin(3*a+phase+level*.46)),centre.z-x*Math.sin(angle)+z*Math.cos(angle));
+   }
+   for(let j=0;j<segments;j++){
+    for(let k=0;k<rings.length-1;k++)
+     quad(rockPos,rockColors,rim(j,k),rim(j,k+1),rim(j+1,k),rim(j+1,k+1),tints[k]);
+    const peak=new THREE.Vector3(centre.x+rx*.18,-2+height,centre.z);
+    const top=rings.length-1;const tint=new THREE.Color(0x929783);
+    for(const v of [peak,rim(j+1,top),rim(j,top)]){rockPos.push(v.x,v.y,v.z);rockColors.push(tint.r,tint.g,tint.b);}
+    lip.push(rim(j,1));
+   }
+   for(let j=0;j<segments;j++){
+    if((j+Math.floor(phase))%4===0)continue;
+    const a=lip[j],b=lip[(j+1)%segments];
+    const outer=v=>new THREE.Vector3(centre.x+(v.x-centre.x)*1.09,-1.91,centre.z+(v.z-centre.z)*1.09);
+    quad(surfPos,surfColors,a,b,outer(a),outer(b),0xb5ceca);
+   }
+  }
+  rockStack(137,34,5.4,8.2,10.4,.7);
+  rockStack(150,42,8.5,12.5,16.5,2.2);
+  rockStack(162,38,6.4,9.8,12.8,1.1);
+  rockStack(199,49,9,15,10.3,2.7);
+  function shoreMesh(pos,colors,material){
+   const g=geo(new THREE.BufferGeometry());
+   g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
+   if(material.map){
+    const uv=[];
+    for(let i=0;i<pos.length;i+=3){
+     const [x,y,z]=[pos[i],pos[i+1],pos[i+2]];
+     uv.push((x*.86+z*.5)/7,(y+z*.21-x*.13)/7);
+    }
+    g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));
+   }
+   g.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));g.computeVertexNormals();
+   kit.add(g,material,root);
+  }
+  // Tileable weathered basalt: coarse mineral variation, narrow vertical joints
+  // and a lighter broken edge. Baked once, it costs no per-frame noise shader.
+  const basaltSkin=texture(256,256,(ctx,w,h)=>{
+   const pixels=ctx.createImageData(w,h);
+   function makeNoise(cells){
+    const values=new Float32Array(cells*cells);let seed=cells;
+    for(let i=0;i<values.length;i++){seed=(Math.imul(seed,1664525)+1013904223)>>>0;values[i]=seed/4294967296;}
+    const mask=cells-1;
+    return (x,y)=>{
+     const ix=Math.floor(x*cells),iy=Math.floor(y*cells),next=(ix+1)&mask;
+     let u=x*cells-ix,v=y*cells-iy;u=u*u*(3-2*u);v=v*v*(3-2*v);
+     const a=iy*cells,b=((iy+1)&mask)*cells;
+     return (1-v)*(values[a+ix]*(1-u)+values[a+next]*u)+v*(values[b+ix]*(1-u)+values[b+next]*u);
+    };
+   }
+   const coarse=makeNoise(8),veins=makeNoise(16),detail=makeNoise(64),grit=makeNoise(128);
+   for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+    const u=x/w,v=y/h,n=coarse(u,v),fine=detail(u,v),grain=grit(u,v);
+    const fracture=Math.abs(Math.sin(Math.PI*(8*u+.58*n+.22*veins(u,v))));
+    const joint=1-Math.min(1,fracture*8),edge=Math.max(0,1-Math.abs(fracture-.17)*9);
+    const value=168+51*(n-.45)+44*(fine-.5)+26*(grain-.5)-51*joint+18*edge;
+    const pale=Math.max(0,(n+fine-1.22)*42),i=(y*w+x)*4;
+    pixels.data[i]=value+pale;pixels.data[i+1]=value+pale*.82;pixels.data[i+2]=value+4;pixels.data[i+3]=255;
+   }
+   ctx.putImageData(pixels,0,0);
+  });
+  basaltSkin.wrapS=basaltSkin.wrapT=THREE.RepeatWrapping;basaltSkin.anisotropy=artMaps.stone.anisotropy;
+  shoreMesh(rockPos,rockColors,mat(0xffffff,{vertexColors:true,map:basaltSkin,bumpMap:basaltSkin,bumpScale:.095,roughness:.92}));
+  shoreMesh(surfPos,surfColors,mat(0xffffff,{vertexColors:true,roughness:.68}));
  }
  const blooms=[0xba3656,0xb55782,0xebad52].map(color=>mat(color));
  for(let j=0;j<33;j++){
@@ -169,13 +340,13 @@ async function createSimpleCoastWorld(THREE,c){
     const reef=kit.add(crag,lichen,g);reef.scale.set(9,4.5,8);
     for(let level=0;level<4;level++){
      const radius=2.3-level*.23;
-     const tower=geo(new THREE.CylinderGeometry(radius-.23,radius,3.15,12));
+     const tower=geo(new THREE.CylinderGeometry(radius-.23,radius,3.15,28));
      kit.add(tower,level%2?awning:linen,g,0,5.15+3.15*level,0);
     }
-    kit.add(geo(new THREE.CylinderGeometry(2.0,2.0,.4,12)),dark,g,0,16.2,0);
-    kit.add(geo(new THREE.CylinderGeometry(1.14,1.14,1.9,10)),gold,g,0,17.25,0);
+    kit.add(geo(new THREE.CylinderGeometry(2.0,2.0,.4,28)),dark,g,0,16.2,0);
+    kit.add(geo(new THREE.CylinderGeometry(1.14,1.14,1.9,24)),gold,g,0,17.25,0);
     for(const x of [-.95,.95])for(const z of [-.7,.7])box(.12,2,.12,dark,g,x,17.25,z);
-    kit.add(geo(new THREE.ConeGeometry(1.95,1.3,12)),roofMat,g,0,18.7,0);
+    kit.add(geo(new THREE.ConeGeometry(1.95,1.3,28)),roofMat,g,0,18.7,0);
    }else{
     box(3.6,.5,15,wood,g,0,1.6,0);
     for(const z of [-6,-2,2,6])for(const x of [-1.55,1.55])box(.3,3.4,.3,wood,g,x,1,z);
@@ -210,7 +381,7 @@ async function createSimpleCoastWorld(THREE,c){
   };
   // Open illuminated arches share a single static material batch on the phone.
   const archInk=mat(0x70ffe0,{emissive:0x098e80,roughness:.38,side:THREE.DoubleSide});
-  const archGeo=geo(new THREE.TorusGeometry(1,.065,6,24,Math.PI));
+  const archGeo=geo(new THREE.TorusGeometry(1,.065,8,48,Math.PI));
   for(const mark of course.gateMarks){
    const p=at(mark.s,mark.lat,.069);
    const dash=box(.23,.018,1.6,archInk,root,p.x,p.y,p.z);

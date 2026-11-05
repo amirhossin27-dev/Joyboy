@@ -1,0 +1,191 @@
+{
+  "passed": true,
+  "phase": "after",
+  "sha256": "01b6f96c8369a805885d203230f1bb53a5cfddf144eeda6ee027cddaeb2ece02",
+  "results": [
+    {
+      "name": "bucht-town",
+      "camera": [
+        -239.59317337373076,
+        11.672697065721453,
+        -140.89200404488994
+      ],
+      "look": [
+        -220.43830310972726,
+        10.178205003697858,
+        -156.30976514754374
+      ],
+      "fov": 57.79951694526262,
+      "calls": 199,
+      "triangles": 709278,
+      "geometries": 174,
+      "textures": 25,
+      "ratio": 0.85,
+      "samples": 4,
+      "audit": {
+        "backdropTrianglesChecked": 229956,
+        "backdropCorridorIntrusions": 0,
+        "corridorSections": 416
+      }
+    },
+    {
+      "name": "bucht-phone",
+      "camera": [
+        -239.59317334467656,
+        11.672697036070833,
+        -140.89200401100175
+      ],
+      "look": [
+        -220.43830502280352,
+        10.178204977100847,
+        -156.3097638072085
+      ],
+      "fov": 57.79920437340411,
+      "calls": 209,
+      "triangles": 711176,
+      "geometries": 181,
+      "textures": 26,
+      "ratio": 1,
+      "samples": 4,
+      "driveTiming": {
+        "frames": 60,
+        "medianMs": 16.69999999999891,
+        "p95Ms": 17,
+        "endRatio": 1
+      }
+    },
+    {
+      "name": "bucht-bridge",
+      "camera": [
+        287.8490590974903,
+        8.38659994133518,
+        -97.96390311042008
+      ],
+      "look": [
+        306.36134506959945,
+        6.738025677907947,
+        -81.78235963652605
+      ],
+      "fov": 57.79920675670715,
+      "calls": 166,
+      "triangles": 414240,
+      "geometries": 187,
+      "textures": 26,
+      "ratio": 1,
+      "samples": 4
+    },
+    {
+      "name": "kap-coast",
+      "camera": [
+        -283.8381894045721,
+        10.896691247549844,
+        -73.37626854690794
+      ],
+      "look": [
+        -262.12522635843055,
+        9.520123669538718,
+        -84.92163622067028
+      ],
+      "fov": 57.79920516863302,
+      "calls": 182,
+      "triangles": 404664,
+      "geometries": 155,
+      "textures": 25,
+      "ratio": 1,
+      "samples": 4,
+      "audit": {
+        "backdropTrianglesChecked": 0,
+        "backdropCorridorIntrusions": 0,
+        "corridorSections": 432
+      }
+    },
+    {
+      "name": "kap-shore",
+      "camera": [
+        -269.8933432560826,
+        11.20103686433147,
+        -81.23174183133477
+      ],
+      "look": [
+        -247.4549087949483,
+        9.825035625589331,
+        -91.30219852229118
+      ],
+      "fov": 57.79920516863302,
+      "calls": 184,
+      "triangles": 404680,
+      "geometries": 155,
+      "textures": 25,
+      "ratio": 1,
+      "samples": 4
+    },
+    {
+      "name": "kap-bridge",
+      "camera": [
+        243.10250455724815,
+        8.639829845454084,
+        -106.49950051105616
+      ],
+      "look": [
+        234.70053232176667,
+        6.9255306620007335,
+        -83.39777005293308
+      ],
+      "fov": 57.79920437340411,
+      "calls": 181,
+      "triangles": 403092,
+      "geometries": 155,
+      "textures": 25,
+      "ratio": 1,
+      "samples": 4,
+      "driveTiming": {
+        "frames": 60,
+        "medianMs": 16.600000000000364,
+        "p95Ms": 17,
+        "endRatio": 1
+      }
+    },
+    {
+      "name": "bucht-hit",
+      "camera": [
+        -233.6753898127288,
+        11.771178552857924,
+        -146.1670991598127
+      ],
+      "look": [
+        -213.89811769877807,
+        10.266130931478893,
+        -160.77865904329573
+      ],
+      "fov": 57.30587825249725,
+      "calls": 212,
+      "triangles": 712248,
+      "geometries": 184,
+      "textures": 26,
+      "ratio": 1,
+      "samples": 4
+    },
+    {
+      "name": "kap-close",
+      "camera": [
+        -209.80380102335758,
+        12.38408428819401,
+        -102.82727053259019
+      ],
+      "look": [
+        -186.71931156388072,
+        10.967340420927446,
+        -111.44835928429528
+      ],
+      "fov": 57.799203577379565,
+      "calls": 100,
+      "triangles": 252687,
+      "geometries": 151,
+      "textures": 24,
+      "ratio": 1,
+      "samples": 4
+    }
+  ],
+  "errors": [],
+  "captureRetries": []
+}

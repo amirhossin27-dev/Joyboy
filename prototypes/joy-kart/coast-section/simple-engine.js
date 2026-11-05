@@ -7,7 +7,7 @@ function createCoastSimpleModule(circuit=null,fastRace=false){
  const course=circuit||{length:LENGTH,halfWidth:6,centreBound:BOUND,frame,point,height,boxes:[60,145,235]};
  class SimpleRace{
   constructor(){this.courseLength=course.lapLength||LENGTH;this.reset();}
-  reset(){this.phase='ready';this.previousPhase='running';this.time=0;this.countdown=3;this.accumulator=0;this.queued=false;this.events=[];this.taken=new Set();this.edge=false;this.k={s:0,lat:0,latV:0,v:0,y:course.height(0),steer:0,boost:0,shield:0,magnet:0,slow:0,blocked:0,waveFlash:0,banana:null,rocket:null,lastHit:null,item:'turbo',grounded:true,lift:0,verticalSpeed:0,route:'main',routeProof:null};this.k.gateChain=0;this.stats={lines:0,lapEnds:{},turboUses:0,edgeTouches:0,boxes:0,itemUses:{turbo:0}};}
+  reset(){this.phase='ready';this.previousPhase='running';this.time=0;this.countdown=3;this.accumulator=0;this.queued=false;this.events=[];this.taken=new Set();this.edge=false;this.k={s:0,lat:0,latV:0,v:0,y:course.height(0),steer:0,boost:0,shield:0,magnet:0,slow:0,blocked:0,waveFlash:0,banana:null,rocket:null,lastHit:null,impact:null,item:'turbo',grounded:true,lift:0,verticalSpeed:0,route:'main',routeProof:null};this.k.gateChain=0;this.stats={lines:0,lapEnds:{},turboUses:0,edgeTouches:0,boxes:0,itemUses:{turbo:0}};}
   begin(){this.reset();this.phase='countdown';}
   pause(){if(!['running','countdown'].includes(this.phase))return;this.previousPhase=this.phase;this.phase='paused';this.accumulator=0;this.queued=false;this.k.latV=0;this.k.steer=0;}
   resume(){if(this.phase==='paused'){this.phase=this.previousPhase;this.accumulator=0;}}

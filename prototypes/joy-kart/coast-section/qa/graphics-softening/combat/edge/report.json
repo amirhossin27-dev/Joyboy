@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "visualCapture": "Continuous page",
+  "sha256": "9cbe307505423254e8b80983ad39512003dac75d67bcb3ff86fce003b3713f07",
+  "checks": [
+    "bucht: threats, contacts, slowdown, shield, recovery, guest, reduced motion, layouts, visible scene pixels",
+    "kap: threats, contacts, slowdown, shield, recovery, guest, reduced motion, layouts, visible scene pixels",
+    "kompakt: threats, contacts, slowdown, shield, recovery, guest, reduced motion, layouts, visible scene pixels"
+  ],
+  "errors": []
+}

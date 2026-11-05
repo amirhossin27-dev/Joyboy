@@ -1,5 +1,41 @@
 # Joyboy – Projektstatus und Übergabe
 
+## 05.11.2026 – Joy-Kart · Licht, Fahrbahn und Fjordküste
+
+**Lokal umgesetzt und geprüft.** Freigegebene Etappe auf `codex/joy-kart-grafik-effekte`. Wärmeres Fülllicht und lesbares Kartheck in der Sonnenbucht, angepasste Fensterhöhen und Kontaktschatten an Fassaden, ruhigerer Asphalt sowie abgestimmte Lack-, Metall- und Reifenmaterialien. Das Kap erhielt ein gestuftes Ufer mit vier vorgelagerten, strukturierten Basaltfelsen. Die Fahrkamera verdeckt Teile der tief liegenden Gischt. Die visuelle Gesamtfreigabe durch den Nutzer ist offen.
+
+**Prüfungen.** 148 App-Tests mit einem Worker und 66 Node-Tests bestanden, ebenso Produktionsbuild/TypeScript. Der parallele Standardlauf überschritt zweimal das 5-Sekunden-Limit eines Lernspieltests. Abschließender Edge-Vergleich am 05.11. mit acht Rennständen einschließlich Fahrzeitmessungen, alle Bilder wie die Ausgangsfassung bei Renderfaktor 1. Am 05.11. vollständiger WebKit-Lauf mit acht sichtbaren Browserbildern, ohne gemeldete Shader-/Skriptfehler und mit Renderfaktor 1. Bilder im Hoch- und Querformat angesehen. Vergleichsseite mit fünf Perspektiven und zehn Bildzuständen im Browser geprüft. PC- und App-Datei bytegleich. Details und Messwerte stehen im [Entwicklungsjournal](kart_dev.md).
+
+**Offene Geräteprüfung.** Windows-WebKit verliert in der lokalen Screenshot-Prüfung nach einer Änderung der Zeichenflächengröße reproduzierbar die sichtbare 3D-Ebene. Das WebGL-Bild bleibt vorhanden. Dies trat auch mit der Ausgangsdatei vom 03.11. auf. Eine kontrollierte Diagnose bestätigt sichtbares Bild bei Faktor 1 und leere Browseraufnahmen nach Wechsel auf 0,85/0,8 sowie zurück auf 1. Der erfolgreiche Lauf vom 05.11. erfolgte ohne solchen Wechsel. Daraus folgt keine Safari-Abnahme am physischen iPhone.
+
+**Ergebnis.** [Interaktiver Vorher-/Nachher-Vergleich](prototypes/joy-kart/coast-section/qa/coastal-light/vergleich.html) und [PC-Version](prototypes/joy-kart/dist/Joy-Kart-PC.html), SHA-256 `01b6f96c8369a805885d203230f1bb53a5cfddf144eeda6ee027cddaeb2ece02`. Vorhandene vorgemerkte Arbeiten und ältere Vergleichsdateien sind erhalten.
+
+**Nächster Schritt.** Auf dem iPhone 15 drei Runden je Kurs fahren, erste und dritte Runde hinsichtlich Bildruhe und Erwärmung vergleichen und das Gerät zwischen Hoch- und Querformat drehen. Sichtbarkeit bei Auflösungswechsel und Nutzerurteil zur Grafik stehen aus.
+
+## 03.11.2026 – Joy-Kart · Weichere Grafik
+
+PR-Vorbereitung auf `codex/joy-kart-grafik-effekte`, Basis `main` nach dem bereits zusammengeführten PR #26. Enthält die folgende Attacken-Etappe und diese Grafiküberarbeitung. Weich auslaufender Rauch, Lichtfunken und Raketenabgas ersetzen die groben Partikelkörper. Rundere Schilde/Items, Torbögen, Geländer, Felsen und Leuchttürme; geglättete Fahrbahn-Normalen einschließlich Rundenschluss. Häuser mit abgerundeten Hauptkanten, ausgearbeiteten Seitenfenstern, Sockeln und Walmdächern mit Ziegelmaterial. Feinere Rundungen bestehender Kart-Bauteile, geglättete Vegetationskanten und stärkeres Fülllicht. Bestehende Fahrregeln erhalten.
+
+**Geprüft:** Produktionsbuild/TypeScript und 214 Tests nach Geometrie-/Partikelumbau. Endgültiger Build in Edge und WebKit mit sieben identischen Grafikständen je Engine, Bildpixelprüfung, Shader-/Skriptfehlerkontrolle sowie den Treffer-/Abwehr-/Erholungs-/Gast-/Bewegungsreduktionsprüfungen. 1280 × 720, 852 × 283/393 und 390 × 844 betrachtet. Vorher-/Nachherbilder getrennt gespeichert und angesehen. Kulissenprüfung weiterhin ohne Eingriffe in die Fahrkorridore. Gemeldete Dreiecksmenge Bucht-Häuser +18,6 %, Kap-Küste +13,8 %, Kap-Nahansicht +22,8 %. Ein zusätzlicher Zeichenaufruf für die 3D-Tempolinien; keine höhere Renderauflösung. Das sind Renderaufwandswerte, keine gemessene iPhone-Bildrate.
+
+**WebKit-Korrektur:** Tempolinien liegen jetzt direkt im 3D-Renderer, ohne maskierte oder transparente Vollbild-DOM-Ebene. Abschließende Querformat-Effektaufnahmen liefen wieder durchgehend. Beim Größenwechsel der lokalen Windows-WebKit-Prüfung wird für das Hochformat weiterhin ein frischer Sichtnachweis desselben Rennzustands verwendet. Die frühere pauschale Beschränkung auf eine frische Seite für jeden WebKit-Effekt ist damit überholt; physische Safari-Drehung bleibt ungeprüft.
+
+**Ausgabe:** [PC-Version](prototypes/joy-kart/dist/Joy-Kart-PC.html), SHA-256 `9cbe307505423254e8b80983ad39512003dac75d67bcb3ff86fce003b3713f07`. [Vergleichsbilder, Messwerte und Prüfwege](kart_dev.md). Keine Veröffentlichung, kein Commit/Push; vorherige Arbeiten und Vergleichsbilder erhalten.
+
+**Nächster Schritt:** Auf dem iPhone 15 dieselbe Häuserpassage und einen Treffer im ersten und dritten Umlauf vergleichen. Laufruhe und Erwärmung beurteilen, bevor weitere Geometrie ergänzt wird. Gesamtstil und ferne Kulisse bleiben stilisiert; vollständige Grafikabnahme offen.
+
+## 03.11.2026 – Joy-Kart · Attacken und Bremswirkung
+
+Lokal auf `codex/joy-kart-rueckblick` umgesetzt: Raketenschweif und Suchring, markierte Bananenschalen, goldene Trefferfunken, Reifenrauch, kurze Schleuderbewegung und blaue Schildabwehr. Gemeinsame Warnanzeige mit Anflugrichtung, Entfernung, Schildhinweis und verbleibender Bremsdauer. Kompaktansicht zeichnet dieselben Zustände mit eigenen Vektorformen. „Bewegung reduzieren“ unterdrückt Schleudern und Partikel. Fahrwerte, Itemverteilung und Trefferregeln bleiben erhalten; unveränderliche Trefferzeitpunkte werden im Rennzustand mitübertragen. Partikel folgen der geglätteten Kartposition, auch beim Gast.
+
+**Geprüft:** Produktionsbuild/TypeScript; 148 App- und 66 Node-Tests, nach der letzten Zustandskorrektur die 20 Kurs-/Effekttests erneut. Endgültige PC-Datei in Edge und WebKit: beide Kurse und Kompaktansicht, echte Raketen-/Bananenkontakte, Temporeduktion, Schildabwehr, Erholung, Gastperspektive, reduzierte Bewegung sowie 852 × 283 und 390 × 844. Pixelprüfungen erkennen eine verdeckte 3D-Szene; finale Bilder angesehen. Rückblick, Loslassen, Tore/Brücken und Ausrollen zusätzlich mit bestehender Edge-Regressionsprüfung bestanden (vor den letzten reinen Effekt-/CSS-Korrekturen). `git diff --check` bestanden.
+
+**Prüfumgebung:** Wiederholte Screenshots derselben Windows-WebKit-Seite können die zusammengesetzten Bildebenen verlieren. Erster Screenshot derselben Bananen-/Trefferszene auf frischer Seite korrekt; daher läuft die Funktionsfolge durchgehend und jeder WebKit-3D-Sichtnachweis auf einer frischen Seite mit exakt demselben Rennzustand. Das ist kein physischer Safari-Test. Der versuchsweise Bildschirm-Randschatten wurde entfernt.
+
+**Ausgabe:** [PC-Version](prototypes/joy-kart/dist/Joy-Kart-PC.html), SHA-256 `9fb7239164eb8ddf131a11e26bd4ab020ab6b3fe1d4a93d94079f0f2411d8469`. [Effektbilder und Prüfdetails](kart_dev.md). Keine Veröffentlichung oder Git-Übertragung; vorhandene unversionierte Entwürfe/Bilder erhalten.
+
+**Nächster Schritt:** Auf dem iPhone 15 pro Kurs einen Bananentreffer und eine Raketenabwehr fahren; auf Warnungslesbarkeit, Partikel-Laufruhe und gleichzeitiges Lenken achten. Physische Leistung und Nutzerabnahme stehen aus.
+
 ## 02.11.2026 – Joy-Kart · Horizont, Rückblick und Zielfahrt
 
 [PR #26](https://github.com/amirhossin27-dev/Joyboy/pull/26) am 03.11.2026 erstellt. Review-Branch `codex/joy-kart-rueckblick` auf dem nach PR #25 aktualisierten `main`. Der PR umfasst beide nachfolgenden Kart-Etappen.

@@ -1,0 +1,53 @@
+{
+  "passed": false,
+  "phase": "after",
+  "sha256": "01b6f96c8369a805885d203230f1bb53a5cfddf144eeda6ee027cddaeb2ece02",
+  "results": [
+    {
+      "name": "kap-coast",
+      "camera": [
+        -283.83818413582856,
+        10.89669086429312,
+        -73.37625926113661
+      ],
+      "look": [
+        -262.1252426042421,
+        9.52012326328817,
+        -84.92162033081394
+      ],
+      "fov": 57.7990320988395,
+      "calls": 182,
+      "triangles": 404664,
+      "geometries": 155,
+      "textures": 25,
+      "ratio": 1,
+      "samples": 4,
+      "compositeColors": 1116,
+      "audit": {
+        "backdropTrianglesChecked": 0,
+        "backdropCorridorIntrusions": 0,
+        "corridorSections": 432
+      },
+      "resizeChecks": [
+        {
+          "ratio": 0.85,
+          "colors": 1
+        },
+        {
+          "ratio": 0.8,
+          "colors": 1
+        },
+        {
+          "ratio": 1,
+          "colors": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "scenePassed": true,
+  "emptyCaptures": [],
+  "instrumentation": "Automatic adaptation disabled in the diagnostic page only; renderer pixel ratio explicitly changed after the first capture.",
+  "initialCapturePassed": true,
+  "resizePassed": false
+}

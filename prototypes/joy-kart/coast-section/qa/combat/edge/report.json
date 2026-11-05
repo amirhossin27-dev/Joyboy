@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "sha256": "9fb7239164eb8ddf131a11e26bd4ab020ab6b3fe1d4a93d94079f0f2411d8469",
+  "checks": [
+    "bucht: threats, contacts, slowdown, shield, recovery, guest, reduced motion, layouts, visible scene pixels",
+    "kap: threats, contacts, slowdown, shield, recovery, guest, reduced motion, layouts, visible scene pixels",
+    "kompakt: threats, contacts, slowdown, shield, recovery, guest, reduced motion, layouts, visible scene pixels"
+  ],
+  "errors": []
+}

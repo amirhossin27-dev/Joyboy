@@ -1,0 +1,200 @@
+{
+  "passed": true,
+  "phase": "after",
+  "sha256": "01b6f96c8369a805885d203230f1bb53a5cfddf144eeda6ee027cddaeb2ece02",
+  "results": [
+    {
+      "name": "bucht-town",
+      "camera": [
+        -239.59316585108832,
+        11.672696658975637,
+        -140.89199527065037
+      ],
+      "look": [
+        -220.4383172284839,
+        10.178204604055521,
+        -156.30974219800763
+      ],
+      "fov": 57.79942456287168,
+      "calls": 199,
+      "triangles": 709278,
+      "geometries": 174,
+      "textures": 25,
+      "ratio": 1,
+      "samples": 4,
+      "compositeColors": 1025,
+      "audit": {
+        "backdropTrianglesChecked": 229956,
+        "backdropCorridorIntrusions": 0,
+        "corridorSections": 416
+      }
+    },
+    {
+      "name": "bucht-phone",
+      "camera": [
+        -239.59316221225882,
+        11.672696458792059,
+        -140.8919910264021
+      ],
+      "look": [
+        -220.4383238754041,
+        10.178204406505333,
+        -156.30973079170158
+      ],
+      "fov": 57.79972269167463,
+      "calls": 209,
+      "triangles": 711176,
+      "geometries": 181,
+      "textures": 26,
+      "ratio": 1,
+      "samples": 4,
+      "compositeColors": 694,
+      "driveTiming": {
+        "frames": 60,
+        "medianMs": 16,
+        "p95Ms": 18,
+        "endRatio": 1
+      }
+    },
+    {
+      "name": "bucht-bridge",
+      "camera": [
+        287.8490475685024,
+        8.386599976386126,
+        -97.96388902377379
+      ],
+      "look": [
+        306.36132124168046,
+        6.738025720716469,
+        -81.7823567971429
+      ],
+      "fov": 57.79947409006326,
+      "calls": 166,
+      "triangles": 414240,
+      "geometries": 187,
+      "textures": 26,
+      "ratio": 1,
+      "samples": 4,
+      "compositeColors": 713
+    },
+    {
+      "name": "kap-coast",
+      "camera": [
+        -283.83818142225203,
+        10.896690658438208,
+        -73.37625447865838
+      ],
+      "look": [
+        -262.1252513573826,
+        9.520123045313587,
+        -84.92161188728694
+      ],
+      "fov": 57.799690446797634,
+      "calls": 182,
+      "triangles": 404664,
+      "geometries": 155,
+      "textures": 25,
+      "ratio": 1,
+      "samples": 4,
+      "compositeColors": 1118,
+      "audit": {
+        "backdropTrianglesChecked": 0,
+        "backdropCorridorIntrusions": 0,
+        "corridorSections": 432
+      }
+    },
+    {
+      "name": "kap-shore",
+      "camera": [
+        -269.8933399567711,
+        11.201036609867165,
+        -81.23173488983069
+      ],
+      "look": [
+        -247.4549196718159,
+        9.82503535667868,
+        -91.30218828505302
+      ],
+      "fov": 57.79927575482458,
+      "calls": 184,
+      "triangles": 404680,
+      "geometries": 155,
+      "textures": 25,
+      "ratio": 1,
+      "samples": 4,
+      "compositeColors": 723
+    },
+    {
+      "name": "kap-bridge",
+      "camera": [
+        243.10249530425514,
+        8.639829856601366,
+        -106.49950346066242
+      ],
+      "look": [
+        234.70052114085658,
+        6.925530678505899,
+        -83.39776848253311
+      ],
+      "fov": 57.799412938270585,
+      "calls": 181,
+      "triangles": 403092,
+      "geometries": 155,
+      "textures": 25,
+      "ratio": 1,
+      "samples": 4,
+      "compositeColors": 612,
+      "driveTiming": {
+        "frames": 60,
+        "medianMs": 16,
+        "p95Ms": 19,
+        "endRatio": 1
+      }
+    },
+    {
+      "name": "bucht-hit",
+      "camera": [
+        -233.6753884130141,
+        11.771178493673045,
+        -146.16709738075946
+      ],
+      "look": [
+        -213.89811948042646,
+        10.266130872548535,
+        -160.7786556032265
+      ],
+      "fov": 57.305763520361914,
+      "calls": 212,
+      "triangles": 712248,
+      "geometries": 184,
+      "textures": 26,
+      "ratio": 1,
+      "samples": 4,
+      "compositeColors": 637
+    },
+    {
+      "name": "kap-close",
+      "camera": [
+        -209.80379941619702,
+        12.38408407463526,
+        -102.82726547685371
+      ],
+      "look": [
+        -186.7193211961627,
+        10.967340200744234,
+        -111.44835245980042
+      ],
+      "fov": 57.799761318512424,
+      "calls": 100,
+      "triangles": 252687,
+      "geometries": 151,
+      "textures": 24,
+      "ratio": 1,
+      "samples": 4,
+      "compositeColors": 368
+    }
+  ],
+  "errors": [],
+  "scenePassed": true,
+  "emptyCaptures": []
+}

@@ -4,8 +4,6 @@
 #joy-kart-simple [hidden]{display:none!important}
 #joy-kart-simple .js-stage{position:relative;width:100%;aspect-ratio:19.5/9;min-height:240px;overflow:hidden;border-radius:18px;background:#102637;isolation:isolate;container-type:inline-size;--js-left:env(safe-area-inset-left,0px);--js-right:env(safe-area-inset-right,0px);--js-bottom:env(safe-area-inset-bottom,0px)}
 #joy-kart-simple canvas{display:block;position:absolute;inset:0;width:100%;height:100%}
-#joy-kart-simple .js-rush{position:absolute;inset:-5%;pointer-events:none;opacity:0;background:repeating-conic-gradient(from 5deg at 50% 46%,transparent 0deg 14deg,#fff0cd99 14.05deg 14.3deg,transparent 14.35deg 30deg);-webkit-mask-image:radial-gradient(ellipse at 50% 46%,transparent 0% 60%,#000 100%);mask-image:radial-gradient(ellipse at 50% 46%,transparent 0% 60%,#000 100%)}
-@media(prefers-reduced-motion:reduce){#joy-kart-simple .js-rush{display:none}}
 #joy-kart-simple button{font:inherit;color:inherit;min-width:44px;min-height:44px;border:1px solid #edd49b80;border-radius:12px;background:#102637ee;padding:8px 12px;touch-action:manipulation}
 #joy-kart-simple .js-top{position:absolute;top:8px;left:max(12px,calc(var(--js-left) + 8px));right:max(12px,calc(var(--js-right) + 8px));display:flex;gap:12px;align-items:start;justify-content:space-between;pointer-events:none;text-shadow:0 2px 5px #000}
 #joy-kart-simple .js-location{font-size:12px;padding-top:3px}
@@ -68,12 +66,18 @@
 #joy-kart-simple .js-rear[aria-pressed=true]{background:#a8f5d9;color:#102937}
 #joy-kart-simple .js-finish-note:not([hidden])~.js-toast{display:none}
 #joy-kart-simple .js-finish-note{position:absolute;top:23%;left:50%;transform:translateX(-50%);padding:6px 12px;border-radius:12px;background:#102937ee;color:#ffedba;text-align:center;font-weight:700;pointer-events:none}
+#joy-kart-simple .js-combat{position:absolute;top:84px;left:50%;transform:translateX(-50%);width:max-content;max-width:62%;padding:5px 12px 8px;border:1px solid var(--combat-ink);border-radius:10px;background:#102937f2;color:var(--combat-ink);text-align:center;pointer-events:none;overflow:hidden;font-size:12px;line-height:1.3;--combat-ink:#ffcf70}
+#joy-kart-simple .js-combat small{display:block;color:#f1eee2;font-size:10px}
+#joy-kart-simple .js-combat i{position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--combat-ink);transform-origin:left}
+#joy-kart-simple .js-combat[data-kind=blocked],#joy-kart-simple .js-combat[data-kind=shield]{--combat-ink:#99f4ff}
+#joy-kart-simple .js-combat[data-kind=rocket]{--combat-ink:#ffb09a}
+@container(min-width:700px){#joy-kart-simple .js-combat{top:8px;left:57%;max-width:30%}}
 </style>
 <div id="joy-kart-simple" aria-label="Joy-Kart · Küsten-Cup">
  <div class="js-stage">
   <canvas aria-label="Dreidimensionale Küstenstraße mit Fuchskart und durchgehendem Unterbau"></canvas>
-  <div class="js-rush" aria-hidden="true"></div>
   <div class="js-top"><div class="js-rank"><b class="js-place">=</b><span class="js-time">Start</span></div><div class="js-race-info"><span class="js-location">Küsten-Cup</span><b class="js-lap">Runde 1 / 3</b><i class="js-progress-fill"></i></div><button type="button" data-action="pause" aria-label="Pause" class="cursor-interaction" hidden>Ⅱ</button></div>
+  <div class="js-combat" hidden><b></b><small></small><i aria-hidden="true"></i></div>
   <div class="js-line" hidden></div>
   <button class="js-rear" type="button" data-action="rear" aria-label="Rückblick halten (R)" aria-pressed="false" title="Für Rückblick halten · R" hidden><svg width="24" height="16" viewBox="0 0 30 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2h6m-3 0v4"/><rect x="2" y="6" width="26" height="12" rx="5"/><path d="m7 14 4-4"/></svg><small>Rückblick</small></button><div class="js-finish-note" role="status" hidden></div>
   <div class="js-controls" hidden><button type="button" class="js-pad cursor-interaction" data-control="pad" aria-label="Lenken: halten und nach links oder rechts ziehen"><span class="js-thumb"></span><span class="js-pad-label">Lenken</span></button><button type="button" class="js-turbo cursor-interaction" data-action="turbo"><svg class="js-item-icon" viewBox="0 0 24 24" aria-hidden="true"><path/></svg><span class="js-item-name">Turbo</span><small class="js-item-hint">Einsetzen</small></button></div>
@@ -194,6 +198,7 @@ function bindAppRace(){
   };
  }
 /*@@COMPACT_ROAD@@*/
+/*@@COMBAT_EFFECTS@@*/
 let compact=false;
 function useCompact(){
  if(compact)return;compact=true;stopped=false;cancelAnimationFrame(animation);
@@ -229,10 +234,10 @@ try{
  const part=(x,y)=>{const half=atlasImage.width/2,t=texture(512,512,(c,w,h)=>c.drawImage(atlasImage,x*half,y*half,half,half,0,0,w,h));t.wrapS=t.wrapT=THREE.RepeatWrapping;t.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy());return t;};
  const artMaps={orangeFur:part(0,0),creamFur:part(1,0),asphalt:part(0,1),stone:part(1,1)};artMaps.furNeutral=texture(256,256,(c,w,h)=>{c.drawImage(artMaps.creamFur.image,0,0,w,h);const p=c.getImageData(0,0,w,h);for(let i=0;i<p.data.length;i+=4){const l=205+((p.data[i]+p.data[i+1]+p.data[i+2])/3-128)*.25;p.data[i]=p.data[i+1]=p.data[i+2]=l;}c.putImageData(p,0,0);});for(const t of[artMaps.furNeutral,artMaps.creamFur,artMaps.orangeFur]){t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(3,3);}
  artMaps.foliage=new THREE.Texture(treeImage);artMaps.foliage.colorSpace=THREE.SRGBColorSpace;artMaps.foliage.needsUpdate=true;textures.add(artMaps.foliage);
- const lighting=createProductionLighting(THREE,{scene,renderer,skyImage,texture,textures,materials,geometries,horizonStrip:true,sunOffset:course.cape?[78,42,-18]:[59,12,-69]}),kit=createKartModels(THREE,{scene,geometries,materials,texture}),assets=createProductionKarts(THREE,{scene,kit,artMaps,materials,texture}),cars=[assets.makeKart(false),assets.makeKart(true)];mark('fox-kart');loadingText.textContent='Küstenstraße wird aufgebaut …';await paintYield();
+ const lighting=createProductionLighting(THREE,{scene,renderer,skyImage,texture,textures,materials,geometries,horizonStrip:true,warmBay:!course.cape,sunOffset:course.cape?[78,42,-18]:[59,12,-69]}),kit=createKartModels(THREE,{scene,geometries,materials,texture}),assets=createProductionKarts(THREE,{scene,kit,artMaps,materials,texture}),cars=[assets.makeKart(false),assets.makeKart(true)];mark('fox-kart');loadingText.textContent='Küstenstraße wird aufgebaut …';await paintYield();
  if(compact)return;
  for(const car of cars){
-  const shield=kit.add(kit.geometry(new THREE.SphereGeometry(1,18,12)),kit.material(0x63e0ff,{transparent:true,opacity:.20,depthWrite:false}),car.group,0,1,0);
+  const shield=kit.add(kit.geometry(new THREE.SphereGeometry(1,32,20)),kit.material(0x63e0ff,{transparent:true,opacity:.20,depthWrite:false}),car.group,0,1,0);
   shield.scale.set(1.65,1.55,2);shield.visible=false;shield.castShadow=false;car.shieldEffect=shield;
   const ring=kit.add(kit.geometry(new THREE.TorusGeometry(1,.05,6,32)),kit.material(0xf294da,{emissive:0x8a4076}),car.group,0,.15,0);
   ring.rotation.x=-Math.PI/2;ring.castShadow=false;ring.visible=false;car.itemRing=ring;
@@ -241,15 +246,15 @@ try{
  const hazards=cars.map(()=>{
   const peel=new THREE.Group(),missile=new THREE.Group();scene.add(peel,missile);
   const yellow=kit.material(0xffd52e,{roughness:.55}),red=kit.material(0xd73b27,{metalness:.32,roughness:.29});
-  const blade=kit.geometry(new THREE.SphereGeometry(1,10,6));
+  const blade=kit.geometry(new THREE.SphereGeometry(1,20,12));
   for(let i=0;i<3;i++){
    const a=i*Math.PI*2/3,leaf=kit.add(blade,yellow,peel,.32*Math.sin(a),.15,.32*Math.cos(a));
    leaf.scale.set(.19,.13,.52);leaf.rotation.y=a;
   }
-  kit.add(kit.geometry(new THREE.ConeGeometry(.18,.52,8)),yellow,peel,0,.34,0);
-  const shell=kit.add(kit.geometry(new THREE.CapsuleGeometry(.2,.7,4,12)),red,missile,0,0,0);
+  kit.add(kit.geometry(new THREE.ConeGeometry(.18,.52,20)),yellow,peel,0,.34,0);
+  const shell=kit.add(kit.geometry(new THREE.CapsuleGeometry(.2,.7,8,24)),red,missile,0,0,0);
   shell.rotation.x=Math.PI/2;
-  const flame=kit.add(kit.geometry(new THREE.ConeGeometry(.17,.6,10)),kit.material(0xffc04a,{emissive:0xff7610}),missile,0,0,-.75);
+  const flame=kit.add(kit.geometry(new THREE.ConeGeometry(.17,.6,20)),kit.material(0xffc04a,{emissive:0xff7610}),missile,0,0,-.75);
   flame.rotation.x=-Math.PI/2;
   return {banana:peel,rocket:missile};
  });
@@ -266,8 +271,15 @@ try{
   lighting.sun.color.setHex(0xfff1da);lighting.sun.intensity=2.35;
   scene.environmentIntensity=.72;
  }
+ const combatEffects=createKartCombatEffects(THREE,{scene,kit,course,cars,hazards,materials});
  const world=await createSimpleCoastWorld(THREE,{scene,course,kit,artMaps,materials,texture,lighting,yieldTask:paintYield});mark('coast');loadingText.textContent='Licht wird vorbereitet …';await paintYield();
- const cameraDesired=new THREE.Vector3(),lookDesired=new THREE.Vector3(),look=new THREE.Vector3(),motion=matchMedia('(prefers-reduced-motion: reduce)'),rush=find('.js-rush');let cameraSet=false,lastFrame=performance.now(),lastCameraAngle=0,maxCameraStep=0,lastDrawS=0,speedVisual=0;
+ // Render speed streaks in the existing WebGL pass, avoiding a composited DOM overlay.
+ const streakPositions=[];
+ for(let i=0;i<18;i++){const a=(i+.25)*Math.PI*2/18,r=.86+(i%3)*.04;for(const t of [r,1.65])streakPositions.push(Math.cos(a)*t,Math.sin(a)*t,-1);}
+ const streakGeometry=kit.geometry(new THREE.BufferGeometry());streakGeometry.setAttribute('position',new THREE.Float32BufferAttribute(streakPositions,3));
+ const streakMaterial=new THREE.LineBasicMaterial({color:0xffeed1,transparent:true,opacity:0,depthWrite:false,depthTest:false,toneMapped:false});materials.add(streakMaterial);
+ const speedStreaks=new THREE.LineSegments(streakGeometry,streakMaterial);speedStreaks.frustumCulled=false;speedStreaks.renderOrder=10000;camera.add(speedStreaks);scene.add(camera);
+ const cameraDesired=new THREE.Vector3(),lookDesired=new THREE.Vector3(),look=new THREE.Vector3(),motion=matchMedia('(prefers-reduced-motion: reduce)');let cameraSet=false,lastFrame=performance.now(),lastCameraAngle=0,maxCameraStep=0,lastDrawS=0,speedVisual=0;
  // Resize only after sustained load; a single startup stall must not blur the track.
  let frameSeconds=0,frameCount=0,fastWindows=0;
  function adaptResolution(seconds){
@@ -295,6 +307,7 @@ try{
   cars[1-slot].group.visible=cars[1-slot].shadow.visible=!!rival;
   if(rival){otherVisual=visualState(rival,dt,otherVisual);moveKart(cars[1-slot],otherVisual,rival.time,dt);}
   showHazards(slot,me,rival);showHazards(1-slot,rival,me);
+  combatEffects(slot,k,effectMotion.matches);combatEffects(1-slot,rival?otherVisual:null,effectMotion.matches);
   if(me.taken!==lastTaken){lastTaken=me.taken;visibleTaken=me.taken?new Set(me.taken):null;}
   world.update(me.time,visibleTaken||race.taken,me.lap);
   const centre=course.point(k.s,k.lat*.93),ahead=course.point(k.s+17,k.lat*.30);cameraDesired.set(centre.x-dx*7.6,p.y+3.25+(k.lift||0)*.32,centre.z-dz*7.6);lookDesired.set(ahead.x,ahead.y+1.55,ahead.z);
@@ -309,7 +322,9 @@ try{
   const angle=Math.atan2(look.x-camera.position.x,look.z-camera.position.z);if(render&&!snapped)maxCameraStep=Math.max(maxCameraStep,Math.abs(Math.atan2(Math.sin(angle-lastCameraAngle),Math.cos(angle-lastCameraAngle))));lastCameraAngle=angle;
   const target=me.phase!=='running'?0:k.boost>0?1:fastRace?.35*clamp(k.v/M.SPEED.cruise,0,1):0;speedVisual=motion.matches?0:speedVisual+(target-speedVisual)*(1-Math.exp(-dt*(target?10:5)));
   const fov=55+speedVisual*8;if(Math.abs(camera.fov-fov)>.001){camera.fov=fov;camera.updateProjectionMatrix();}
-  rush.style.opacity=(me.phase==='running'&&!rear?speedVisual*.6:0).toFixed(3);
+  speedStreaks.visible=me.phase==='running'&&!rear&&!motion.matches&&speedVisual>.01;
+  streakMaterial.opacity=speedVisual*.24;
+  const halfHeight=Math.tan(camera.fov*Math.PI/360);speedStreaks.scale.set(halfHeight*camera.aspect,halfHeight,1);
   lighting.update(camera,p.x,p.y,p.z);if(render)renderer.render(scene,camera);
  }
  // Establish the rear view before shader preparation; prewarm turbo's first-use material too.

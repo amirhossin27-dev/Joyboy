@@ -1,0 +1,81 @@
+{
+  "passed": true,
+  "phase": "after",
+  "sha256": "9cbe307505423254e8b80983ad39512003dac75d67bcb3ff86fce003b3713f07",
+  "results": [
+    {
+      "name": "bucht-town",
+      "calls": 198,
+      "triangles": 708990,
+      "geometries": 173,
+      "textures": 24,
+      "ratio": 1,
+      "samples": 4,
+      "audit": {
+        "backdropTrianglesChecked": 229956,
+        "backdropCorridorIntrusions": 0,
+        "corridorSections": 416
+      }
+    },
+    {
+      "name": "bucht-phone",
+      "calls": 208,
+      "triangles": 710888,
+      "geometries": 180,
+      "textures": 25,
+      "ratio": 1,
+      "samples": 4
+    },
+    {
+      "name": "bucht-bridge",
+      "calls": 166,
+      "triangles": 414240,
+      "geometries": 186,
+      "textures": 25,
+      "ratio": 1,
+      "samples": 4
+    },
+    {
+      "name": "kap-coast",
+      "calls": 180,
+      "triangles": 404164,
+      "geometries": 153,
+      "textures": 24,
+      "ratio": 1,
+      "samples": 4,
+      "audit": {
+        "backdropTrianglesChecked": 0,
+        "backdropCorridorIntrusions": 0,
+        "corridorSections": 432
+      }
+    },
+    {
+      "name": "kap-bridge",
+      "calls": 180,
+      "triangles": 404164,
+      "geometries": 153,
+      "textures": 24,
+      "ratio": 1,
+      "samples": 4
+    },
+    {
+      "name": "bucht-hit",
+      "calls": 211,
+      "triangles": 711960,
+      "geometries": 183,
+      "textures": 25,
+      "ratio": 1,
+      "samples": 4
+    },
+    {
+      "name": "kap-close",
+      "calls": 98,
+      "triangles": 252187,
+      "geometries": 149,
+      "textures": 23,
+      "ratio": 1,
+      "samples": 4
+    }
+  ],
+  "errors": []
+}

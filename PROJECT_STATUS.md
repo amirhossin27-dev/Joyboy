@@ -2,6 +2,8 @@
 
 ## 05.11.2026 – Joy-Kart · Licht, Fahrbahn und Fjordküste
 
+[PR #27](https://github.com/amirhossin27-dev/Joyboy/pull/27) am 05.11.2026 gegen `main` erstellt. Branch `codex/joy-kart-grafik-effekte` enthält die Grafik-/Effektarbeiten und die verlinkten Vergleichsbilder und Prüfberichte. Code-Commit `39e91df`. Review, GitHub-Prüfungen und physischer iPhone-Test stehen aus.
+
 **Lokal umgesetzt und geprüft.** Freigegebene Etappe auf `codex/joy-kart-grafik-effekte`. Wärmeres Fülllicht und lesbares Kartheck in der Sonnenbucht, angepasste Fensterhöhen und Kontaktschatten an Fassaden, ruhigerer Asphalt sowie abgestimmte Lack-, Metall- und Reifenmaterialien. Das Kap erhielt ein gestuftes Ufer mit vier vorgelagerten, strukturierten Basaltfelsen. Die Fahrkamera verdeckt Teile der tief liegenden Gischt. Die visuelle Gesamtfreigabe durch den Nutzer ist offen.
 
 **Prüfungen.** 148 App-Tests mit einem Worker und 66 Node-Tests bestanden, ebenso Produktionsbuild/TypeScript. Der parallele Standardlauf überschritt zweimal das 5-Sekunden-Limit eines Lernspieltests. Abschließender Edge-Vergleich am 05.11. mit acht Rennständen einschließlich Fahrzeitmessungen, alle Bilder wie die Ausgangsfassung bei Renderfaktor 1. Am 05.11. vollständiger WebKit-Lauf mit acht sichtbaren Browserbildern, ohne gemeldete Shader-/Skriptfehler und mit Renderfaktor 1. Bilder im Hoch- und Querformat angesehen. Vergleichsseite mit fünf Perspektiven und zehn Bildzuständen im Browser geprüft. PC- und App-Datei bytegleich. Details und Messwerte stehen im [Entwicklungsjournal](kart_dev.md).

@@ -256,8 +256,8 @@ export const GAMES: GameMeta[] = [
   {
     id: 'schwung',
     name: 'Schwung-Strecke',
-    tagline: 'Bring den Bären zum Honig – fahr die Schwünge nach!',
-    learn: 'Vorbereitung aufs Schreiben: Linien, Bögen, Wellen, Zickzack, Schlaufen und Spiralen in der richtigen Richtung nachfahren. Stärkt Stiftführung und Ausdauer.',
+    tagline: 'Fahr Buchstaben und Wörter mit dem Finger nach!',
+    learn: 'Großbuchstaben in Druckschrift nachfahren und kurze Wörter Strich für Strich schreiben.',
     category: 'sprache',
     minAge: 4,
     players: [1, 4],
@@ -269,10 +269,10 @@ export const GAMES: GameMeta[] = [
     scoreLabel: 'sauber',
     subject: 'writing',
     tutorial: [
-      { say: 'Der Bär will zum Honig. Fahr mit dem Finger auf der Straße hinter ihm her.', art: { k: 'trace', task: { k: 'schwung', id: 'huegel', mover: '🐻', goal: '🍯' }, level: 0 } },
-      { say: 'Fang immer beim grünen Punkt an und folge dem Pfeil. Je genauer, desto mehr Sterne.', art: { k: 'pics', items: ['🟢', '➡️', '⭐', '⭐', '⭐'] } },
-      { say: 'Auf Mittel und Schwer werden die Schwünge kniffliger und die Spur dünner.', art: { k: 'pics', items: ['〰️', '🌀', '➰'], caption: 'Welle, Schneckenhaus, Schlaufe' } },
-      { say: 'Jetzt du! Bring die Biene zur Blume.', art: { k: 'trace', task: { k: 'schwung', id: 'welle', mover: '🐝', goal: '🌻' }, level: 0, tryIt: true } },
+      { say: 'Fang immer beim grünen Punkt an und folge dem Pfeil.', art: { k: 'trace', task: { k: 'schwung', text: 'A' }, level: 0 } },
+      { say: 'Je genauer, desto mehr Sterne.', art: { k: 'pics', items: ['🟢', '➡️', '⭐', '⭐', '⭐'] } },
+      { say: 'Am grünen Punkt geht es los.', art: { k: 'trace', task: { k: 'schwung', text: 'OMA' }, level: 1 } },
+      { say: 'Jetzt du! Fang beim grünen Punkt an.', art: { k: 'trace', task: { k: 'schwung', text: 'O' }, level: 0, tryIt: true } },
     ],
   },
   {

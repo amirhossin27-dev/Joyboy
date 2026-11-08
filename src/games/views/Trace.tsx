@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { SEAT_COLORS, type PlayProps } from '../../engine/game';
 import { useGame } from '../../engine/useGame';
-import { traceDef, tracePoints, type TraceGameKind, type TraceState, type TraceTask } from '../../learn/trace/game';
-import { digitLayout, schwungLayout, SCHWUNG_BY_ID, type Layout } from '../../learn/trace/shapes';
+import { schwungText, traceDef, tracePoints, type TraceGameKind, type TraceState, type TraceTask } from '../../learn/trace/game';
+import { digitLayout, letterLayout, type Layout } from '../../learn/trace/shapes';
 import { speakIfAuto } from '../../lib/speech';
 import type { Level } from '../../lib/store';
 import { cls } from '../../lib/util';
@@ -13,7 +13,7 @@ import { TracePad, type TraceResult } from '../../ui/TracePad';
 const DEFS = { schwung: traceDef('schwung'), zahlen: traceDef('zahlen') };
 
 export function layoutFor(task: TraceTask): Layout {
-  return task.k === 'schwung' ? schwungLayout(task.id) : digitLayout(task.text);
+  return task.k === 'schwung' ? letterLayout(schwungText(task)) : digitLayout(task.text);
 }
 
 /** Kräftige Farbe für die Striche: Lieblingsfarbe, wenn sie dunkel genug ist, sonst Spielfarbe. */
@@ -27,15 +27,14 @@ export function inkColor(color: string | undefined, seat: number): string {
   return SEAT_COLORS[seat % SEAT_COLORS.length];
 }
 
-/** Was über der Fläche steht: Name des Schwungs, Zahl, Menge zum Zählen oder Rechenaufgabe */
-export function TraceTaskCard({ task }: { task: TraceTask }) {
+/** Was über der Fläche steht: Buchstabe, Wort, Zahl, Menge zum Zählen oder Rechenaufgabe */
+export function TraceTaskCard({ task, demo = false }: { task: TraceTask; demo?: boolean }) {
   if (task.k === 'schwung') {
+    const text = schwungText(task);
     return (
       <div className="trace-card">
-        <span className="trace-hint">
-          Bring {task.mover} zu {task.goal}
-        </span>
-        <b className="display">{SCHWUNG_BY_ID[task.id]?.name}</b>
+        <b className="display trace-prompt">{text}</b>
+        <span className="trace-hint">{demo ? 'Schau zu.' : text.length === 1 ? 'Spure den Buchstaben nach.' : 'Spure das Wort nach.'}</span>
       </div>
     );
   }
@@ -65,7 +64,6 @@ export function TraceTaskPad({ task, level, color, disabled, autoDemo, showAnswe
       level={level}
       free={task.k === 'zahl' && task.mode === 'free'}
       color={color}
-      mover={task.k === 'schwung' ? { e: task.mover, goal: task.goal } : undefined}
       autoDemo={autoDemo}
       disabled={disabled}
       showAnswer={showAnswer}

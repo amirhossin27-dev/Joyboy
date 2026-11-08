@@ -28,8 +28,6 @@ interface Props {
   free?: boolean;
   /** Farbe der Striche des Kindes */
   color: string;
-  /** Schwung-Strecke: Wer fährt mit, was ist das Ziel? */
-  mover?: { e: string; goal: string };
   /** Hand spielt die Vorlage gleich zu Beginn einmal vor */
   autoDemo?: boolean;
   disabled?: boolean;
@@ -48,7 +46,7 @@ interface Fade {
   at: number;
 }
 
-export function TracePad({ layout, level, free = false, color, mover, autoDemo = false, disabled = false, showAnswer = false, onDone }: Props) {
+export function TracePad({ layout, level, free = false, color, autoDemo = false, disabled = false, showAnswer = false, onDone }: Props) {
   const wrap = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const [cssW, setCssW] = useState(320);
@@ -191,16 +189,6 @@ export function TracePad({ layout, level, free = false, color, mover, autoDemo =
             const t = Math.min(1, (now - s.autoFill.at) / 900);
             line(cur.slice(0, Math.max(2, Math.round(t * cur.length))), 7, color, 0.7);
           }
-          // Schwung-Strecke: Ziel und Fahrer (wartet vor dem Startpunkt, damit der frei bleibt)
-          if (mover) {
-            emoji(mover.goal, cur[cur.length - 1], 15);
-            if (s.ink && s.rail > 0) emoji(mover.e, cur[s.rail], 16);
-            else {
-              const a = at(cur, Math.min(0.5, 14 / Math.max(14, length(cur))));
-              const ang = Math.atan2(a[1] - cur[0][1], a[0] - cur[0][0]);
-              emoji(mover.e, [cur[0][0] - Math.cos(ang) * 13, cur[0][1] - Math.sin(ang) * 13], 15);
-            }
-          }
           // Start: grüner Punkt mit Nummer, wackelt nach einem Fehlversuch
           const shake = now - s.shakeAt < 600 ? Math.sin((now - s.shakeAt) / 30) * 2.5 : 0;
           const [sx, sy] = cur[0];
@@ -232,8 +220,6 @@ export function TracePad({ layout, level, free = false, color, mover, autoDemo =
           ctx.textBaseline = 'middle';
           ctx.fillText(String(s.k + 1), sx + shake, sy + 0.5);
           ctx.restore();
-        } else if (mover && strokes.length) {
-          emoji(mover.e, strokes[strokes.length - 1][strokes[strokes.length - 1].length - 1], 18);
         }
         // Fehlversuche verblassen
         s.fades = s.fades.filter((f) => now - f.at < 650);
@@ -273,7 +259,7 @@ export function TracePad({ layout, level, free = false, color, mover, autoDemo =
     };
     raf = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(raf);
-  }, [layout, maxW, cssH, scale, color, free, showAnswer, mover?.e]);
+  }, [layout, maxW, cssH, scale, color, free, showAnswer]);
 
   const toUnits = (e: { clientX: number; clientY: number }): Pt => {
     const r = canvas.current!.getBoundingClientRect();

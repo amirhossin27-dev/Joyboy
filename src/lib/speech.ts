@@ -30,7 +30,8 @@ let loading = false;
 function loadIndex() {
   if (loading || typeof fetch === 'undefined') return;
   loading = true;
-  fetch(`${DIR}index.json`)
+  // Neue Aufnahmen auch mit einem älteren Service-Worker-Cache sofort finden.
+  fetch(`${DIR}index.json?v=2`)
     .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
     .then((i: { clips?: Record<string, string> }) => {
       clips = i.clips ?? {};
@@ -87,6 +88,8 @@ if (VOICE_ENABLED && typeof window !== 'undefined') {
     if (!clips) loadIndex();
   };
   window.addEventListener('pointerdown', wake, { capture: true, passive: true });
+  // Ein Touch aktiviert den Ton spätestens beim daraus entstehenden Klick.
+  window.addEventListener('click', wake, { capture: true, passive: true });
   window.addEventListener('keydown', wake, { capture: true });
 }
 

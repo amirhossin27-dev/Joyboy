@@ -6,8 +6,8 @@ import { AnswerGrid, TaskCard } from '../games/views/Quiz';
 import { inkColor, TraceTaskCard, TraceTaskPad } from '../games/views/Trace';
 import { nav } from '../lib/nav';
 import { finishTutorial } from '../lib/progress';
-import { canSpeak, speak, speakIfAuto, stopSpeaking, useVoiceReady } from '../lib/speech';
-import { useProfile } from '../lib/store';
+import { canSpeak, speak, stopSpeaking, useVoiceReady } from '../lib/speech';
+import { useData, useProfile } from '../lib/store';
 import { cls } from '../lib/util';
 import { GameArt } from '../ui/GameArt';
 import { Icon } from '../ui/Icon';
@@ -94,7 +94,7 @@ function Art({ art, color, onSolved }: { art: TutArt; color?: string; onSolved: 
     case 'trace':
       return (
         <div className="col" style={{ width: '100%', gap: 8, alignItems: 'center' }}>
-          <TraceTaskCard task={art.task} />
+          <TraceTaskCard task={art.task} demo={!art.tryIt} />
           <TraceTaskPad
             task={art.task}
             level={art.level}
@@ -135,6 +135,7 @@ function Art({ art, color, onSolved }: { art: TutArt; color?: string; onSolved: 
 export function Tutorial({ game }: { game: GameId }) {
   const meta = GAME_BY_ID[game];
   const profile = useProfile();
+  const { speech } = useData().settings;
   const steps: TutorialStep[] = meta.tutorial;
   const [i, setI] = useState(0);
   const [solved, setSolved] = useState<boolean | null>(null);
@@ -146,13 +147,14 @@ export function Tutorial({ game }: { game: GameId }) {
   const say = needsTry && solved === true ? 'Super, das ist richtig! Du bist bereit.' : needsTry && solved === false ? 'Fast! Probier es nochmal.' : step.say;
 
   useEffect(() => {
+    if (speech !== 'off') speak(say);
+    return stopSpeaking;
+  }, [i, say, speech]);
+
+  const goTo = (next: number) => {
     setSolved(null);
-    speakIfAuto(steps[i].say);
-  }, [i]);
-  useEffect(() => {
-    if (solved !== null) speakIfAuto(say);
-  }, [solved]);
-  useEffect(() => () => stopSpeaking(), []);
+    setI(next);
+  };
 
   /** `completed`: bis zum Ende angeschaut (zählt fürs Abzeichen „Regel-Kenner“) */
   const finish = (completed: boolean) => {
@@ -197,11 +199,11 @@ export function Tutorial({ game }: { game: GameId }) {
           </div>
         </div>
         <div className="tut-nav">
-          <button type="button" className="btn secondary" disabled={i === 0} onClick={() => setI(i - 1)}>
+          <button type="button" className="btn secondary" disabled={i === 0} onClick={() => goTo(i - 1)}>
             Zurück
           </button>
           {!last ? (
-            <button type="button" className="btn primary" onClick={() => setI(i + 1)}>
+            <button type="button" className="btn primary" onClick={() => goTo(i + 1)}>
               Weiter <Icon name="arrow" />
             </button>
           ) : (

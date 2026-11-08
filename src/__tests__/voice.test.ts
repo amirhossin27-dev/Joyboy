@@ -1,3 +1,4 @@
+import { GAMES } from '../games/registry';
 import { describe, expect, it } from 'vitest';
 import { makeTask, type Subject } from '../learn/tasks';
 import { lockSpeech, tipSpeech } from '../lib/speechtexts';
@@ -59,6 +60,14 @@ describe('Joys Stimme: welche Aufnahme gehört zu welchem Text', () => {
         }
     const lock = lockSpeech(3);
     expect(planVoice(lock, (k) => neededKeys(lock).includes(k)).length).toBe(2);
+  });
+
+  it('hat für jeden Tutorialschritt die vollständige Tonaufnahme', () => {
+    const clips = index.clips as Record<string, string>;
+    const missing = GAMES.flatMap((game) => game.tutorial.flatMap(({ say }) =>
+      sentences(say).filter((s) => !planVoice(s, (k) => k in clips).length).map((s) => game.name + ': ' + s),
+    ));
+    expect(missing).toEqual([]);
   });
 
   it('hat für jeden Eintrag im Verzeichnis auch eine Tondatei', () => {

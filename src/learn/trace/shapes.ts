@@ -25,49 +25,38 @@ export const DIGITS: Record<string, Glyph> = {
   '9': { d: ['M 72 27 C 72 15 63 8 51 8 C 39 8 30 16 30 28 C 30 40 39 47 51 47 C 63 47 72 40 72 27 L 72 92'] },
 };
 
-/** Spirale von außen nach innen, gegen den Uhrzeigersinn */
-function spiral(): string {
-  const pts: string[] = [];
-  const turns = 2.6;
-  const steps = 90;
-  for (let i = 0; i <= steps; i++) {
-    const t = i / steps;
-    const a = -Math.PI / 2 - t * turns * 2 * Math.PI;
-    const r = 42 * (1 - t * 0.86);
-    pts.push(`${(50 + r * Math.cos(a)).toFixed(1)} ${(50 + r * Math.sin(a)).toFixed(1)}`);
-  }
-  return `M ${pts.join(' L ')}`;
-}
-
-export interface Schwung extends Glyph {
-  id: string;
-  name: string;
-  /** 0 = Leicht, 1 = Mittel, 2 = Schwer */
-  level: 0 | 1 | 2;
-}
-
-/** Schwung-Übungen zur Vorbereitung aufs Schreiben, je ein Strich von links nach rechts. */
-export const SCHWUNGE: Schwung[] = [
-  { id: 'gerade', name: 'Gerade Straße', level: 0, d: ['M 10 50 L 90 50'] },
-  { id: 'regen', name: 'Regen', level: 0, d: ['M 50 10 L 50 90'] },
-  { id: 'rutsche', name: 'Rutsche', level: 0, d: ['M 14 14 L 86 86'] },
-  { id: 'huegel', name: 'Hügel', level: 0, d: ['M 10 78 C 10 18 90 18 90 78'] },
-  { id: 'welle', name: 'Welle', level: 0, d: ['M 8 50 C 16 22 32 22 38 50 C 44 78 62 78 68 50 C 72 30 84 26 92 38'] },
-  { id: 'zickzack', name: 'Zickzack', level: 1, d: ['M 8 72 L 24 30 L 40 72 L 56 30 L 72 72 L 90 30'] },
-  { id: 'girlande', name: 'Girlande', level: 1, d: ['M 8 32 C 8 76 30 76 30 32 C 30 76 52 76 52 32 C 52 76 74 76 74 32 C 74 64 84 70 92 60'] },
-  { id: 'bruecke', name: 'Brücken', level: 1, d: ['M 8 72 C 8 28 30 28 30 72 C 30 28 52 28 52 72 C 52 28 74 28 74 72 C 74 28 92 28 92 72'] },
-  { id: 'kreis', name: 'Kreis', level: 1, d: ['M 50 12 C 29 12 12 29 12 50 C 12 71 29 88 50 88 C 71 88 88 71 88 50 C 88 29 71 12 50 12'] },
-  { id: 'treppe', name: 'Treppe', level: 1, d: ['M 10 88 L 10 68 L 30 68 L 30 48 L 50 48 L 50 28 L 70 28 L 70 10 L 90 10'] },
-  { id: 'welle2', name: 'Große Welle', level: 1, d: ['M 6 50 C 12 12 26 12 30 50 C 34 88 48 88 52 50 C 56 12 70 12 74 50 C 78 88 92 88 94 60'] },
-  { id: 'schlaufen', name: 'Schlaufen', level: 2, d: ['M 6 72 C 22 72 30 52 30 40 C 30 28 18 28 18 40 C 18 56 30 72 46 72 C 62 72 70 52 70 40 C 70 28 58 28 58 40 C 58 56 70 72 94 72'] },
-  { id: 'spirale', name: 'Schneckenhaus', level: 2, d: [spiral()] },
-  { id: 'berge', name: 'Berge', level: 2, d: ['M 6 84 L 20 30 L 34 84 L 50 16 L 64 84 L 78 44 L 94 84'] },
-  { id: 'acht', name: 'Liegende Acht', level: 2, d: ['M 50 50 C 60 30 90 26 90 50 C 90 74 60 70 50 50 C 40 30 10 26 10 50 C 10 74 40 70 50 50'] },
-  { id: 'kringel', name: 'Kringel', level: 2, d: ['M 6 70 C 18 70 26 58 26 48 C 26 38 16 38 16 48 C 16 62 26 70 38 70 C 50 70 58 58 58 48 C 58 38 48 38 48 48 C 48 62 58 70 70 70 C 82 70 90 58 90 48 C 90 38 80 38 80 48 C 80 62 88 70 96 70'] },
-  { id: 'zacken', name: 'Zackenkrone', level: 2, d: ['M 8 80 L 8 30 L 30 58 L 50 22 L 70 58 L 92 30 L 92 80 Z'] },
-];
-
-export const SCHWUNG_BY_ID: Record<string, Schwung> = Object.fromEntries(SCHWUNGE.map((s) => [s.id, s]));
+/** Großbuchstaben in Druckschrift, jeweils in Schreibreihenfolge. */
+const LETTERS: Record<string, Glyph> = {
+  A: { d: ['M 24 92 L 50 8 L 76 92', 'M 35 59 L 65 59'] },
+  B: { d: ['M 28 8 L 28 92', 'M 28 8 L 50 8 C 77 8 77 49 50 49 L 28 49', 'M 50 49 C 82 49 82 92 50 92 L 28 92'] },
+  C: { d: ['M 73 20 C 65 9 56 8 50 8 C 32 8 23 26 23 50 C 23 74 32 92 50 92 C 60 92 68 88 74 79'] },
+  D: { d: ['M 28 8 L 28 92', 'M 28 8 L 45 8 C 68 8 77 27 77 50 C 77 73 68 92 45 92 L 28 92'] },
+  E: { d: ['M 29 8 L 29 92 L 74 92', 'M 29 8 L 74 8', 'M 29 49 L 65 49'] },
+  F: { d: ['M 29 8 L 29 92', 'M 29 8 L 74 8', 'M 29 49 L 65 49'] },
+  G: { d: ['M 74 20 C 67 11 58 8 50 8 C 32 8 23 26 23 50 C 23 74 32 92 51 92 C 68 92 76 79 76 61 L 76 53 L 53 53'] },
+  H: { d: ['M 25 8 L 25 92', 'M 75 8 L 75 92', 'M 25 50 L 75 50'] },
+  I: { d: ['M 50 8 L 50 92', 'M 34 8 L 66 8', 'M 34 92 L 66 92'] },
+  J: { d: ['M 68 8 L 68 69 C 68 84 60 92 47 92 C 35 92 27 84 27 73'] },
+  K: { d: ['M 26 8 L 26 92', 'M 74 8 L 26 55', 'M 45 36 L 76 92'] },
+  L: { d: ['M 29 8 L 29 92 L 74 92'] },
+  M: { d: ['M 23 92 L 23 8 L 50 57 L 77 8 L 77 92'] },
+  N: { d: ['M 25 92 L 25 8 L 75 92 L 75 8'] },
+  O: { d: [DIGITS['0'].d[0]] },
+  P: { d: ['M 28 8 L 28 92', 'M 28 8 L 52 8 C 81 8 81 52 52 52 L 28 52'] },
+  Q: { d: [DIGITS['0'].d[0], 'M 54 69 L 77 94'] },
+  R: { d: ['M 28 8 L 28 92', 'M 28 8 L 52 8 C 81 8 81 52 52 52 L 28 52', 'M 48 52 L 75 92'] },
+  S: { d: ['M 71 19 C 63 7 46 4 35 14 C 21 27 28 42 49 49 C 72 57 80 72 67 85 C 57 96 37 94 27 81'] },
+  T: { d: ['M 23 8 L 77 8', 'M 50 8 L 50 92'] },
+  U: { d: ['M 25 8 L 25 64 C 25 82 34 92 50 92 C 66 92 75 82 75 64 L 75 8'] },
+  V: { d: ['M 23 8 L 50 92 L 77 8'] },
+  W: { d: ['M 20 8 L 34 92 L 50 38 L 66 92 L 80 8'] },
+  X: { d: ['M 24 8 L 76 92', 'M 76 8 L 24 92'] },
+  Y: { d: ['M 23 8 L 50 49 L 77 8', 'M 50 49 L 50 92'] },
+  Z: { d: ['M 24 8 L 76 8 L 24 92 L 76 92'] },
+  Ä: { d: ['M 24 92 L 50 24 L 76 92', 'M 35 63 L 65 63', 'M 37 6 L 37 14', 'M 63 6 L 63 14'] },
+  Ö: { d: ['M 50 24 C 35 24 25 37 25 58 C 25 79 35 92 50 92 C 65 92 75 79 75 58 C 75 37 65 24 50 24', 'M 37 6 L 37 14', 'M 63 6 L 63 14'] },
+  Ü: { d: ['M 25 24 L 25 65 C 25 82 34 92 50 92 C 66 92 75 82 75 65 L 75 24', 'M 37 6 L 37 14', 'M 63 6 L 63 14'] },
+};
 
 /** Abstand der Ziffern bei mehrstelligen Zahlen (Feld-Einheiten) */
 export const DIGIT_ADVANCE = 64;
@@ -76,7 +65,7 @@ export const DIGIT_ADVANCE = 64;
 const DENSITY = 1.5;
 
 export interface Layout {
-  /** Was geschrieben wird (Zahl) bzw. Kennung des Schwungs */
+  /** Was geschrieben wird (Zahl, Buchstabe oder Wort) */
   text: string;
   /** Breite der Zeichenfläche in Feld-Einheiten (Höhe immer 100) */
   w: number;
@@ -103,32 +92,29 @@ function sampled(d: string): Pt[] {
   return pts;
 }
 
-/** Eine Zahl wie „17“ als Zeichenfläche mit Kästchen je Ziffer. */
-export function digitLayout(text: string): Layout {
+function glyphLayout(text: string, glyphs: Record<string, Glyph>, advance: number): Layout {
   const strokes: Pt[][] = [];
   const cellOf: number[] = [];
   const cells: { x: number; w: number }[] = [];
   const paths: { d: string; dx: number }[] = [];
   [...text].forEach((ch, i) => {
-    const dx = i * DIGIT_ADVANCE;
+    const dx = i * advance;
     cells.push({ x: dx + 22, w: 56 });
-    for (const d of DIGITS[ch].d) {
+    for (const d of glyphs[ch].d) {
       strokes.push(sampled(d).map(([x, y]) => [x + dx, y] as Pt));
       cellOf.push(i);
       paths.push({ d, dx });
     }
   });
-  return { text, w: 100 + (text.length - 1) * DIGIT_ADVANCE, strokes, cellOf, cells, paths };
+  return { text, w: 100 + (text.length - 1) * advance, strokes, cellOf, cells, paths };
 }
 
-export function schwungLayout(id: string): Layout {
-  const s = SCHWUNG_BY_ID[id];
-  return {
-    text: id,
-    w: 100,
-    strokes: s.d.map((d) => sampled(d)),
-    cellOf: s.d.map(() => 0),
-    cells: [{ x: 0, w: 100 }],
-    paths: s.d.map((d) => ({ d, dx: 0 })),
-  };
+/** Eine Zahl wie „17“ als Zeichenfläche mit Kästchen je Ziffer. */
+export function digitLayout(text: string): Layout {
+  return glyphLayout(text, DIGITS, DIGIT_ADVANCE);
+}
+
+/** Buchstaben stehen nebeneinander und werden von links nach rechts geschrieben. */
+export function letterLayout(text: string): Layout {
+  return glyphLayout(text, LETTERS, 72);
 }

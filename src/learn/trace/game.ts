@@ -2,7 +2,6 @@ import type { GameDef } from '../../engine/game';
 import type { Level } from '../../lib/store';
 import { pick, placesFromScores, shuffle, type Rnd } from '../../lib/util';
 import { int } from '../choice';
-import { SCHWUNGE } from './shapes';
 
 /**
  * Regeln der Nachspur-Spiele (Schwung-Strecke, Zahlen-Spur). Aufgebaut wie die Quiz-Engine:
@@ -13,7 +12,8 @@ import { SCHWUNGE } from './shapes';
 export type TraceGameKind = 'schwung' | 'zahlen';
 
 export type TraceTask =
-  | { k: 'schwung'; id: string; mover: string; goal: string }
+  | { k: 'schwung'; text: string }
+  | { k: 'schwung'; id: string } // Bereits laufende Runden können noch alte Strecken-IDs enthalten.
   | {
       k: 'zahl';
       /** Was geschrieben wird, z. B. „7“ oder „15“ */
@@ -55,32 +55,32 @@ export interface TraceState {
 
 export type TraceAction = { t: 'done'; stars: number; ms: number } | { t: 'next' };
 
-/** Wer etwas nachspurt und womit es ans Ziel kommt (keine Herzen). */
-const MOVERS: [string, string][] = [
-  ['🐻', '🍯'],
-  ['🚗', '🏠'],
-  ['🐝', '🌻'],
-  ['🐌', '🍓'],
-  ['🚀', '🌙'],
-  ['🐭', '🧀'],
-  ['🐶', '🦴'],
-  ['🐰', '🥕'],
-  ['🐞', '🍃'],
-  ['🚂', '🏁'],
+const SCHWUNG_TEXTS = [
+  [...'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ'],
+  ['EI', 'EIS', 'KUH', 'OMA', 'OPA', 'HUT', 'BUS', 'ZUG', 'RAD', 'TEE', 'UHR', 'ÖL', 'BÄR', 'TÜR', 'SEE', 'TOR'],
+  ['HAUS', 'MAUS', 'BALL', 'ENTE', 'MOND', 'BROT', 'KATZE', 'APFEL', 'SONNE', 'BLUME', 'PFERD', 'BUCH', 'LÖWE', 'FISCH'],
 ];
+
+/** Eine bereits gestartete Online-Runde mit alten IDs als Schrift darstellen. */
+const LEGACY_SCHWUNG_TEXT: Record<string, string> = {
+  gerade: 'I', regen: 'L', rutsche: 'V', huegel: 'A', welle: 'S',
+  zickzack: 'ZUG', girlande: 'OMA', bruecke: 'HUT', kreis: 'ÖL', treppe: 'TEE', welle2: 'SEE',
+  schlaufen: 'MAUS', spirale: 'SONNE', berge: 'BERG', acht: 'BALL', kringel: 'BLUME', zacken: 'KATZE',
+};
+
+export function schwungText(task: Extract<TraceTask, { k: 'schwung' }>): string {
+  return 'text' in task ? task.text : LEGACY_SCHWUNG_TEXT[task.id] ?? 'A';
+}
 
 const COUNT_EMOJI = ['🍎', '⭐', '🐟', '🌼', '🍓', '⚽', '🐞', '🍐'];
 
 function schwungTasks(level: Level, count: number, rnd: Rnd): TraceTask[] {
-  const pool = SCHWUNGE.filter((s) => s.level === level);
-  const movers = shuffle(MOVERS, rnd);
+  const pool = SCHWUNG_TEXTS[level];
   const out: TraceTask[] = [];
-  let bag: typeof pool = [];
+  let bag: string[] = [];
   while (out.length < count) {
     if (!bag.length) bag = shuffle(pool, rnd);
-    const s = bag.pop()!;
-    const [mover, goal] = movers[out.length % movers.length];
-    out.push({ k: 'schwung', id: s.id, mover, goal });
+    out.push({ k: 'schwung', text: bag.pop()! });
   }
   return out;
 }

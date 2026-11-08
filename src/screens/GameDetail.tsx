@@ -27,7 +27,7 @@ const LEVEL_SUB: Record<string, [string, string, string]> = {
   woerter: ['Buchstaben', 'Silben', 'Mehrzahl, Schreiben'],
   englisch: ['Bild → Wort', 'Wort → Bild', 'Sätze, Grammatik'],
   zahlenspur: ['0 bis 9', 'bis 20', 'ohne Vorlage'],
-  schwung: ['Bögen', 'Zickzack', 'Schlaufen'],
+  schwung: ['Großbuchstaben', 'kurze Wörter', 'längere Wörter'],
   paare: ['12 Karten', '16 Karten', '24 Karten'],
   vier: ['Robo übt', 'Robo denkt mit', 'Robo-Profi'],
   ttt: ['Robo übt', 'Robo denkt mit', 'Robo-Profi'],
@@ -153,7 +153,6 @@ export function GameDetail({ id, profile }: { id: GameId; profile: Profile }) {
 
   const start = (seats: SeatInfo[]) => {
     setSetup(null);
-    // Das Tutorial kommt nur, wenn man es selbst über „So geht's“ oder das ? öffnet.
     if (id === 'joykart') unlockAudio();
     nav.play({ game: id, seats, level: id === 'joykart' ? circuit : level });
   };
@@ -193,18 +192,6 @@ export function GameDetail({ id, profile }: { id: GameId; profile: Profile }) {
           <b>Das übst du:</b> {meta.learn}
         </p>
       </div>
-
-      <button type="button" className="card stitched row" style={{ textAlign: 'left' }} onClick={() => nav.tutorial(id)}>
-        <Joy size={46} mood="talk" />
-        <span className="grow">
-          <b className="display">So geht's</b>
-          <br />
-          <span className="small muted">Joy erklärt das Spiel in {meta.tutorial.length} Schritten</span>
-        </span>
-        <span className="icon-btn" style={{ background: 'var(--butter)', color: 'var(--on-butter)' }} aria-hidden="true">
-          <Icon name="play" />
-        </span>
-      </button>
 
       {id === 'joykart' && <div className="field"><span className="field-label">Startstrecke gegen Robo</span><div className="seg">
         {(['Sonnenbucht','Kap der Winde'] as const).map((name,i)=><button key={name} aria-pressed={circuit===i} onClick={()=>setCircuit(i as Level)}>{name}</button>)}

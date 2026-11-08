@@ -26,7 +26,7 @@ interface NavState {
   route: Route;
   back: Route[];
   session: Session | null;
-  /** Nur auf Wunsch geöffnet (So geht's / ?), nie von selbst beim Spielstart */
+  /** Nur auf Wunsch geöffnet (z. B. über ?), nie von selbst beim Spielstart */
   tutorial: { game: GameId } | null;
 }
 

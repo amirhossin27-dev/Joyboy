@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { checkFree, checkStroke, starsFor, TOLERANCE } from '../trace/check';
 import { pathPoints, resample, type Pt } from '../trace/path';
-import { numberTask, TRACE_EACH, TRACE_SOLO, traceDef, tracePoints } from '../trace/game';
-import { DIGITS, digitLayout, SCHWUNGE, schwungLayout } from '../trace/shapes';
+import { numberTask, schwungText, TRACE_EACH, TRACE_SOLO, traceDef, tracePoints } from '../trace/game';
+import { DIGITS, digitLayout, letterLayout } from '../trace/shapes';
 
 /** Fester Zufall, damit die Tests immer gleich laufen */
 function seeded(seed: number) {
@@ -25,7 +25,7 @@ function wobble(line: Pt[], amount: number, seed = 1, shift: Pt = [0, 0]): Pt[] 
   });
 }
 
-const ALL = [...Object.keys(DIGITS).map((d) => digitLayout(d)), ...SCHWUNGE.map((s) => schwungLayout(s.id))];
+const ALL = [...Object.keys(DIGITS).map((d) => digitLayout(d)), ...[...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'].map(letterLayout)];
 
 describe('Pfade', () => {
   it('liest Linien, Kurven und Bögen', () => {
@@ -151,7 +151,12 @@ describe('Spielregeln Nachspuren', () => {
     for (const level of [0, 1, 2] as const) {
       const s = traceDef('schwung').init(ctx(1, level));
       expect(s.tasks).toHaveLength(TRACE_SOLO);
-      for (const t of s.tasks) expect(t.k === 'schwung' && SCHWUNGE.find((x) => x.id === t.id)!.level).toBe(level);
+      const template = [/^\p{Lu}$/u, /^\p{Lu}{2,3}$/u, /^\p{Lu}{4,5}$/u][level];
+      for (const t of s.tasks) {
+        if (t.k !== 'schwung' || !('text' in t)) throw new Error('Schriftaufgabe erwartet');
+        expect(t.text).toMatch(template);
+        expect(letterLayout(t.text).cells).toHaveLength(t.text.length);
+      }
     }
     const r = seeded(9);
     for (let i = 0; i < 300; i++) {
@@ -167,6 +172,19 @@ describe('Spielregeln Nachspuren', () => {
       const calc = /^(\d+) ([+−]) (\d+) = \?$/.exec(hard.prompt);
       if (calc) expect(calc[2] === '+' ? Number(calc[1]) + Number(calc[3]) : Number(calc[1]) - Number(calc[3])).toBe(Number(hard.text));
     }
+  });
+
+  it('zeichnet ein Wort von links nach rechts und führt jeden Strich', () => {
+    const layout = letterLayout('ÖL');
+    expect(layout.cellOf).toEqual([0, 0, 0, 1]);
+    expect(layout.strokes[3][0]).toEqual([101, 8]);
+    for (const stroke of layout.strokes) {
+      expect(checkStroke(stroke, stroke, TOLERANCE[2]).ok).toBe(true);
+    }
+  });
+
+  it('ersetzt die Strecken-ID einer alten Online-Runde durch Schrift', () => {
+    expect(schwungText({ k: 'schwung', id: 'spirale' })).toBe('SONNE');
   });
 
   it('zählt Sterne, Punkte und geht reihum weiter', () => {

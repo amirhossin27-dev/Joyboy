@@ -118,11 +118,12 @@ function art(kind: Exclude<ArtKind, object>): ReactNode {
     case 'schwung':
       return (
         <>
-          <path d="M14 70 C24 34 40 34 50 70 C60 106 76 106 86 70 C96 34 112 34 122 70" fill="none" stroke="#E3DDCF" strokeWidth="14" strokeLinecap="round" />
-          <path d="M14 70 C24 34 40 34 50 70 C55 88 62 97 68 99" fill="none" stroke={C.terra} strokeWidth="6" strokeLinecap="round" />
-          <text x="70" y="104" textAnchor="middle" fontSize="24">🐻</text>
-          <text x="134" y="78" textAnchor="middle" fontSize="24">🍯</text>
-          <circle cx="14" cy="70" r="7" fill={C.sage} />
+          <rect x="30" y="12" width="100" height="88" rx="12" fill={C.paper} stroke={C.ink} strokeWidth="2" />
+          <path d="M53 85 L80 25 L107 85 M64 63 H96" fill="none" stroke="#E3DDCF" strokeWidth="12" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M53 85 L80 25 L93 54" fill="none" stroke={C.terra} strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx="53" cy="85" r="7" fill={C.sage} />
+          <text x="53" y="89" textAnchor="middle" fontSize="10" fontWeight="800" fontFamily={FONT} fill={C.paper}>1</text>
+          <circle cx="93" cy="54" r="6" fill={C.paper} stroke={C.ink} strokeWidth="2" />
         </>
       );
     case 'paare':

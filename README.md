@@ -137,7 +137,7 @@ src/
 
 ### Joys Stimme
 
-Joy liest mit einer freien KI-Stimme vor (Qwen3-TTS, Apache-2.0). Alle Sätze sind vorab als kleine Tondateien in `public/stimme/` aufgenommen, die App braucht dafür keinen Dienst im Netz. Rechenaufgaben und Uhrzeiten setzt sie aus Bausteinen zusammen, Sätze mit selbst getippten Namen liest sie nicht vor.
+Joy liest mit einer freien KI-Stimme vor (Qwen3-TTS, Apache-2.0). Für die Joy-Kart-Anleitung kommt [Piper mit der deutschen Stimme Thorsten](https://huggingface.co/rhasspy/piper-voices/blob/v1.0.0/de/de_DE/thorsten/high/MODEL_CARD) zum Einsatz. Alle Sätze sind vorab als kleine Tondateien in `public/stimme/` aufgenommen, die App braucht dafür keinen Dienst im Netz. Rechenaufgaben und Uhrzeiten setzt sie aus Bausteinen zusammen, Sätze mit selbst getippten Namen liest sie nicht vor.
 
 Kommen neue Texte dazu (Spiele, Anleitungen, Fragen), fehlen dafür einfach die Aufnahmen. So kommen sie dazu:
 

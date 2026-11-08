@@ -1,5 +1,17 @@
 # Joyboy – Projektstatus und Übergabe
 
+## 08.11.2026 – Schwung-Strecke und Tutorial
+
+**Freigabe und PR.** Nutzer hat die Änderungen freigegeben. [PR #28](https://github.com/amirhossin27-dev/Joyboy/pull/28) von codex/schwung-strecke-tutorial gegen main. Ausgangsstand 7cfa8e0, Code-Commit a9685a7.
+
+**Lokal umgesetzt.** Schwung-Strecke zeigt ausschließlich Schriftvorlagen in Spiel, Vorschau und Tutorial. Leicht nutzt Großbuchstaben einschließlich Ä, Ö, Ü, Mittel Wörter mit zwei bis drei und Schwer Wörter mit vier bis fünf Buchstaben. Bereits laufende Online-Runden mit alten Aufgaben-IDs zeigen auf der neuen App-Version Ersatzvorlagen aus Schrift. Betroffene Bereiche sind die Nachspur-Engine, die Spielansichten und die Tutorial-Navigation.
+
+**Tutorial.** Auf der Spieldetailseite öffnet das Fragezeichen oben rechts „So geht’s“. Die Vorlesestimme startet unabhängig vom Profilalter beim Öffnen und beim Schrittwechsel. Die Eltern-Einstellung „Vorlesen aus“ schaltet die Automatik ab. Für die Joy-Kart-Anleitung wurden zwölf fehlende Aufnahmen lokal mit Piper und Thorsten erzeugt.
+
+**Geprüft.** Produktionsbuild mit TypeScript, 151 App- und 66 Node-Tests sowie Git-Diff-Prüfung bestanden. In Edge und Windows-WebKit im Handyformat alle drei Schwung-Stufen, vollständiges Nachspuren eines Wortes und der Tutorial-Probe sowie der Einstieg über das Fragezeichen geprüft. In Edge zusätzlich automatische Wiedergabe, manuelles Vorlesen bei „Aus“ und alle zwölf Joy-Kart-Aufnahmen geprüft. Nach Zwischenspeicherung startete Joy-Karts erster Schritt in Edge auch offline. Bildschirmfotos von Wortvorlage und Tutorial nach dem ersten Zeichenframe angesehen.
+
+**Offen / nächster Schritt.** Die Windows-WebKit-Testversion stellt keinen AudioContext bereit. Auf dem iPhone 15 das Fragezeichen und danach „Weiter“ antippen und den Ton prüfen. Für gemeinsame Runden dieselbe aktuelle App-Version verwenden.
+
 ## 05.11.2026 – Joy-Kart · Licht, Fahrbahn und Fjordküste
 
 [PR #27](https://github.com/amirhossin27-dev/Joyboy/pull/27) am 05.11.2026 gegen `main` erstellt. Branch `codex/joy-kart-grafik-effekte` enthält die Grafik-/Effektarbeiten und die verlinkten Vergleichsbilder und Prüfberichte. Code-Commit `39e91df`. Review, GitHub-Prüfungen und physischer iPhone-Test stehen aus.

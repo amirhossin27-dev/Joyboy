@@ -16,6 +16,18 @@ export function SpeakButton({ text, className }: { text: string | string[]; clas
   );
 }
 
+/** Die Aufgabe wird von selbst vorgelesen – dieser Knopf wiederholt sie. */
+export function ListenAgain({ text }: { text: string | string[] }) {
+  useVoiceReady();
+  if (!canSpeak(text)) return null;
+  return (
+    <button type="button" className="listen-btn" onClick={() => speak(text)}>
+      <Icon name="speaker" size={22} />
+      Nochmal hören
+    </button>
+  );
+}
+
 /** Joy mit Sprechblase. Liest von selbst vor, wenn das für dieses Kind eingeschaltet ist (außer `quiet`). */
 export function JoySays({ text, mood = 'talk', size = 64, quiet, children }: { text: string; mood?: JoyMood; size?: number; quiet?: boolean; children?: ReactNode }) {
   useEffect(() => {

@@ -3,11 +3,11 @@ import { SEAT_COLORS, type PlayProps } from '../../engine/game';
 import { useGame } from '../../engine/useGame';
 import { schwungText, traceDef, tracePoints, type TraceGameKind, type TraceState, type TraceTask } from '../../learn/trace/game';
 import { digitLayout, letterLayout, type Layout } from '../../learn/trace/shapes';
-import { speakIfAuto } from '../../lib/speech';
+import { speakTask } from '../../lib/speech';
 import type { Level } from '../../lib/store';
 import { cls } from '../../lib/util';
 import { Icon } from '../../ui/Icon';
-import { SeatStrip, Stars } from '../../ui/parts';
+import { ListenAgain, SeatStrip, Stars } from '../../ui/parts';
 import { TracePad, type TraceResult } from '../../ui/TracePad';
 
 const DEFS = { schwung: traceDef('schwung'), zahlen: traceDef('zahlen') };
@@ -26,6 +26,9 @@ export function inkColor(color: string | undefined, seat: number): string {
   }
   return SEAT_COLORS[seat % SEAT_COLORS.length];
 }
+
+/** Was Joy zur Aufgabe sagt */
+const taskSpeech = (task: TraceTask) => (task.k === 'schwung' ? 'Fang beim grünen Punkt an.' : task.hint);
 
 /** Was über der Fläche steht: Buchstabe, Wort, Zahl, Menge zum Zählen oder Rechenaufgabe */
 export function TraceTaskCard({ task, demo = false }: { task: TraceTask; demo?: boolean }) {
@@ -86,7 +89,7 @@ export function Trace(props: PlayProps & { game: TraceGameKind }) {
     if (s.phase !== 'ask') return;
     start.current = performance.now();
     const name = asker !== null && g.humans > 1 ? `${seats[asker].name}, ` : '';
-    if (!seats[me]?.robo) speakIfAuto([name, task.k === 'schwung' ? 'Fang beim grünen Punkt an.' : task.hint]);
+    if (!seats[me]?.robo) speakTask([name, taskSpeech(task)]);
   }, [s.q, s.phase]);
 
   const canTrace = g.myTurn && s.phase === 'ask' && !mine && !seats[me].robo;
@@ -113,6 +116,7 @@ export function Trace(props: PlayProps & { game: TraceGameKind }) {
         </span>
       </div>
       <TraceTaskCard task={task} />
+      <ListenAgain text={taskSpeech(task)} />
       <TraceTaskPad
         key={`${s.q}:${me}`}
         task={task}

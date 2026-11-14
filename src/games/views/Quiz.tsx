@@ -4,11 +4,12 @@ import type { PlayProps } from '../../engine/game';
 import { useGame } from '../../engine/useGame';
 import { quizDef, quizPoints, type QuizState } from '../../learn/quiz';
 import type { Subject, Task } from '../../learn/tasks';
-import { canSpeak, speak, speakIfAuto } from '../../lib/speech';
+import { canSpeak, speak, speakTask } from '../../lib/speech';
 import { tipSpeech } from '../../lib/speechtexts';
 import { cls } from '../../lib/util';
 import { Icon } from '../../ui/Icon';
-import { AnalogClock, SeatStrip, SpeakButton } from '../../ui/parts';
+import { Joy } from '../../ui/Joy';
+import { AnalogClock, ListenAgain, SeatStrip } from '../../ui/parts';
 
 const DEFS = {
   rechnen: quizDef('rechnen'),
@@ -19,7 +20,7 @@ const DEFS = {
   englisch: quizDef('englisch'),
 };
 
-export const ANSWER_COLORS = ['#417A4D', '#B5532E', '#2F6E9E', '#6E4C86'];
+export const ANSWER_COLORS = ['#2A8A4F', '#D94F1E', '#1C7CC2', '#8B52C4'];
 
 export function Shape({ i }: { i: number }) {
   const s = ['circle', 'triangle', 'square', 'diamond'][i % 4];
@@ -50,7 +51,6 @@ export function TaskCard({ task, speakable = true, letter }: { task: Task; speak
   const v = task.visual;
   return (
     <div className="quiz-card">
-      {speakable && <SpeakButton text={task.say} />}
       {v?.k === 'picture' && <span className="quiz-pic">{v.e}</span>}
       {v?.k === 'clock' && <AnalogClock h={v.h} m={v.m} size={160} />}
       {v?.k === 'tiles' && v.e && <span className="quiz-pic">{v.e}</span>}
@@ -79,6 +79,7 @@ export function TaskCard({ task, speakable = true, letter }: { task: Task; speak
           )}
         </span>
       )}
+      {speakable && <ListenAgain text={task.say} />}
     </div>
   );
 }
@@ -137,7 +138,7 @@ export function Quiz(props: PlayProps & { subject: Subject }) {
     askStart.current = performance.now();
     setElapsed(0);
     const name = asker !== null && g.humans > 1 ? `${seats[asker].name}, ` : '';
-    if (!seats[me]?.robo) speakIfAuto([name, task.say]);
+    if (!seats[me]?.robo) speakTask([name, task.say]);
     const t = window.setInterval(() => setElapsed(performance.now() - askStart.current), 250);
     return () => window.clearInterval(t);
   }, [s.q, s.phase]);
@@ -185,7 +186,14 @@ export function Quiz(props: PlayProps & { subject: Subject }) {
       <AnswerGrid task={task} chosen={mine?.i ?? null} reveal={s.phase !== 'ask'} disabled={!canAnswer} onPick={pick} />
       {s.phase === 'reveal' && mine && (
         <div className={cls('quiz-feedback', right ? 'ok' : 'bad')} role="status">
-          {right ? <Icon name="check" stroke={3} /> : <Icon name="help" />}
+          {right ? <Joy size={40} mood="cheer" /> : <Icon name="help" />}
+          {right && (
+            <span className="yay" aria-hidden="true">
+              {Array.from({ length: 12 }, (_, i) => (
+                <i key={i} />
+              ))}
+            </span>
+          )}
           <span className="grow">
             {right ? `Richtig! +${quizPoints(mine.ms)} Punkte` : `Richtig ist: ${task.options[task.correct]}. ${task.explain ?? ''}`}
           </span>

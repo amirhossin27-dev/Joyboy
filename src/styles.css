@@ -1,31 +1,31 @@
 /* ───────────── Joyboy · Papierwelt ───────────── */
 :root {
-  --paper: #f6f0e4;
+  --paper: #fff6e2;
   --card: #fffdf8;
-  --kraft: #efe6d4;
-  --kraft-2: #e3d8c2;
+  --kraft: #ffecc8;
+  --kraft-2: #f7d9a0;
   --ink: #2d3a31;
   --ink-2: #3b4a3f;
   --muted: #5e6b60;
-  --line: #e3d8c2;
-  --stitch: #cbbf9f;
-  --sage: #417a4d;
-  --sage-l: #5e9c6b;
-  --sage-soft: #ddebdd;
-  --terra: #d9774f;
-  --terra-d: #b5532e;
-  --terra-soft: #f6e1d8;
-  --sky: #6fa8d6;
-  --sky-d: #2f6e9e;
-  --sky-soft: #dce9f3;
-  --butter: #f2c94c;
-  --butter-soft: #f7edc8;
-  --sticky: #f7e7a1;
-  --plum: #6e4c86;
-  --plum-soft: #e9e1f0;
+  --line: #f1dcb0;
+  --stitch: #e3c486;
+  --sage: #2a8a4f;
+  --sage-l: #4fc07a;
+  --sage-soft: #d4f3de;
+  --terra: #ff7a45;
+  --terra-d: #d94f1e;
+  --terra-soft: #ffe1d3;
+  --sky: #58b7f5;
+  --sky-d: #1c7cc2;
+  --sky-soft: #d9efff;
+  --butter: #ffcb2e;
+  --butter-soft: #fff0b8;
+  --sticky: #ffe680;
+  --plum: #8b52c4;
+  --plum-soft: #eedfff;
   --shadow: 0 2px 0 rgba(45, 58, 49, 0.06), 0 10px 22px rgba(45, 58, 49, 0.1);
   --radius: 18px;
-  --tabbar-h: 78px;
+  --tabbar-h: 92px;
   --font-display: 'Grandstander Variable', Grandstander, ui-rounded, system-ui, sans-serif;
   --font-body: Andika, ui-rounded, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
@@ -53,12 +53,16 @@
   --health: var(--sage);
   --health-soft: var(--sage-soft);
   --memo-ink: var(--ink);
-  --sage-ink: #33673e;
+  --sage-ink: #1f7340;
   --terra-ink: var(--terra-d);
   --focus: var(--sky-d);
   --on-accent: #fffdf8;
   --on-butter: var(--ink);
   --trace-paper: #fffdf8;
+  --dot-a: rgb(255 203 46 / 30%);
+  --dot-b: rgb(88 183 245 / 22%);
+  --dot-c: rgb(255 122 69 / 24%);
+  --chat-dot: rgb(255 255 255 / 75%);
   color-scheme: light;
 }
 
@@ -1371,60 +1375,178 @@ p {
   opacity: 0.5;
 }
 
-/* Chat im Spielzimmer */
+/* Chat im Spielzimmer: bunte Sprechblasen, Sticker und fertige Sätze */
 .chat {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   padding: 12px;
-  border-radius: var(--radius);
+  border-radius: 26px;
   background: var(--card);
-  border: 2px dashed var(--stitch);
+  border: 2px solid var(--ink);
+  box-shadow: 3px 4px 0 var(--ink);
+}
+
+.chat.compact {
+  padding: 0;
+  border: none;
+  box-shadow: none;
+  background: none;
 }
 
 .chat-log {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  max-height: 220px;
-  min-height: 70px;
+  gap: 10px;
+  height: 250px;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 2px;
+  padding: 14px 12px;
+  border-radius: 18px;
+  background-color: var(--sky-soft);
+  background-image:
+    radial-gradient(circle at 12px 12px, var(--chat-dot) 2.5px, transparent 3px), radial-gradient(circle at 36px 36px, var(--chat-dot) 2.5px, transparent 3px);
+  background-size: 48px 48px;
+  scrollbar-width: thin;
 }
 
 .chat.compact .chat-log {
-  max-height: 38dvh;
+  height: 34dvh;
+}
+
+.chat-empty {
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-align: center;
+  color: var(--ink-2);
+}
+
+.chat-empty svg {
+  animation: joy-bob 2.4s ease-in-out infinite;
+}
+
+.chat-empty .display {
+  font-size: 1.35rem;
 }
 
 .chat-msg {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 8px;
-  max-width: 88%;
+  max-width: 90%;
+  animation: chat-in 0.32s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+  transform-origin: left bottom;
 }
 
 .chat-msg.mine {
   align-self: flex-end;
+  transform-origin: right bottom;
+}
+
+.chat-msg.follow {
+  margin-top: -5px;
+}
+
+.chat-face {
+  flex-shrink: 0;
+  width: 40px;
+}
+
+.chat-face .avatar {
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+}
+
+.chat-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+}
+
+.chat-msg.mine .chat-body {
+  align-items: flex-end;
+}
+
+.chat-name {
+  padding-left: 6px;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  color: var(--ink-2);
 }
 
 .chat-bubble {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  padding: 7px 12px;
-  border-radius: 14px 14px 14px 4px;
-  background: var(--kraft);
+  padding: 9px 14px;
+  border-radius: 6px 20px 20px 20px;
+  border: 2px solid var(--ink);
+  /* Sprechblase in der Lieblingsfarbe des Kindes, aufgehellt, damit die Schrift gut lesbar bleibt */
+  background: color-mix(in srgb, var(--who, var(--kraft)) 38%, var(--card));
+  box-shadow: 2px 3px 0 var(--ink);
+  font-size: 1.08rem;
+  font-weight: 700;
+  line-height: 1.3;
   overflow-wrap: anywhere;
 }
 
-.chat-msg.mine .chat-bubble {
-  border-radius: 14px 14px 4px 14px;
-  background: var(--sage-soft);
+.chat-msg.follow .chat-bubble {
+  border-radius: 20px;
 }
 
-.chat-bubble b {
-  font-family: var(--font-display);
+.chat-msg.mine .chat-bubble {
+  border-radius: 20px 6px 20px 20px;
+  background: var(--sage);
+  color: var(--on-accent);
+}
+
+.chat-msg.mine.follow .chat-bubble {
+  border-radius: 20px;
+}
+
+.chat-sticker {
+  font-size: 3.4rem;
+  line-height: 1.1;
+  filter: drop-shadow(2px 3px 0 rgb(0 0 0 / 14%));
+  animation: sticker-pop 0.5s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+
+.chat-stickers {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.chat-sticker-btn {
+  aspect-ratio: 1;
+  min-height: 40px;
+  border-radius: 14px;
+  border: 2px solid var(--ink);
+  background: var(--card);
+  box-shadow: 2px 3px 0 var(--ink);
+  font-size: clamp(1.25rem, 5.6vw, 1.7rem);
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  transition: transform 0.08s ease;
+}
+
+.chat-sticker-btn:nth-child(4n + 1) {
+  background: var(--butter-soft);
+}
+
+.chat-sticker-btn:nth-child(4n + 2) {
+  background: var(--sky-soft);
+}
+
+.chat-sticker-btn:nth-child(4n + 3) {
+  background: var(--terra-soft);
+}
+
+.chat-sticker-btn:nth-child(4n + 4) {
+  background: var(--plum-soft);
 }
 
 .chat-quick {
@@ -1435,26 +1557,55 @@ p {
   justify-content: start;
   gap: 8px;
   overflow-x: auto;
+  margin: 0 -12px;
+  padding: 2px 12px 6px;
+  scrollbar-width: none;
+}
+
+.chat.compact .chat-quick {
+  margin: 0;
   padding: 2px 2px 6px;
-  scrollbar-width: thin;
+}
+
+.chat-quick::-webkit-scrollbar {
+  display: none;
 }
 
 .chat-chip {
   flex-shrink: 0;
-  min-height: 42px;
-  padding: 0 14px;
+  min-height: 46px;
+  padding: 0 16px;
   border-radius: 999px;
   border: 2px solid var(--ink);
   background: var(--butter-soft);
   font-family: var(--font-display);
   font-weight: 700;
+  font-size: 1.02rem;
   white-space: nowrap;
-  box-shadow: 1px 2px 0 var(--ink);
+  box-shadow: 2px 3px 0 var(--ink);
 }
 
-.chat-chip:active:not(:disabled) {
-  transform: translate(1px, 2px);
+.chat-chip:nth-child(4n + 2) {
+  background: var(--sage-soft);
+}
+
+.chat-chip:nth-child(4n + 3) {
+  background: var(--sky-soft);
+}
+
+.chat-chip:nth-child(4n + 4) {
+  background: var(--terra-soft);
+}
+
+.chat-chip:active:not(:disabled),
+.chat-sticker-btn:active:not(:disabled) {
+  transform: translate(2px, 3px);
   box-shadow: none;
+}
+
+.chat-chip:disabled,
+.chat-sticker-btn:disabled {
+  opacity: 0.6;
 }
 
 .chat-input {
@@ -1464,17 +1615,58 @@ p {
 }
 
 .chat-input .input {
-  min-height: 48px;
-  font-size: 1rem;
+  min-height: 52px;
+  font-size: 1.05rem;
+  border-radius: 999px;
+  padding-left: 18px;
 }
 
 .icon-btn.send {
+  width: 52px;
+  height: 52px;
   background: var(--sage);
   color: var(--on-accent);
 }
 
 .icon-btn.send:disabled {
   opacity: 0.4;
+}
+
+.chat-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+}
+
+.chat-problem {
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--butter-soft);
+  border: 2px dashed var(--ink);
+  font-weight: 700;
+}
+
+@keyframes chat-in {
+  from {
+    transform: scale(0.6) translateY(10px);
+    opacity: 0;
+  }
+}
+
+@keyframes sticker-pop {
+  0% {
+    transform: scale(0.2) rotate(-20deg);
+  }
+  70% {
+    transform: scale(1.15) rotate(6deg);
+  }
+}
+
+@keyframes joy-bob {
+  50% {
+    transform: translateY(-5px) rotate(-3deg);
+  }
 }
 
 /* Spielfreunde und Spielzimmer, in denen gerade Freunde sind */
@@ -3429,6 +3621,601 @@ p {
   flex-wrap: wrap;
 }
 
+/* ───────────── Frischer Anstrich: größer, runder, fröhlicher ───────────── */
+body {
+  font-size: 18px;
+  background-image:
+    radial-gradient(circle at 24px 30px, var(--dot-a) 4px, transparent 5px), radial-gradient(circle at 96px 110px, var(--dot-b) 5px, transparent 6px),
+    radial-gradient(circle at 150px 50px, var(--dot-c) 3px, transparent 4px);
+  background-size: 180px 160px;
+}
+
+.btn {
+  min-height: 56px;
+  border-radius: 18px;
+  font-size: 1.1rem;
+}
+
+.btn.big {
+  min-height: 66px;
+  border-radius: 22px;
+  font-size: 1.3rem;
+}
+
+.card {
+  border-radius: 22px;
+}
+
+/* Begrüßung als bunte Karte */
+.hello {
+  padding: 14px;
+  border-radius: 26px;
+  border: 2px solid var(--ink);
+  background: linear-gradient(120deg, var(--sky-soft), var(--butter-soft));
+  box-shadow: 4px 5px 0 var(--ink);
+}
+
+.hello h1 {
+  font-size: 1.75rem;
+}
+
+.hello .polaroid {
+  animation: wiggle 5s ease-in-out infinite;
+}
+
+.star-badge {
+  animation: pulse 3s ease-in-out infinite;
+}
+
+.sticky.spruch {
+  border-radius: 20px;
+  border: 2px solid var(--ink);
+  box-shadow: 3px 4px 0 var(--ink);
+}
+
+.sticky.spruch > svg {
+  animation: joy-bob 2.6s ease-in-out infinite;
+}
+
+.sticky.spruch p {
+  font-size: 1.22rem;
+}
+
+/* Filter als runde Knöpfe statt Mappen-Reiter */
+.folder-tabs {
+  gap: 8px;
+  align-items: center;
+  padding: 4px 20px 10px;
+}
+
+.folder-tab,
+.folder-tab[aria-pressed='true'] {
+  min-height: 46px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 2px solid var(--ink);
+  background: var(--card);
+  color: var(--ink);
+  font-size: 1.05rem;
+  font-weight: 700;
+  box-shadow: 2px 3px 0 var(--ink);
+}
+
+.folder-tab[aria-pressed='true'] {
+  background: var(--butter);
+  color: var(--on-butter);
+  font-weight: 800;
+  transform: translate(1px, 2px);
+  box-shadow: 1px 1px 0 var(--ink);
+}
+
+.games-panel {
+  background: none;
+  border-radius: 0;
+  padding: 0;
+  gap: 14px;
+}
+
+.game-card {
+  padding: 8px 8px 14px;
+  border-radius: 24px;
+  border: 2px solid var(--ink);
+  box-shadow: 3px 4px 0 var(--ink);
+  transition:
+    transform 0.08s ease,
+    box-shadow 0.08s ease;
+  animation: pop-in 0.3s ease both;
+}
+
+.game-card:nth-child(2) {
+  animation-delay: 0.04s;
+}
+
+.game-card:nth-child(3) {
+  animation-delay: 0.08s;
+}
+
+.game-card:nth-child(4) {
+  animation-delay: 0.12s;
+}
+
+.game-card:nth-child(n + 5) {
+  animation-delay: 0.16s;
+}
+
+.game-card:active {
+  transform: translate(2px, 3px);
+  box-shadow: 1px 1px 0 var(--ink);
+}
+
+.game-card .game-art {
+  border-radius: 18px;
+}
+
+.game-card b {
+  font-weight: 800;
+  font-size: 1.14rem;
+}
+
+.game-card .meta {
+  font-size: 0.85rem;
+}
+
+.tag {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+
+/* Hauptmenü: schwebende Leiste mit großen Bildern */
+.tabbar {
+  background: none;
+  border-top: none;
+  padding: 0 12px calc(env(safe-area-inset-bottom) + 10px);
+  pointer-events: none;
+}
+
+.tabbar-inner {
+  pointer-events: auto;
+  max-width: 536px;
+  padding: 6px;
+  border-radius: 28px;
+  border: 2px solid var(--ink);
+  background: var(--card);
+  box-shadow: 3px 4px 0 var(--ink);
+}
+
+.tab {
+  padding: 4px 0;
+  font-size: 0.9rem;
+  border-radius: 22px;
+}
+
+.tab .tab-icon {
+  width: 64px;
+  height: 40px;
+  border-radius: 20px;
+  transition: transform 0.2s cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+
+.tab .tab-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.tab[aria-current='page'] {
+  color: var(--ink);
+}
+
+.tab[aria-current='page'] .tab-icon {
+  background: var(--butter);
+  color: var(--on-butter);
+  transform: translateY(-3px) scale(1.08);
+}
+
+/* Lernspiele: große Aufgabe, große Antworten */
+.quiz-card {
+  border-radius: 24px;
+  border: 2px solid var(--ink);
+  box-shadow: 3px 4px 0 var(--ink);
+  padding: 24px 16px 16px 30px;
+  animation: pop-in 0.28s ease both;
+}
+
+.quiz-prompt {
+  font-size: clamp(2.5rem, 12.5vw, 3.8rem);
+}
+
+.quiz-prompt.small {
+  font-size: 1.55rem;
+}
+
+.quiz-pic {
+  font-size: 4.8rem;
+}
+
+.quiz-hint {
+  font-size: 1.1rem;
+  color: var(--ink-2);
+}
+
+.listen-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 18px 0 14px;
+  border-radius: 999px;
+  border: 2px solid var(--ink);
+  background: var(--butter);
+  color: var(--on-butter);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.05rem;
+  box-shadow: 2px 3px 0 var(--ink);
+  flex-shrink: 0;
+}
+
+.listen-btn:active {
+  transform: translate(2px, 3px);
+  box-shadow: none;
+}
+
+.g-col > .listen-btn {
+  align-self: center;
+}
+
+.answers {
+  gap: 14px;
+}
+
+.answer {
+  min-height: 98px;
+  border-radius: 24px;
+  font-size: 2.3rem;
+  box-shadow: 3px 5px 0 var(--ink);
+  transition:
+    opacity 0.2s ease,
+    transform 0.08s ease,
+    box-shadow 0.08s ease;
+}
+
+.answer.text {
+  font-size: 1.35rem;
+}
+
+.answer.pic {
+  font-size: 3.1rem;
+}
+
+.answer:active:not(:disabled) {
+  transform: translate(2px, 4px);
+  box-shadow: 1px 1px 0 var(--ink);
+}
+
+.answer.ok {
+  animation: answer-yes 0.6s cubic-bezier(0.2, 1.5, 0.4, 1);
+}
+
+.answer.bad {
+  animation: answer-no 0.4s ease;
+}
+
+.quiz-feedback {
+  position: relative;
+  padding: 12px 16px;
+  border-radius: 20px;
+  font-size: 1.1rem;
+  box-shadow: 2px 3px 0 var(--ink);
+  animation: pop-in 0.25s ease both;
+}
+
+.quiz-feedback.ok {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.25rem;
+}
+
+.yay {
+  position: absolute;
+  left: 34px;
+  top: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.yay i {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: var(--butter);
+  opacity: 0;
+  animation: yay 0.9s ease-out forwards;
+}
+
+.yay i:nth-child(3n + 1) {
+  background: var(--terra);
+  border-radius: 50%;
+}
+
+.yay i:nth-child(3n + 2) {
+  background: var(--sky);
+}
+
+.yay i:nth-child(4n) {
+  background: var(--sage-l);
+}
+
+.yay i:nth-child(1) { --dx: -60px; --dy: -70px; }
+.yay i:nth-child(2) { --dx: -20px; --dy: -95px; }
+.yay i:nth-child(3) { --dx: 30px; --dy: -90px; }
+.yay i:nth-child(4) { --dx: 80px; --dy: -75px; }
+.yay i:nth-child(5) { --dx: 130px; --dy: -85px; animation-delay: 0.05s; }
+.yay i:nth-child(6) { --dx: 180px; --dy: -60px; animation-delay: 0.05s; }
+.yay i:nth-child(7) { --dx: -45px; --dy: -30px; animation-delay: 0.08s; }
+.yay i:nth-child(8) { --dx: 60px; --dy: -120px; animation-delay: 0.08s; }
+.yay i:nth-child(9) { --dx: 110px; --dy: -110px; animation-delay: 0.1s; }
+.yay i:nth-child(10) { --dx: 220px; --dy: -90px; animation-delay: 0.1s; }
+.yay i:nth-child(11) { --dx: 160px; --dy: -125px; animation-delay: 0.12s; }
+.yay i:nth-child(12) { --dx: 0; --dy: -130px; animation-delay: 0.12s; }
+
+.timer-bar {
+  height: 16px;
+}
+
+@keyframes wiggle {
+  0%,
+  88%,
+  100% {
+    transform: rotate(0);
+  }
+  92% {
+    transform: rotate(-6deg);
+  }
+  96% {
+    transform: rotate(5deg);
+  }
+}
+
+@keyframes answer-yes {
+  30% {
+    transform: scale(1.1) rotate(-2deg);
+  }
+  60% {
+    transform: scale(0.97) rotate(1deg);
+  }
+}
+
+@keyframes answer-no {
+  20%,
+  60% {
+    transform: translateX(-6px);
+  }
+  40%,
+  80% {
+    transform: translateX(6px);
+  }
+}
+
+@keyframes yay {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0) scale(0.4);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), calc(var(--dy) + 40px)) rotate(300deg) scale(1);
+  }
+}
+
+/* Übrige Seiten im selben Stil: Karten mit Rand und Schatten statt blasser Flächen */
+.card {
+  border: 2px solid var(--ink);
+  box-shadow: 3px 4px 0 var(--ink);
+}
+
+.card.stitched {
+  border: 2px dashed var(--ink);
+  background: var(--butter-soft);
+  box-shadow: none;
+}
+
+.bubble {
+  border-radius: 22px 22px 22px 6px;
+  box-shadow: 2px 3px 0 var(--ink);
+  font-size: 1.12rem;
+}
+
+.joy-row > svg {
+  animation: joy-bob 2.8s ease-in-out infinite;
+}
+
+.input {
+  border-radius: 18px;
+}
+
+.seg button {
+  border-radius: 18px;
+  box-shadow: 2px 3px 0 var(--ink);
+}
+
+.seg button[aria-pressed='true'] {
+  transform: translate(1px, 2px);
+  box-shadow: 1px 1px 0 var(--ink);
+}
+
+/* Willkommen und Profile */
+.avatar-pick {
+  border: 2px solid var(--ink);
+  border-radius: 22px;
+  transition: transform 0.15s cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+
+.avatar-pick:nth-child(4n + 1) {
+  background: var(--butter-soft);
+}
+
+.avatar-pick:nth-child(4n + 2) {
+  background: var(--sage-soft);
+}
+
+.avatar-pick:nth-child(4n + 3) {
+  background: var(--sky-soft);
+}
+
+.avatar-pick:nth-child(4n + 4) {
+  background: var(--plum-soft);
+}
+
+.avatar-pick[aria-pressed='true'] {
+  transform: scale(1.06) rotate(-2deg);
+}
+
+.swatch {
+  box-shadow: 2px 3px 0 var(--ink);
+}
+
+.who-card {
+  border-radius: 24px;
+  border: 2px solid var(--ink);
+  box-shadow: 3px 4px 0 var(--ink);
+}
+
+/* Ich */
+.card[aria-label='Mein Profil'] {
+  background: linear-gradient(120deg, var(--sky-soft), var(--butter-soft));
+}
+
+.stats3 > div {
+  border-radius: 18px;
+  border: 2px solid var(--ink);
+  background: var(--card);
+}
+
+.stats3 > div:nth-child(1) {
+  background: var(--butter);
+  color: var(--on-butter);
+}
+
+.stats3 > div:nth-child(1) * {
+  color: inherit;
+}
+
+.stats3 > div:nth-child(2) {
+  background: var(--sky-soft);
+}
+
+.stats3 > div:nth-child(3) {
+  background: var(--sage-soft);
+}
+
+.stats3 b {
+  font-size: 1.7rem;
+}
+
+.badge {
+  font-size: 0.88rem;
+}
+
+.badge .medal {
+  width: 68px;
+  height: 68px;
+}
+
+.badge:not(.locked) .medal {
+  animation: pulse 3s ease-in-out infinite;
+}
+
+.rank-row {
+  border-radius: 16px;
+}
+
+.rank-row.me {
+  border: 2px solid var(--ink);
+  background: var(--butter-soft);
+}
+
+/* Spielseite und Spielzimmer */
+.detail-hero {
+  border-radius: 26px;
+  border: 2px solid var(--ink);
+  box-shadow: 4px 5px 0 var(--ink);
+}
+
+.seat-row {
+  border-radius: 18px;
+}
+
+.seat-row:not(.empty) {
+  box-shadow: 2px 3px 0 var(--ink);
+}
+
+.pick-game {
+  border: 2px solid var(--ink);
+  border-radius: 18px;
+}
+
+.code-stamp {
+  border-style: solid;
+  border-radius: 14px;
+  background: var(--butter-soft);
+}
+
+/* Ergebnis */
+.result {
+  border-radius: 30px;
+  border: 2px solid var(--ink);
+  box-shadow: 5px 6px 0 var(--ink);
+  animation: result-in 0.45s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+
+.result h2 {
+  font-size: 1.7rem;
+}
+
+.result > .row:first-child > svg {
+  animation: joy-bob 1.6s ease-in-out infinite;
+}
+
+.result > .card.center {
+  background: var(--butter);
+  color: var(--on-butter);
+}
+
+.result > .card.center .muted {
+  color: inherit;
+}
+
+.reward {
+  border-radius: 20px;
+  border: 2px solid var(--ink);
+}
+
+.reward .stars svg {
+  animation: sticker-pop 0.6s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+
+.reward .stars svg:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.reward .stars svg:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes result-in {
+  from {
+    transform: scale(0.7) rotate(-3deg);
+    opacity: 0;
+  }
+}
+
 /* ───────────── Abend und Nacht · 20:00–07:00 ───────────── */
 :root[data-theme='dark'] {
   --paper: #1d2420;
@@ -3463,6 +4250,10 @@ p {
   --on-accent: #f0e7d5;
   --on-butter: #292d25;
   --trace-paper: #c8c0aa;
+  --dot-a: rgb(255 255 255 / 3%);
+  --dot-b: rgb(255 255 255 / 2%);
+  --dot-c: rgb(255 255 255 / 3%);
+  --chat-dot: rgb(255 255 255 / 6%);
   --shadow: 0 2px 0 rgb(0 0 0 / 12%), 0 10px 22px rgb(0 0 0 / 20%);
   color-scheme: dark;
 }

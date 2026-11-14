@@ -5,3 +5,5 @@ dist
 .env.local
 .env.*.local
 __pycache__
+# Wird bei jedem Testlauf neu erzeugt
+prototypes/joy-kart/coast-section/qa/phone-server-qa/

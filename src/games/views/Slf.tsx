@@ -3,7 +3,7 @@ import { buzz, sfx } from '../../arcade/engine';
 import type { PlayProps } from '../../engine/game';
 import { useGame } from '../../engine/useGame';
 import type { Level } from '../../lib/store';
-import { speakIfAuto } from '../../lib/speech';
+import { speakTask } from '../../lib/speech';
 import { cls } from '../../lib/util';
 import { Icon } from '../../ui/Icon';
 import { Curtain, SeatStrip, useOnChange } from '../../ui/parts';
@@ -21,7 +21,7 @@ function WriteForm({ s, level, onSubmit }: { s: SlfState; level: Level; onSubmit
   latest.current = answers;
 
   useEffect(() => {
-    speakIfAuto(`Der Buchstabe ist ${letter}.`);
+    speakTask(`Der Buchstabe ist ${letter}.`);
     const t = window.setInterval(() => setLeft((x) => x - 1), 1000);
     return () => window.clearInterval(t);
   }, []);

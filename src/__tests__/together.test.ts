@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import dbRules from '../../database.rules.json';
-import { CHAT_MAX, CHAT_WORDS, chatProblem, chatText, freeChat, QUICK_SENTENCES } from '../lib/chat';
+import { CHAT_MAX, CHAT_WORDS, chatProblem, chatText, freeChat, isSticker, QUICK_SENTENCES, STICKER_FROM } from '../lib/chat';
 import { BAD_WORDS } from '../lib/names';
 import { canJoin, friendRooms, isOnline, ONLINE_MS } from '../net/presence';
 import { admitChanges, autoAdmit, chatOf, chatToPrune, CHAT_KEEP, fillSeats, openSeat, slotsFor, waitingKids, type ChatMsg, type NetSeat, type RoomInfo, type SeatDoc } from '../net/roomLogic';
@@ -42,6 +42,14 @@ describe('Chat-Filter', () => {
     expect(chatText(msg('irgendwas', { q: 0 }), 'a', only)).toBe(QUICK_SENTENCES[0]);
     // was durch den Filter dieses Geräts nicht kommt, wird nicht gezeigt
     expect(chatText(msg('du bist dumm'), 'a', settings)).toBeNull();
+    // Sticker: fertige Bilder am Ende der Liste, die Sätze davor behalten ihre Nummern
+    expect(QUICK_SENTENCES[0]).toBe('Hallo! 👋');
+    expect(QUICK_SENTENCES[STICKER_FROM - 1]).toBe('Tschüss! 👋');
+    for (const [i, q] of QUICK_SENTENCES.entries()) expect(isSticker(q), q).toBe(i >= STICKER_FROM);
+    expect(isSticker('😄😄')).toBe(true);
+    expect(isSticker('ok 👍')).toBe(false);
+    expect(isSticker('123')).toBe(false);
+    expect(isSticker('')).toBe(false);
   });
 
   it('sortiert die Nachrichten und räumt alte erst ab ein paar zu viel weg', () => {

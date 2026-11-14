@@ -61,7 +61,7 @@ describe('Theme im laufenden App-Fenster', () => {
 
   it.each([
     [at(19, 59, 59, 999), 'light', 'dark', '#1d2420'],
-    [at(6, 59, 59, 999), 'dark', 'light', '#f6f0e4'],
+    [at(6, 59, 59, 999), 'dark', 'light', '#fff6e2'],
   ])('wechselt exakt an der Grenze %s', (now, before, after, color) => {
     vi.setSystemTime(now);
     stop = startAutoTheme();

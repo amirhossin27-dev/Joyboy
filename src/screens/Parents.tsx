@@ -308,8 +308,8 @@ function ParentPanel({ onClose }: { onClose: () => void }) {
             <div className="seg">
               {(
                 [
-                  ['auto', 'Automatisch', 'bis 7 Jahre'],
-                  ['on', 'Immer', ''],
+                  ['auto', 'Aufgaben', 'in Lernspielen'],
+                  ['on', 'Alles', 'auch Hinweise'],
                   ['off', 'Aus', ''],
                 ] as const
               ).map(([v, l, sub]) => (

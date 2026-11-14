@@ -174,7 +174,7 @@ export function stopSpeaking() {
   playing = [];
 }
 
-/** Soll Joy von selbst vorlesen? (Einstellung im Elternbereich, „auto“ = für 4–7-Jährige.) */
+/** Soll Joy auch Begrüßungen und Hinweise von selbst vorlesen? (Elternbereich, „auto“ = für 4–7-Jährige.) */
 export function autoSpeak(): boolean {
   if (!VOICE_ENABLED) return false;
   const d = getData();
@@ -186,4 +186,13 @@ export function autoSpeak(): boolean {
 
 export function speakIfAuto(text: string | string[]) {
   if (autoSpeak()) speak(text);
+}
+
+/** Aufgaben in Lernspielen liest Joy für jedes Alter von selbst vor – außer die Eltern haben „Aus“ gewählt. */
+export function autoSpeakTasks(speech: 'auto' | 'on' | 'off' = getData().settings.speech): boolean {
+  return VOICE_ENABLED && speech !== 'off';
+}
+
+export function speakTask(text: string | string[]) {
+  if (autoSpeakTasks()) speak(text);
 }

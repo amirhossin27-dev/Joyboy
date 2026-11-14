@@ -24,7 +24,7 @@ export function startAutoTheme(): () => void {
     const now = new Date();
     const theme = themeAt(now);
     document.documentElement.dataset.theme = theme;
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#1d2420' : '#f6f0e4');
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#1d2420' : '#fff6e2');
     // Exakte Grenze; spätestens jede Minute auch Änderungen der Gerätezeit erkennen.
     timer = setTimeout(update, Math.min(60_000, nextThemeChange(now).getTime() - now.getTime()));
   };

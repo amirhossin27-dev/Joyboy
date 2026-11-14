@@ -77,3 +77,12 @@ describe('Joys Stimme: welche Aufnahme gehört zu welchem Text', () => {
     expect(missing).toEqual([]);
   });
 });
+
+describe('Aufgaben von selbst vorlesen', () => {
+  it('liest Aufgaben in Lernspielen für jedes Alter vor – nur „Aus“ schaltet ab', async () => {
+    const { autoSpeakTasks } = await import('../lib/speech');
+    expect(autoSpeakTasks('auto')).toBe(true);
+    expect(autoSpeakTasks('on')).toBe(true);
+    expect(autoSpeakTasks('off')).toBe(false);
+  });
+});

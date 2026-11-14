@@ -26,7 +26,25 @@ export const QUICK_SENTENCES = [
   'Hihi 😄',
   'Danke fürs Spielen! 😊',
   'Tschüss! 👋',
+  // Sticker: nur ein Bild. Neue Einträge immer hinten anfügen – die Nummern stehen in gesendeten Nachrichten.
+  '👋',
+  '👍',
+  '😄',
+  '🎉',
+  '⭐',
+  '❤️',
+  '😮',
+  '🤔',
 ] as const;
+
+/** Ab dieser Nummer sind die fertigen Sätze Sticker. */
+export const STICKER_FROM = 13;
+
+/** Besteht die Nachricht nur aus ein bis drei Bildchen? Dann wird sie groß und ohne Blase gezeigt. */
+export function isSticker(text: string): boolean {
+  const t = text.replace(/\s/g, '');
+  return t.length > 0 && t.length <= 12 && /^[\p{Extended_Pictographic}\u{1F1E6}-\u{1F1FF}\u{FE0F}\u{200D}\u{1F3FB}-\u{1F3FF}]+$/u.test(t);
+}
 
 /** Wörter, die zusätzlich zu den Schimpfwörtern im Chat nicht gehen – damit niemand nach Kontaktdaten fragt. */
 export const CHAT_WORDS = ['adresse', 'wohnst', 'telefon', 'handy', 'nummer', 'passwort'];

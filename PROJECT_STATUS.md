@@ -1,5 +1,18 @@
 # Joyboy – Projektstatus und Übergabe
 
+## 14.11.2026 – Kinderfreundlicheres Layout, Vorlesen von selbst, neuer Chat
+
+**Nutzerentscheidung.** Variante A: Die Papierwelt bleibt erkennbar (Joy, Schriften, Bastel-Idee) und wird aufgefrischt; kein komplett neuer Look. Branch `claude/zealous-noether-ly1k61`, Ausgangsstand f063ad6. Kein PR erstellt.
+
+**Umgesetzt.**
+- **Vorlesen:** Aufgaben in Lernspielen (Quiz-Spiele, Zahlen-Spur, Schwung-Strecke, Buchstabe bei Stadt-Land-Fluss) werden für jedes Alter von selbst vorgelesen (`speakTask` in `src/lib/speech.ts`). Vorher nur bei Profilen bis 7 Jahre. Nur „Vorlesen: Aus“ im Elternbereich schaltet das ab. Der Knopf heißt jetzt „Nochmal hören“ und wiederholt die Aufgabe (`ListenAgain` in `src/ui/parts.tsx`). Elternbereich: „Aufgaben“ (Standard, früher „Automatisch“; Begrüßungen und Hinweise weiter nur bis 7 Jahre), „Alles“, „Aus“.
+- **Chat** (`src/screens/Chat.tsx`, `src/lib/chat.ts`): Sprechblasen in der Lieblingsfarbe des Kindes, größere Avatare, Name nur einmal je Nachrichtenfolge, große Sticker ohne Blase, acht Sticker-Knöpfe, farbige Satz-Knöpfe, leerer Zustand mit Joy, Einblend-Animation. Sticker sind neue fertige Sätze am Ende von `QUICK_SENTENCES` (ab `STICKER_FROM`); die Nummern der bisherigen Sätze sind unverändert, die Datenbankregeln mussten nicht neu gebaut werden.
+- **Layout** (`src/styles.css`, Abschnitt „Frischer Anstrich“ und Farbwerte in `:root`): kräftigere Farben, getupfter Hintergrund, Begrüßung als bunte Karte, runde Filterknöpfe, Spielkarten mit Rand und Schatten, schwebendes Hauptmenü, größere Aufgaben und Antworten, Konfetti und jubelnder Joy bei richtiger Antwort. Helle Hintergrundfarbe jetzt `#fff6e2` (auch in `index.html`, Manifest, `theme.ts`).
+
+**Geprüft.** Produktionsbuild mit TypeScript, 152 App- und 66 Node-Tests bestanden. In Chromium im Handyformat (393 × 852) angesehen: Startseite, Spieldetail, Rechen-Rallye mit richtiger Antwort, Zahlen-Spur hell und dunkel, Chat hell, dunkel und leer (Chat über eine vorübergehende Vorschauseite mit Beispielnachrichten, ohne Netz). Mit einem 8–9-Jahre-Profil startete der Ton bei der ersten Aufgabe von selbst, „Nochmal hören“ startete ihn erneut (gezählte Audio-Starts, nicht angehört).
+
+**Offen / nächster Schritt.** Nicht geprüft: Chat in einem echten Online-Spielzimmer mit zwei Geräten, iPhone/Safari, Hörprobe am Gerät. Ältere App-Versionen zeigen Sticker bei der Einstellung „nur fertige Sätze“ nicht an. Noch im alten Stil und mögliche nächste Etappe: Willkommen, „Ich“, Elternbereich, Spielzimmer-Übersicht, Brett- und Arcade-Spiele. Die optische Gesamtfreigabe durch den Nutzer steht aus.
+
 ## 08.11.2026 – Schwung-Strecke und Tutorial
 
 **Freigabe und PR.** Nutzer hat die Änderungen freigegeben. [PR #28](https://github.com/amirhossin27-dev/Joyboy/pull/28) von codex/schwung-strecke-tutorial gegen main. Ausgangsstand 7cfa8e0, Code-Commit a9685a7.

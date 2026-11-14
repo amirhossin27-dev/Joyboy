@@ -1,15 +1,15 @@
 // Soft camera-facing particles: fixed GPU instance pools, no bitmap downloads or per-frame objects.
 function createKartCombatEffects(THREE,{scene,kit,course,cars,hazards,materials,camera}){
  // Möwen: drei gebündelte Zeichenaufrufe je Schwarm, Flügelschlag über die Instanzmatrizen.
- const gullWhite=kit.material(0xf6f4ec,{roughness:.85}),gullGrey=kit.material(0x9fb0b8,{roughness:.85,side:THREE.DoubleSide});
+ const gullWhite=kit.material(0xfbf9f1,{roughness:.8,emissive:0x8a8a84,emissiveIntensity:.35}),gullGrey=kit.material(0xdfe6e8,{roughness:.8,side:THREE.DoubleSide,emissive:0x6f787c,emissiveIntensity:.35});
  const gullBody=kit.geometry(new THREE.SphereGeometry(1,10,8)),gullWing=kit.geometry(new THREE.BufferGeometry());
- gullWing.setAttribute('position',new THREE.Float32BufferAttribute([0,0,-.16,0,0,.16,.75,0,-.04,.75,0,-.04,0,0,.16,1.25,0,.1],3));gullWing.computeVertexNormals();
+ gullWing.setAttribute('position',new THREE.Float32BufferAttribute([0,0,-.2,0,0,.22,.8,.1,-.1,.8,.1,-.1,0,0,.22,.85,.1,.2,.8,.1,-.1,.85,.1,.2,1.55,-.06,.12],3));gullWing.computeVertexNormals();
  function flock(parent,count){
   const group=new THREE.Group(),dummy=new THREE.Object3D(),parts=[gullBody,gullWing,gullWing].map((g,i)=>{
    const mesh=new THREE.InstancedMesh(g,i?gullGrey:gullWhite,count);mesh.frustumCulled=false;mesh.castShadow=false;mesh.receiveShadow=false;group.add(mesh);return mesh;});
   group.visible=false;parent.add(group);
   return {group,place(i,x,y,z,heading,size,flap){
-   dummy.position.set(x,y,z);dummy.rotation.set(0,heading,0);dummy.scale.set(size*.2,size*.17,size*.42);dummy.updateMatrix();parts[0].setMatrixAt(i,dummy.matrix);
+   dummy.position.set(x,y,z);dummy.rotation.set(0,heading,0);dummy.scale.set(size*.17,size*.15,size*.5);dummy.updateMatrix();parts[0].setMatrixAt(i,dummy.matrix);
    dummy.scale.setScalar(size);
    for(const side of [1,-1]){dummy.rotation.set(0,heading+(side<0?Math.PI:0),flap,'YXZ');dummy.updateMatrix();parts[side>0?1:2].setMatrixAt(i,dummy.matrix);}
   },flush(){for(const part of parts)part.instanceMatrix.needsUpdate=true;}};
@@ -54,9 +54,9 @@ function createKartCombatEffects(THREE,{scene,kit,course,cars,hazards,materials,
   const band=kit.add(kit.geometry(new THREE.CylinderGeometry(.21,.21,.14,24)),basic(0xfff0cf),hazards[i].rocket,0,0,.12);band.rotation.x=Math.PI/2;band.castShadow=false;
   const exhaust=particles(5,0xffad56,true);hazards[i].rocket.add(exhaust.mesh);
   // Specials: Sonnenkraft-Schein, Eisfläche, Windfahnen und Staub beim scharfen Lenken.
-  const sun=kit.add(kit.geometry(new THREE.SphereGeometry(1,28,18)),basic(0xffd257,.26),group,0,1,0);sun.material.blending=THREE.AdditiveBlending;sun.castShadow=false;
-  const frost=kit.add(kit.geometry(new THREE.CircleGeometry(1,40)),basic(0xc8f3ff,.5),group,0,.07,0);frost.rotation.x=-Math.PI/2;frost.castShadow=false;
-  const ice=kit.add(kit.geometry(new THREE.IcosahedronGeometry(1,1)),kit.material(0xd8f6ff,{transparent:true,opacity:.34,roughness:.08,metalness:.3,flatShading:true,depthWrite:false}),group,0,1,0);ice.scale.set(1.5,1.35,1.9);ice.castShadow=false;
+  const sun=kit.add(kit.geometry(new THREE.SphereGeometry(1,28,18)),basic(0xff8a00,.5),group,0,1,0);sun.material.blending=THREE.AdditiveBlending;sun.castShadow=false;
+  const frost=kit.add(kit.geometry(new THREE.CircleGeometry(1,40)),basic(0x7fd4ff,.5),group,0,.07,0);frost.rotation.x=-Math.PI/2;frost.castShadow=false;
+  const ice=kit.add(kit.geometry(new THREE.IcosahedronGeometry(1,1)),kit.material(0x86d6ff,{transparent:true,opacity:.34,roughness:.08,metalness:.3,flatShading:true,depthWrite:false,emissive:0x2a86c8,emissiveIntensity:.6}),group,0,1,0);ice.scale.set(1.5,1.35,1.9);ice.castShadow=false;
   const wind=particles(8,0xeafcff),dust=particles(6,0xd9c8a4);group.add(wind.mesh,dust.mesh);
   const crabRing=kit.add(ringGeo,basic(0xff8a6a,.7),hazards[i].crab,0,.03,0);crabRing.rotation.x=-Math.PI/2;crabRing.scale.setScalar(1.5);crabRing.castShadow=false;
   return {group,sparks,smoke,ring,halo,exhaust,sun,frost,ice,wind,dust,crabRing};
@@ -69,21 +69,31 @@ function createKartCombatEffects(THREE,{scene,kit,course,cars,hazards,materials,
    const fade=Math.min(1,k.gulls/.5,(4.5-k.gulls)/.35+.2),clock=reduced?k.time*.4:k.time;
    if(viewer){
     for(let n=0;n<16;n++){
-     const dir=n%2?1:-1,x=dir*(((clock*(.34+noise(n)*.3)+noise(n+9))%1)*8-4);
-     screenFlock.place(n,x,-.95+noise(n+3)*2+.12*Math.sin(clock*3+n),-2.1-noise(n+5)*2.6,dir>0?Math.PI/2:-Math.PI/2,(.34+noise(n+7)*.3)*fade,Math.sin(clock*13+n*2)*.7);
+     const dir=n%2?1:-1,x=dir*(((clock*(.2+noise(n)*.2)+noise(n+9))%1)*8-4);
+     screenFlock.place(n,x,-.85+noise(n+3)*1.9+.16*Math.sin(clock*3+n),-2.2-noise(n+5)*2.8,dir*.5,(.42+noise(n+7)*.34)*fade,.15+Math.sin(clock*11+n*2)*.6);
     }screenFlock.flush();
    }else{
     const p=course.point(k.s,k.lat);
-    for(let n=0;n<6;n++){const a=clock*2.3+n*Math.PI/3;birds.place(n,p.x+Math.sin(a)*1.7,p.y+2.3+(k.lift||0)+.35*Math.sin(clock*4+n),p.z+Math.cos(a)*1.7,a+Math.PI/2,.5*fade,Math.sin(clock*13+n*2)*.7);}
+    for(let n=0;n<6;n++){const a=clock*2.3+n*Math.PI/3;birds.place(n,p.x+Math.sin(a)*1.7,p.y+2.3+(k.lift||0)+.35*Math.sin(clock*4+n),p.z+Math.cos(a)*1.7,a+Math.PI/2,.62*fade,.15+Math.sin(clock*11+n*2)*.6);}
     birds.flush();
    }
   }
   const fx=kartImpact(k),p=course.point(k.s,k.lat),t=k.time;
   pool.group.position.set(p.x,p.y+(k.lift||0),p.z);pool.group.rotation.y=p.angle;
   const active=fx.burst>0;
-  pool.sparks.mesh.visible=active&&!reduced;pool.smoke.mesh.visible=k.slow>0&&!reduced;
-  pool.sparks.material.uniforms.ink.value.setHex(fx.blocked?0x8eeeff:0xffcc65);
-  if(pool.sparks.mesh.visible){
+  // Kiste eingesammelt: bunte Funken steigen auf, solange das Roulette läuft.
+  const shining=!active&&k.sun>0,picked=!active&&!shining&&k.roll>.2;
+  pool.sparks.mesh.visible=(active||shining||picked)&&!reduced;pool.smoke.mesh.visible=k.slow>0&&!reduced;
+  if(picked)pool.sparks.material.uniforms.ink.value.setHSL((t*1.6)%1,.9,.66);
+  else pool.sparks.material.uniforms.ink.value.setHex(fx.blocked?0x8eeeff:0xffcc65);
+  if(pool.sparks.mesh.visible&&picked){
+   const rise=1-(k.roll-.2)/.6;
+   for(let n=0;n<16;n++){const a=n*2.399;pool.sparks.set(n,Math.sin(a)*(.5+rise*1.1),.9+rise*(1.3+n%4*.3),Math.cos(a)*(.5+rise*1.1),.15,.3,a,(1-rise)*.95);}
+   pool.sparks.flush();
+  }else if(pool.sparks.mesh.visible&&shining){
+   for(let n=0;n<16;n++){const a=n*2.399+t*3.2,rise=(t*.9+n/16)%1;pool.sparks.set(n,Math.sin(a)*1.5,.3+rise*2.1,Math.cos(a)*1.8,.16,.3,a,.9*Math.sin(rise*Math.PI));}
+   pool.sparks.flush();
+  }else if(pool.sparks.mesh.visible){
    for(let n=0;n<16;n++){
     const a=n*2.399,r=.6+(1-fx.burst)*(2.6+n%3*.3);
     pool.sparks.set(n,Math.sin(a)*r,1.1+Math.sin(n*4)*.4+(1-fx.burst)*1.3,Math.cos(a)*r,.12,.28,a,fx.burst*.9);
@@ -103,7 +113,7 @@ function createKartCombatEffects(THREE,{scene,kit,course,cars,hazards,materials,
   pool.exhaust.flush();
   cars[slot].shieldEffect.material.opacity=reduced?.20:.20+.035*Math.sin(t*4);
   pool.sun.visible=k.sun>0;
-  if(pool.sun.visible){const pulse=reduced?0:Math.sin(t*9)*.07,fade=Math.min(1,k.sun/.6);pool.sun.scale.set((1.75+pulse)*fade,(1.55+pulse)*fade,(2.2+pulse)*fade);pool.sun.material.opacity=.22+.06*Math.sin(t*5);}
+  if(pool.sun.visible){const pulse=reduced?0:Math.sin(t*9)*.07,fade=Math.min(1,k.sun/.6);pool.sun.scale.set((1.75+pulse)*fade,(1.55+pulse)*fade,(2.2+pulse)*fade);pool.sun.material.opacity=.42+.08*Math.sin(t*5);}
   pool.frost.visible=pool.ice.visible=k.ice>0;
   if(k.ice>0){const fade=Math.min(1,k.ice/.5);pool.frost.scale.setScalar(2.3*fade);pool.frost.material.opacity=.42*fade;pool.ice.material.opacity=.3*fade;pool.ice.rotation.y=reduced?0:t*.6;}
   // Windfahnen: quer beim Windstoß, längs im Windschatten.

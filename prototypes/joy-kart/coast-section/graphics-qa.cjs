@@ -30,7 +30,7 @@ function sceneColors(bytes){
    await frame.evaluate(({distance,name})=>{
     const a=window.joyKartRace;a.begin();let grid;for(let i=0;i<110;i++)grid=a.advance(1/30,[{steer:0,turbo:false},{steer:0,turbo:false}]);
     grid=grid.map((k,i)=>({...k,s:distance+i*16,lat:i?1.7:0,v:38,speedKmh:137,time:10,shield:0,boost:0,slow:0,blocked:0,impact:null,item:null,banana:null,rocket:null,grounded:true,lift:0}));
-    if(name.endsWith('hit')){grid[1].banana={s:distance+.3,lat:0};a.restore(grid);grid=a.advance(.05,[{steer:0,turbo:false},{steer:0,turbo:false}]);grid=a.advance(.2,[{steer:0,turbo:false},{steer:0,turbo:false}]);}
+    if(name.endsWith('hit')){grid[1].banana={id:1,s:distance+.3,lat:0};a.restore(grid);grid=a.advance(.05,[{steer:0,turbo:false},{steer:0,turbo:false}]);grid=a.advance(.2,[{steer:0,turbo:false},{steer:0,turbo:false}]);}
     a.restore(grid);a.show(grid,name.endsWith('close')?1:0);
    },{distance,name});
    await frame.evaluate(()=>new Promise(resolve=>{let n=24;function f(){if(--n)requestAnimationFrame(f);else resolve();}requestAnimationFrame(f);}));

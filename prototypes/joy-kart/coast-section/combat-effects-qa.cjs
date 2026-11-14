@@ -49,12 +49,12 @@ const server=http.createServer((req,res)=>{res.setHeader('content-type','text/ht
     window.base=grid.map((k,i)=>({...k,s:160+i*16,lat:i?2:0,v:38,speedKmh:137,time:10,item:null,shield:0,slow:0,blocked:0,impact:null,banana:null,rocket:null}));
     window.scene=(kind)=>{
      const g=structuredClone(window.base);
-     if(kind==='rocket'){g[0].item='shield';g[1].rocket={s:g[0].s+20,lat:.4};}
-     if(kind==='banana')g[1].banana={s:g[0].s+12,lat:0};
+     if(kind==='rocket'){g[0].item='shield';g[1].rocket={id:1,s:g[0].s+20,lat:.4};}
+     if(kind==='banana')g[1].banana={id:1,s:g[0].s+12,lat:0};
      api.restore(g);api.show(g,0);return g;
     };
     window.contact=(item,shield=false)=>{
-     const g=structuredClone(window.base);g[1][item]={s:g[0].s+(item==='banana'?.3:2),lat:0};g[0].shield=shield?12:0;
+     const g=structuredClone(window.base);g[1][item]={id:1,s:g[0].s+(item==='banana'?.3:2),lat:0};g[0].shield=shield?12:0;
      api.restore(g);let hit=api.advance(.05,[{steer:0,turbo:false},{steer:0,turbo:false}]);api.show(hit,0);return hit;
     };
     window.scene('rocket');

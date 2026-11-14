@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { NetLink, SeatInfo } from '../engine/game';
 import { GAME_BY_ID } from '../games/registry';
 import { rememberFriends } from '../net/cloud';
-import { admit, backToLobby, deny, leaveRoom, publishState, pushAct, serverNow, startGame, useRoom } from '../net/room';
+import { admit, backToLobby, deny, leaveRoom, liveOf, publishState, pushAct, sendLive, serverNow, startGame, useRoom } from '../net/room';
 import { absentSeats, guestActs, knocking, roomForKid, waitingKids, type NetSeat } from '../net/roomLogic';
 import { learnLeft } from '../lib/unlock';
 import { getData } from '../lib/store';
@@ -126,7 +126,7 @@ export function OnlineGame({ profileId }: { profileId: string }) {
   if (!info || info.status !== 'playing' || !game || !shared || me < 0) return null;
 
   const absent = absentSeats(game.seats, seats, serverNow(), me);
-  const net: NetLink = { me, host, shared, acts, absent, publish: publishState, push: pushAct };
+  const net: NetLink = { me, host, shared, acts, absent, publish: publishState, push: pushAct, live: { send: sendLive, peer: (seat) => liveOf(game.seats[seat]?.uid), mine: () => liveOf(uid), now: serverNow } };
   const playSeats: SeatInfo[] = game.seats.map((s, i) => ({ name: s.name, avatar: s.avatar, color: s.color, robo: s.robo, profileId: i === me ? profileId : undefined }));
   const hostName = game.seats.find((s) => s.uid === info.host)?.name ?? 'der Gastgeber';
   const next = waitingKids(info, seats, game.seats).map((w) => w.doc.name);

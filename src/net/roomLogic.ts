@@ -20,6 +20,8 @@ export interface SeatDoc {
   /** Züge als JSON-Text: [{ n, r, a }] */
   acts?: string;
   react?: { e: ReactionId; at: number };
+  /** Laufender Stand eines Echtzeitspiels (Joy-Kart) als JSON-Text: { r, d } – nur der neueste zählt */
+  live?: string;
 }
 
 export interface RoomInfo {

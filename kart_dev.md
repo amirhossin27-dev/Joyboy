@@ -1,5 +1,17 @@
 # Joy-Kart · Entwicklungsjournal
 
+## 14.11.2026 · Jedes Gerät fährt sein Kart, Kisten würfeln, sechs neue Specials
+
+**Warum.** Zu zweit stockte das Bild beim Gast und seine Lenkung kam verspätet an: Der Gastgeber rechnete beide Karts, der Gast bekam wenige Stände pro Sekunde und rechnete nur 0,12 s weiter.
+
+**Aufbau jetzt.** `kart-duel.js` hält zwei Karts. Je Platz bekommt `step(dt, inputs)` entweder `{steer,turbo}` (hier gelenkt), `null` (Robo) oder `{ghost: Stand}` (Kart eines anderen Geräts). Ein Geist wird aus dem letzten Stand auf die eigene Rennuhr vorgerechnet – mit Anfahren, laufendem Turbo und Bremsung wie in der Fahrphysik – und pro Bild weich nachgeführt. Länger stumme Karts rollen mit Reisetempo weiter. Maßgeblich ist die Rennzeit jedes Karts auf seinem eigenen Gerät; beide Geräte zeigen die auf vier Stellen gerundete Zielzeit.
+
+**Angriffe.** Der Angreifer trägt Bananenschale, Rakete und zuletzt gewirkten Zauber (`cast`) mit laufender Nummer in seinem Stand. Das getroffene Kart wertet aus (`kartReceive` in `circuit.js`) und führt die erledigten Nummern in `done`; daran räumt der Angreifer Schale und Rakete (`kartOwnHazards`). Die Krabbe gehört zum Stand des Karts, vor dem sie läuft. Dadurch geht nichts verloren, wenn ein Stand im Netz übersprungen wird.
+
+**Fahrwerte.** Windstoß 6,5 m/s seitlich für 1,2 s, am Rand 12 % langsamer. Glatteis: Zeitkonstante der Spur 0,55 s statt 0,07 s für 5 s. Sonnenkraft: 12 % schneller, 6 s. Sprungfeder: 8,6 m/s nach oben (rund 1,85 m, 0,86 s), 0,9 s Schub beim Landen. Krabbe: 60 m voraus, pendelt ±3,6 m, Treffer bei weniger als 1,6 m seitlich und unter 0,6 m Höhe, 2,4 s Bremsung. Windschatten: 3–24 m hinter dem Gegner bei weniger als 1,5 m Versatz, bis 7 % schneller nach 1,2 s, beim Ausscheren 0,7 s Schub. Blitzstart: Tippen in den letzten 0,5 s des Countdowns gibt 1,4 s Schub. Bestehende Werte für Turbo, Schild, Schale, Rakete und Welle sind unverändert.
+
+**Prüfen.** `npm test` (Node-Tests in `kart-duel.test.cjs`, `circuit.test.cjs`, `combat-effects.test.cjs`). Für zwei Geräte: App bauen, `npx vite preview --port 4173`, dann `node prototypes/joy-kart/coast-section/joyboy-latency-qa.cjs 180 120` (Verzögerung und Schwankung in ms). Gegen Robo: `node prototypes/joy-kart/coast-section/joyboy-qa.cjs --compact`. Ergebnisse und offene Punkte stehen in [PROJECT_STATUS.md](PROJECT_STATUS.md).
+
 ## 04.11.2026 · Licht in der Sonnenbucht, trockener Asphalt und Basalt am Kap
 
 Die warme Himmelsaufhellung und das bestehende Fülllicht zeichnen das Kartheck in der Sonnenbucht. Ein weicher Schatten direkt unter den vier Reifen nutzt die bestehende Kontakttextur. Die Fenster der Häuser sitzen unter der jeweiligen Traufe. Schmale Schatten unter Fensterläden und Gesimsen teilen sich ein Material. Der Asphalt nutzt einen kontrastärmeren Ausschnitt des vorhandenen Atlas und ein engeres Rauheitsintervall. Lack, Stoßbügel und Reifen reagieren unterschiedlich auf dieselbe Beleuchtung.
@@ -80,8 +92,8 @@ Beide alten Panoramen hatten 1774 Pixel für 360°. Die neuen WebP-Horizontstrei
 
 - In Joyboy **Arcade → Joy-Kart → Kap der Winde → Gegen Robo** wählen. Eigenständig am PC auch per Doppelklick auf [Joy-Kart-PC.html](prototypes/joy-kart/dist/Joy-Kart-PC.html). Der Doppelklick startet die Standalone-Fassung, persönliche Bestzeiten werden über die Joyboy-App im jeweiligen Profil gespeichert.
 - [Kap mit Torfolge](prototypes/joy-kart/coast-section/qa/joyboy/kap-tor.png), [Hafenbrücke](prototypes/joy-kart/coast-section/qa/joyboy/bucht-bruecke.png) und [Kompaktkamera](prototypes/joy-kart/coast-section/qa/joyboy/kompakt-tor.png). Die Vergleichsbilder stammen aus der ausgelieferten Datei bei reproduzierbaren Simulationsständen und 852 × 283 CSS-Pixeln.
-- Build mit `npm run build`. Gesamttests mit `npm test`. `node prototypes/joy-kart/coast-section/bonus-lines-qa.cjs` prüft die Grafik in Edge über einen vorübergehenden Loopback-Server. Für die beiden vollständigen App-Fahrten die gebaute Vorschau starten und `JOY_KART_QA_URL` auf ihre lokale Adresse setzen. Prüfskripte sind `joyboy-qa.cjs` und `joyboy-room-qa.cjs` im selben Ordner.
-- Für die Fortsetzung zuerst die Gerätetests unter **Nächster Schritt** am Ende lesen. Aktuelle Quellen sind die Kursdaten in `circuit.js`, die Regeln in `simple-engine.js`, die Strecke in `simple-world.js`, die Anzeige in `race-hud.js` und Joyboys Einbindung in `src/games/views/JoyKart.tsx`.
+- Build mit `npm run build`. Gesamttests mit `npm test`. `node prototypes/joy-kart/coast-section/bonus-lines-qa.cjs` prüft die Grafik in Edge über einen vorübergehenden Loopback-Server. Für die beiden vollständigen App-Fahrten die gebaute Vorschau starten und `JOY_KART_QA_URL` auf ihre lokale Adresse setzen. Prüfskripte sind `joyboy-qa.cjs` und `joyboy-latency-qa.cjs` (ersetzt das frühere `joyboy-room-qa.cjs`) im selben Ordner.
+- Für die Fortsetzung zuerst die Gerätetests unter **Nächster Schritt** am Ende lesen. Aktuelle Quellen sind die Kursdaten in `circuit.js`, die Regeln in `simple-engine.js` und `kart-duel.js`, die Strecke in `simple-world.js`, die Anzeige in `race-hud.js` und Joyboys Einbindung in `src/games/views/JoyKart.tsx`.
 
 ## 02.11.2026 · Rennrhythmus und Bedienung
 

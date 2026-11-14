@@ -129,6 +129,81 @@ const GONE = 'Dieses Spielzimmer gibt es nicht mehr.';
 
 let lastChatRaw: unknown = null;
 
+// ───── Echtzeit-Stände (Joy-Kart) ─────
+// Jedes Kind schreibt seinen laufenden Stand in `live` auf dem eigenen Platz. Das kommt viele Male
+// pro Sekunde und soll die App nicht jedes Mal neu zeichnen lassen: `live` wird hier abgezweigt.
+
+const liveRaw: Record<string, string | undefined> = {};
+const liveParsed: Record<string, { raw: string; r: number; d: unknown } | undefined> = {};
+let seatKeys: Record<string, string> = {};
+let infoKey = '';
+let infoShown: RoomInfo | null = null;
+
+/** Plätze ohne `live`; bleibt alles andere gleich, kommt dasselbe Objekt zurück. */
+function seatsWithoutLive(seats: Record<string, SeatDoc>): Record<string, SeatDoc> {
+  const out: Record<string, SeatDoc> = {};
+  const keys: Record<string, string> = {};
+  let same = Object.keys(seats).length === Object.keys(view.seats).length;
+  for (const [uid, doc] of Object.entries(seats)) {
+    const { live, ...rest } = doc;
+    liveRaw[uid] = live;
+    keys[uid] = JSON.stringify(rest);
+    if (keys[uid] === seatKeys[uid] && view.seats[uid]) out[uid] = view.seats[uid];
+    else {
+      out[uid] = rest;
+      same = false;
+    }
+  }
+  for (const uid of Object.keys(liveRaw)) if (!seats[uid]) delete liveRaw[uid];
+  seatKeys = keys;
+  return same ? view.seats : out;
+}
+
+/** Neuester Echtzeit-Stand eines Kindes in der laufenden Runde (oder null). */
+export function liveOf(uid: string | null | undefined): unknown {
+  const raw = uid ? liveRaw[uid] : undefined;
+  if (!uid || !raw) return null;
+  let parsed = liveParsed[uid];
+  if (parsed?.raw !== raw) {
+    try {
+      const p = JSON.parse(raw) as { r: number; d: unknown };
+      parsed = liveParsed[uid] = { raw, r: p.r, d: p.d };
+    } catch {
+      return null;
+    }
+  }
+  return parsed.r === (view.game?.round ?? 0) ? parsed.d : null;
+}
+
+let liveBusy = false;
+let liveNext: string | null = null;
+
+/** Eigenen Echtzeit-Stand melden. Läuft noch ein Schreibvorgang, ersetzt der neueste den wartenden. */
+export function sendLive(d: unknown) {
+  liveNext = JSON.stringify({ r: view.game?.round ?? 0, d });
+  if (liveBusy) return;
+  liveBusy = true;
+  void (async () => {
+    try {
+      while (liveNext !== null) {
+        const body: string = liveNext;
+        liveNext = null;
+        const { code, uid } = view;
+        if (!code || !uid) break;
+        try {
+          await dbRequest('PATCH', `rooms/${code}/seats/${uid}`, await token(), { live: body });
+          liveRaw[uid] = body;
+        } catch {
+          // Verbindung hakt: kurz warten, dann zählt ohnehin nur der neueste Stand
+          await new Promise((r) => window.setTimeout(r, 400));
+        }
+      }
+    } finally {
+      liveBusy = false;
+    }
+  })();
+}
+
 function onTree(tree: Record<string, unknown> | null) {
   if (!tree || !tree.info) {
     // Zimmer gelöscht
@@ -136,7 +211,7 @@ function onTree(tree: Record<string, unknown> | null) {
     return;
   }
   const info = tree.info as RoomInfo;
-  const seats = (tree.seats ?? {}) as Record<string, SeatDoc>;
+  const seats = seatsWithoutLive((tree.seats ?? {}) as Record<string, SeatDoc>);
   const state = tree.state as StateDoc | undefined;
   let game = view.game;
   if (!state) game = null;
@@ -165,6 +240,11 @@ function onTree(tree: Record<string, unknown> | null) {
     lastChatRaw = tree.chat;
     chat = chatOf(tree.chat);
   }
+  // Hat sich nur ein Echtzeit-Stand geändert, bleibt die Oberfläche in Ruhe.
+  const key = JSON.stringify(info);
+  if (key === infoKey && view.conn === 'online' && view.info === infoShown && seats === view.seats && game === view.game && chat === view.chat) return;
+  infoKey = key;
+  infoShown = info;
   set({ conn: 'online', error: info.status === 'closed' ? 'Das Spielzimmer wurde zugemacht.' : null, info, seats, game, chat });
   if (info.status !== 'closed' && info.host === view.uid) void hostChores();
 }
@@ -327,6 +407,12 @@ function stopAll() {
   lastStateRaw = '';
   lastChatRaw = null;
   myActs = [];
+  for (const uid of Object.keys(liveRaw)) delete liveRaw[uid];
+  for (const uid of Object.keys(liveParsed)) delete liveParsed[uid];
+  seatKeys = {};
+  infoKey = '';
+  infoShown = null;
+  liveNext = null;
 }
 
 if (typeof document !== 'undefined') {

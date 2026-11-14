@@ -177,6 +177,7 @@ const updateMap=makeCourseMap();
 const updateHud=createRaceHud();
 function bindAppRace(){
   let boost=false;
+  const parts={overlay:find('.js-overlay'),controls:find('.js-controls'),speed:find('.js-speed'),count:find('.js-count')};
   requestBoost=()=>{if(['running','countdown'].includes(packet?.me.phase))boost=true;};
   startButton.hidden=true;find('h2').textContent='An der Startlinie';
   find('p').textContent='Das Rennen beginnt, sobald beide Fahrer bereit sind.';
@@ -194,10 +195,11 @@ function bindAppRace(){
     const me=states[slot],old=packet;if(!me)return;
     packet={slot,me,other:states[1-slot],round:1};received=performance.now();
     announce(me,old?.me,packet.other,old?.other);
-    const live=['running','countdown'].includes(me.phase);
-    find('.js-overlay').hidden=true;find('.js-controls').hidden=!live;
-    find('.js-speed').hidden=false;find('.js-count').hidden=me.phase!=='countdown';
-    find('.js-count').textContent=Math.max(1,Math.ceil(me.countdown));
+    // Diese Funktion läuft in jedem Bild: nur schreiben, was sich geändert hat.
+    const live=['running','countdown'].includes(me.phase),count=me.phase==='countdown'?String(Math.max(1,Math.ceil(me.countdown))):'';
+    const set=(node,key,value)=>{if(node[key]!==value)node[key]=value;};
+    set(parts.overlay,'hidden',true);set(parts.controls,'hidden',!live);set(parts.speed,'hidden',false);
+    set(parts.count,'hidden',!count);if(count)set(parts.count,'textContent',count);
    }
   };
  }
@@ -210,6 +212,7 @@ function useCompact(){
  const ctx=fallback.getContext('2d');
  if(!ready){bindDuel();if(inJoyboy)bindAppRace();ready=true;}
  loading.hidden=true;find('.js-location').textContent=course.name+' · Kompakt';
+ root.__duelSnapshot=()=>packet&&({slot:packet.slot,me:packet.me,other:packet.other,round:packet.round});
  let lastCompact=performance.now();
  function draw(now){
   if(stopped||!root.isConnected)return;
@@ -262,7 +265,7 @@ try{
   flame.rotation.x=-Math.PI/2;
   // Krabbe: läuft quer vor dem getroffenen Kart über die Straße.
   const crab=new THREE.Group(),shellRed=kit.material(0xe5533b,{roughness:.42}),shellDark=kit.material(0xb5382a,{roughness:.5}),eyeWhite=kit.material(0xfffbea,{roughness:.4}),eyeBlack=kit.material(0x1c2228,{roughness:.3});
-  scene.add(crab);const figure=new THREE.Group();crab.add(figure);figure.scale.setScalar(1.9);
+  scene.add(crab);const figure=new THREE.Group();crab.add(figure);figure.scale.setScalar(2.6);
   kit.add(blade,shellRed,figure,0,.42,0).scale.set(.62,.3,.46);
   kit.add(blade,shellDark,figure,0,.3,-.02).scale.set(.5,.2,.38);
   const claws=[-1,1].map(side=>{

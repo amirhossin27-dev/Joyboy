@@ -2,7 +2,7 @@
 
 ## 14.11.2026 – Joy-Kart · flüssig zu zweit, Zufalls-Items, sechs neue Specials
 
-**Nutzerauftrag.** „Zu zweit hängt es“, dazu Spielgefühl und Grafik verbessern, Items nach Zufall statt fester Reihenfolge, neue Specials. Nach dem vorgeschlagenen Fünf-Etappen-Plan sagte der Nutzer: „Bau alle Ideen ein und leg los.“ Branch `claude/determined-hamilton-bm8hnb`, Ausgangsstand 11b23db. Kein PR erstellt (nicht beauftragt).
+**Nutzerauftrag.** „Zu zweit hängt es“, dazu Spielgefühl und Grafik verbessern, Items nach Zufall statt fester Reihenfolge, neue Specials. Nach dem vorgeschlagenen Fünf-Etappen-Plan sagte der Nutzer: „Bau alle Ideen ein und leg los.“ Branch `claude/determined-hamilton-bm8hnb`, Ausgangsstand 11b23db. [PR #30](https://github.com/amirhossin27-dev/Joyboy/pull/30) gegen main, vom Nutzer mit „go“ beauftragt; Review, GitHub-Prüfungen und Gerätetest stehen aus.
 
 **Ursache des Hängens.** Bisher rechnete nur der Gastgeber beide Karts und schrieb etwa 5–7 Stände pro Sekunde in die Datenbank. Der Gast rechnete höchstens 0,12 s weiter und blieb dann stehen; seine Lenkung lief erst zum Gastgeber und zurück.
 

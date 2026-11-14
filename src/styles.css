@@ -4014,6 +4014,208 @@ body {
   }
 }
 
+/* Übrige Seiten im selben Stil: Karten mit Rand und Schatten statt blasser Flächen */
+.card {
+  border: 2px solid var(--ink);
+  box-shadow: 3px 4px 0 var(--ink);
+}
+
+.card.stitched {
+  border: 2px dashed var(--ink);
+  background: var(--butter-soft);
+  box-shadow: none;
+}
+
+.bubble {
+  border-radius: 22px 22px 22px 6px;
+  box-shadow: 2px 3px 0 var(--ink);
+  font-size: 1.12rem;
+}
+
+.joy-row > svg {
+  animation: joy-bob 2.8s ease-in-out infinite;
+}
+
+.input {
+  border-radius: 18px;
+}
+
+.seg button {
+  border-radius: 18px;
+  box-shadow: 2px 3px 0 var(--ink);
+}
+
+.seg button[aria-pressed='true'] {
+  transform: translate(1px, 2px);
+  box-shadow: 1px 1px 0 var(--ink);
+}
+
+/* Willkommen und Profile */
+.avatar-pick {
+  border: 2px solid var(--ink);
+  border-radius: 22px;
+  transition: transform 0.15s cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+
+.avatar-pick:nth-child(4n + 1) {
+  background: var(--butter-soft);
+}
+
+.avatar-pick:nth-child(4n + 2) {
+  background: var(--sage-soft);
+}
+
+.avatar-pick:nth-child(4n + 3) {
+  background: var(--sky-soft);
+}
+
+.avatar-pick:nth-child(4n + 4) {
+  background: var(--plum-soft);
+}
+
+.avatar-pick[aria-pressed='true'] {
+  transform: scale(1.06) rotate(-2deg);
+}
+
+.swatch {
+  box-shadow: 2px 3px 0 var(--ink);
+}
+
+.who-card {
+  border-radius: 24px;
+  border: 2px solid var(--ink);
+  box-shadow: 3px 4px 0 var(--ink);
+}
+
+/* Ich */
+.card[aria-label='Mein Profil'] {
+  background: linear-gradient(120deg, var(--sky-soft), var(--butter-soft));
+}
+
+.stats3 > div {
+  border-radius: 18px;
+  border: 2px solid var(--ink);
+  background: var(--card);
+}
+
+.stats3 > div:nth-child(1) {
+  background: var(--butter);
+  color: var(--on-butter);
+}
+
+.stats3 > div:nth-child(1) * {
+  color: inherit;
+}
+
+.stats3 > div:nth-child(2) {
+  background: var(--sky-soft);
+}
+
+.stats3 > div:nth-child(3) {
+  background: var(--sage-soft);
+}
+
+.stats3 b {
+  font-size: 1.7rem;
+}
+
+.badge {
+  font-size: 0.88rem;
+}
+
+.badge .medal {
+  width: 68px;
+  height: 68px;
+}
+
+.badge:not(.locked) .medal {
+  animation: pulse 3s ease-in-out infinite;
+}
+
+.rank-row {
+  border-radius: 16px;
+}
+
+.rank-row.me {
+  border: 2px solid var(--ink);
+  background: var(--butter-soft);
+}
+
+/* Spielseite und Spielzimmer */
+.detail-hero {
+  border-radius: 26px;
+  border: 2px solid var(--ink);
+  box-shadow: 4px 5px 0 var(--ink);
+}
+
+.seat-row {
+  border-radius: 18px;
+}
+
+.seat-row:not(.empty) {
+  box-shadow: 2px 3px 0 var(--ink);
+}
+
+.pick-game {
+  border: 2px solid var(--ink);
+  border-radius: 18px;
+}
+
+.code-stamp {
+  border-style: solid;
+  border-radius: 14px;
+  background: var(--butter-soft);
+}
+
+/* Ergebnis */
+.result {
+  border-radius: 30px;
+  border: 2px solid var(--ink);
+  box-shadow: 5px 6px 0 var(--ink);
+  animation: result-in 0.45s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+
+.result h2 {
+  font-size: 1.7rem;
+}
+
+.result > .row:first-child > svg {
+  animation: joy-bob 1.6s ease-in-out infinite;
+}
+
+.result > .card.center {
+  background: var(--butter);
+  color: var(--on-butter);
+}
+
+.result > .card.center .muted {
+  color: inherit;
+}
+
+.reward {
+  border-radius: 20px;
+  border: 2px solid var(--ink);
+}
+
+.reward .stars svg {
+  animation: sticker-pop 0.6s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+
+.reward .stars svg:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.reward .stars svg:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes result-in {
+  from {
+    transform: scale(0.7) rotate(-3deg);
+    opacity: 0;
+  }
+}
+
 /* ───────────── Abend und Nacht · 20:00–07:00 ───────────── */
 :root[data-theme='dark'] {
   --paper: #1d2420;

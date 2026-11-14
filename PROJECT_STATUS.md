@@ -11,7 +11,9 @@
 
 **Geprüft.** Produktionsbuild mit TypeScript, 152 App- und 66 Node-Tests bestanden. In Chromium im Handyformat (393 × 852) angesehen: Startseite, Spieldetail, Rechen-Rallye mit richtiger Antwort, Zahlen-Spur hell und dunkel, Chat hell, dunkel und leer (Chat über eine vorübergehende Vorschauseite mit Beispielnachrichten, ohne Netz). Mit einem 8–9-Jahre-Profil startete der Ton bei der ersten Aufgabe von selbst, „Nochmal hören“ startete ihn erneut (gezählte Audio-Starts, nicht angehört).
 
-**Offen / nächster Schritt.** Nicht geprüft: Chat in einem echten Online-Spielzimmer mit zwei Geräten, iPhone/Safari, Hörprobe am Gerät. Ältere App-Versionen zeigen Sticker bei der Einstellung „nur fertige Sätze“ nicht an. Noch im alten Stil und mögliche nächste Etappe: Willkommen, „Ich“, Elternbereich, Spielzimmer-Übersicht, Brett- und Arcade-Spiele. Die optische Gesamtfreigabe durch den Nutzer steht aus.
+**Zweite Etappe (Nutzer: „Passt alles, mach weiter“).** Übrige Seiten im selben Stil, nur über `src/styles.css`: Karten mit Rand und Schatten, farbige Tier-Auswahl, Profilkarte und Zahlenkacheln auf „Ich“, größere Abzeichen, Spielseite, Spielzimmer-Plätze und Code, Ergebnis-Bildschirm mit gelber Punktekarte und einfliegenden Sternen. Angesehen in Chromium (393 × 852): Willkommen, „Ich“, Spielzimmer ohne Online-Freigabe, Elternbereich (Passwort festlegen), Vier gewinnt, Mau-Mau, Welt-Quiz mit Ergebnis; Willkommen, Start und „Ich“ zusätzlich im Nachtmodus. Nicht angesehen: Spielzimmer mit Online-Freigabe, Elternbereich nach dem Passwort, Arcade-Spiele, Tutorial im Nachtmodus. Build und Tests danach erneut bestanden.
+
+**Offen / nächster Schritt.** Nicht geprüft: Chat in einem echten Online-Spielzimmer mit zwei Geräten, iPhone/Safari, Hörprobe am Gerät. Ältere App-Versionen zeigen Sticker bei der Einstellung „nur fertige Sätze“ nicht an. Die Arcade-Spiele behalten ihre dunkle Schultafel und wurden nicht angefasst. Die optische Gesamtfreigabe am iPhone steht aus.
 
 ## 08.11.2026 – Schwung-Strecke und Tutorial
 

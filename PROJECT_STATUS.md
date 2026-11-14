@@ -2,7 +2,7 @@
 
 ## 14.11.2026 – Kinderfreundlicheres Layout, Vorlesen von selbst, neuer Chat
 
-**Nutzerentscheidung.** Variante A: Die Papierwelt bleibt erkennbar (Joy, Schriften, Bastel-Idee) und wird aufgefrischt; kein komplett neuer Look. Branch `claude/zealous-noether-ly1k61`, Ausgangsstand f063ad6. Kein PR erstellt.
+**Nutzerentscheidung.** Variante A: Die Papierwelt bleibt erkennbar (Joy, Schriften, Bastel-Idee) und wird aufgefrischt; kein komplett neuer Look. Branch `claude/zealous-noether-ly1k61`, Ausgangsstand f063ad6. [PR #29](https://github.com/amirhossin27-dev/Joyboy/pull/29) gegen main, vom Nutzer mit „go“ beauftragt.
 
 **Umgesetzt.**
 - **Vorlesen:** Aufgaben in Lernspielen (Quiz-Spiele, Zahlen-Spur, Schwung-Strecke, Buchstabe bei Stadt-Land-Fluss) werden für jedes Alter von selbst vorgelesen (`speakTask` in `src/lib/speech.ts`). Vorher nur bei Profilen bis 7 Jahre. Nur „Vorlesen: Aus“ im Elternbereich schaltet das ab. Der Knopf heißt jetzt „Nochmal hören“ und wiederholt die Aufgabe (`ListenAgain` in `src/ui/parts.tsx`). Elternbereich: „Aufgaben“ (Standard, früher „Automatisch“; Begrüßungen und Hinweise weiter nur bis 7 Jahre), „Alles“, „Aus“.

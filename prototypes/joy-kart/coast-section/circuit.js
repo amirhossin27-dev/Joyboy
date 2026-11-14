@@ -40,58 +40,97 @@ function createKartCircuit(second=false){
   const from=gate.index?gates[i-1].lat:gate.lat;
   return {s:gate.s-distance,lat:gate.lat+(from-gate.lat)*distance/60};
  }));
- const materials=['rocket','shield','banana','turbo','rocket','banana','turbo','shield','banana','turbo'];
- return {cape:second,name:second?'Kap der Winde':'Sonnenbucht',lapLength,laps,length:laps*lapLength,features,gates,gateMarks,frame,point,height,boxes,lanes,halfWidth:6,centreBound:4.5,wrap,
-  pickupType:(row,lap)=>materials[(row+lap+(second?1:0))%materials.length]};
+ // Jede Kiste würfelt. Wer zurückliegt, zieht eher Aufholhilfen; dasselbe Item kommt selten zweimal.
+ function rollItem(gap=0,rng=Math.random,last=null){
+  const trailing=Math.max(0,Math.min(1,.5+(Number.isFinite(gap)?gap:0)/120));
+  const odds=Object.entries(KART_ITEM_ODDS).map(([item,[lead,chase]])=>[item,(lead+(chase-lead)*trailing)*(item===last?.15:1)]);
+  let pick=rng()*odds.reduce((sum,[,weight])=>sum+weight,0);
+  for(const [item,weight] of odds){pick-=weight;if(pick<0)return item;}
+  return odds[0][0];
+ }
+ return {cape:second,name:second?'Kap der Winde':'Sonnenbucht',lapLength,laps,length:laps*lapLength,features,gates,gateMarks,frame,point,height,boxes,lanes,halfWidth:6,centreBound:4.5,wrap,rollItem};
 }
-const KART_ITEMS={turbo:'Turbo',shield:'Schild',magnet:'Magnet',wave:'Welle',banana:'Bananenschale',rocket:'Zielrakete'};
+const KART_ITEMS={turbo:'Turbo',shield:'Schild',magnet:'Magnet',wave:'Welle',banana:'Bananenschale',rocket:'Zielrakete',gulls:'Möwenschwarm',gust:'Windstoß',crab:'Krabbe',spring:'Sprungfeder',ice:'Glatteis',sun:'Sonnenkraft'};
+// Gewichte je Item: [in Führung, im Rückstand]. Dazwischen wird nach Abstand gemischt.
+const KART_ITEM_ODDS={turbo:[3,3],shield:[3,1.5],banana:[3,1],magnet:[2,1.5],spring:[2,2],crab:[1.5,2.5],wave:[1,2],gust:[1.5,2.5],ice:[1.2,2.5],gulls:[1.5,2.5],rocket:[.5,3],sun:[.3,2.5]};
+const KART_HIT_NAMES={banana:'Bananenschale',rocket:'Zielrakete',wave:'Welle',crab:'Krabbe',gulls:'Möwenschwarm',gust:'Windstoß',ice:'Glatteis'};
 function roboPace(gap){
  // Give a leading player a close chase and leave a passing opportunity when Robo leads.
  return .91+.075*Math.max(0,Math.min(1,gap/45));
 }
-function resolveKartWaves(racers,previous){
- function hit(target,item,seconds,time){
-  // Immutable event metadata travels with snapshots, including shielded/repeated hits.
-  target.impact={item,time,blocked:target.shield>0,duration:seconds};
-  if(target.shield>0){target.shield=0;target.blocked=1.2;return;}
-  target.lastHit=item;target.slow=Math.max(target.slow,seconds);
+/**
+ * Auswertung auf dem Gerät des getroffenen Karts: `victim` ist ein eigenes SimpleRace, `rival` der
+ * letzte bekannte Stand des anderen Karts (lokal oder aus dem Netz). Jede Angriffsnummer wirkt einmal.
+ */
+function kartReceive(victim,rival){
+ if(!rival||victim.phase!=='running')return;
+ const k=victim.k,length=victim.courseLength,seen=id=>k.done.includes(id),mark=id=>{k.done=[...k.done.slice(-9),id];};
+ const arc=(a,b)=>((a-b)%length+1.5*length)%length-length*.5;
+ const peel=rival.banana;
+ if(peel&&!seen(peel.id)){
+  const start=victim.stepStart??k.s,crossing=peel.s+Math.ceil((start-peel.s)/length)*length;
+  if((k.lift||0)<.6&&k.s>=crossing&&Math.abs(k.lat-peel.lat)<1.25){victim.hit('banana',2.5);mark(peel.id);}
  }
- for(let i=0;i<2;i++){
-  const source=racers[i],opponent=racers[1-i],owner=source.k,target=opponent.k;
-  if(opponent.phase!=='running')continue;
-  const length=source.courseLength;
-  if((source.stats.itemUses.wave||0)>previous[i]){
-   const gap=Math.abs(owner.s-target.s)%length;
-   if(Math.min(gap,length-gap)<=85)hit(target,'wave',2.2,opponent.time);
-  }
-  if(owner.banana){
-   const peel=owner.banana,start=opponent.stepStart??target.s;
-   const crossing=peel.s+Math.ceil((start-peel.s)/length)*length;
-   if((target.lift||0)<.6 && target.s>=crossing && Math.abs(target.lat-peel.lat)<1.25){
-    hit(target,'banana',2.5,opponent.time);owner.banana=null;
-   }else if(owner.s-peel.s>length)owner.banana=null;
-  }
-  if(owner.rocket){
-   const rocket=owner.rocket,dt=opponent.time-(opponent.stepTime??opponent.time);
-   // Home along the shortest road arc, including across the start line.
-   const delta=((target.s-rocket.s)%length+1.5*length)%length-length*.5;
-   const reach=92*dt;
-   if(Math.abs(delta)<=reach+1){hit(target,'rocket',1.8,opponent.time);owner.rocket=null;}
-   else owner.rocket={s:rocket.s+Math.sign(delta)*reach,lat:rocket.lat+(target.lat-rocket.lat)*(1-Math.exp(-5*dt))};
+ if(rival.rocket&&!seen(rival.rocket.id)&&k.incoming?.id!==rival.rocket.id)k.incoming={id:rival.rocket.id,s:rival.rocket.s,lat:rival.rocket.lat};
+ if(k.incoming){
+  // Die Rakete folgt dem kürzeren Weg, auch über die Ziellinie.
+  const rocket=k.incoming,dt=Math.max(0,victim.time-(victim.stepTime??victim.time)),delta=arc(k.s,rocket.s),reach=92*dt;
+  if(Math.abs(delta)<=reach+1){victim.hit('rocket',1.8);mark(rocket.id);k.incoming=null;}
+  else k.incoming={id:rocket.id,s:rocket.s+Math.sign(delta)*reach,lat:rocket.lat+(k.lat-rocket.lat)*(1-Math.exp(-5*dt))};
+ }
+ const cast=rival.cast;
+ if(cast&&!seen(cast.id)){
+  mark(cast.id);
+  const gap=Math.abs(arc(k.s,rival.s??k.s));
+  if(cast.type==='wave'){if(gap<=85)victim.hit('wave',2.2);}
+  else if(cast.type==='gulls')victim.hit('gulls',0,q=>{q.gulls=4.5;});
+  else if(cast.type==='ice')victim.hit('ice',0,q=>{q.ice=5;});
+  else if(cast.type==='gust')victim.hit('gust',0,q=>{q.gust=1.2;q.gustDir=q.lat>(rival.lat??0)?1:q.lat<(rival.lat??0)?-1:q.lat>=0?-1:1;});
+  // Die Krabbe kriecht ein Stück voraus auf die Straße; Ausweichen ist möglich.
+  else if(cast.type==='crab'&&k.s+60<victim.totalLength)k.crab={id:cast.id,s:k.s+60,time:victim.time,lat:0};
+ }
+}
+/** Eigene Bananenschale und Rakete räumen, sobald der Gegner sie gemeldet hat. Die Rakete fliegt sichtbar mit. */
+function kartOwnHazards(owner,rival,dt){
+ const k=owner.k,length=owner.courseLength,taken=id=>!!rival?.done?.includes(id);
+ if(k.banana&&(taken(k.banana.id)||k.s-k.banana.s>length))k.banana=null;
+ if(k.rocket){
+  const rocket=k.rocket;
+  if(!rival||rival.phase!=='running'||taken(rocket.id)||(rocket.wait||0)>1.5)k.rocket=null;
+  else{
+   const delta=((rival.s-rocket.s)%length+1.5*length)%length-length*.5,reach=92*dt;
+   k.rocket=Math.abs(delta)<=reach+1?{...rocket,s:rival.s,lat:rival.lat,wait:(rocket.wait||0)+dt}
+    :{...rocket,s:rocket.s+Math.sign(delta)*reach,lat:rocket.lat+(rival.lat-rocket.lat)*(1-Math.exp(-5*dt))};
   }
  }
+}
+const kartRivalState=r=>({...r.k,phase:r.phase,time:r.time});
+/** Zwei Karts auf demselben Gerät (gegen Robo, LAN-Server): beide Richtungen in einem Schritt. */
+function resolveKartWaves(racers){
+ const states=racers.map(kartRivalState);
+ for(let i=0;i<2;i++)kartReceive(racers[i],states[1-i]);
+ for(let i=0;i<2;i++)kartOwnHazards(racers[i],kartRivalState(racers[1-i]),Math.max(0,racers[i].time-(racers[i].stepTime??racers[i].time)));
 }
 
 // Presentation only: never change the authoritative speed, lane or item timers.
 function kartImpact(k){
  const age=k?.impact?k.time-k.impact.time:Infinity;
  return {age,burst:k?.phase==='running'&&age>=0&&age<.7?1-age/.7:0,
-  blocked:!!k?.impact?.blocked,slip:Number.isFinite(age)&&age>=0&&k?.phase==='running'&&k.slow>0&&k.lastHit==='banana'};
+  blocked:!!k?.impact?.blocked,slip:Number.isFinite(age)&&age>=0&&k?.phase==='running'&&k.slow>0&&(k.lastHit==='banana'||k.lastHit==='crab')};
 }
 function kartThreat(k,other,course){
- if(k?.phase!=='running'||!other)return null;
+ if(k?.phase!=='running')return null;
  const gap=s=>course.wrap(s-k.s+course.lapLength/2)-course.lapLength/2;
- if(other.rocket){const d=gap(other.rocket.s);if(Math.abs(d)<100)return {kind:'rocket',distance:Math.abs(d),behind:d<0};}
- if(other.banana){const d=gap(other.banana.s);if(d>=0&&d<34&&Math.abs(k.lat-other.banana.lat)<1.8&&(k.lift||0)<.6)return {kind:'banana',distance:d};}
+ const rocket=k.incoming||(other?.rocket&&!k.done?.includes(other.rocket.id)?other.rocket:null);
+ if(rocket){const d=gap(rocket.s);if(Math.abs(d)<100)return {kind:'rocket',distance:Math.abs(d),behind:d<0};}
+ if(k.crab){const d=k.crab.s-k.s;if(d>=0&&d<70)return {kind:'crab',distance:d,lat:k.crab.lat};}
+ if(other?.banana&&!k.done?.includes(other.banana.id)){const d=gap(other.banana.s);if(d>=0&&d<34&&Math.abs(k.lat-other.banana.lat)<1.8&&(k.lift||0)<.6)return {kind:'banana',distance:d};}
  return null;
+}
+/** Windschatten: dicht hinter dem anderen Kart in derselben Spur baut sich ein Tempobonus auf. */
+function kartDraft(k,rival,length,dt,draft=0){
+ if(!rival||rival.phase!=='running')return 0;
+ const gap=((rival.s-k.s)%length+1.5*length)%length-length*.5;
+ const inside=gap>3&&gap<24&&Math.abs(rival.lat-k.lat)<1.5&&(k.lift||0)<.3;
+ return Math.max(0,Math.min(1,draft+(inside?dt/1.2:-dt/.5)));
 }

@@ -89,11 +89,11 @@ export const GAMES: GameMeta[] = [
   {
     id: 'joykart', name: 'Joy-Kart', tagline: 'Mit Fuchs und Panda über die Sonnenküste.',
     learn: 'Halte deine Linie, sammle Items und wähle den richtigen Moment zum Überholen.',
-    category: 'arcade', minAge: 6, players: [2, 2], minutes: '3–4 Min', art: 'joykart',
+    category: 'arcade', minAge: 6, players: [2, 2], minutes: '2–3 Min', art: 'joykart',
     kind: 'duel', robo: true, levels: false,
     tutorial: [
       { say: 'Das Kart gibt selbst Gas. Ziehe links am Lenkpad oder lenke mit den Pfeiltasten.', art: { k: 'pics', items: ['🦊', '🏎️'], caption: 'Links und rechts lenken' } },
-      { say: 'Sammle farbige Boxen. Mit E oder der Item-Taste setzt du Turbo, Schild, Bananenschale oder Zielrakete ein.', art: { k: 'pics', items: ['⚡', '🏁'], caption: 'Wer nach drei Runden zuerst im Ziel ist, gewinnt' } },
+      { say: 'Sammle farbige Boxen. Mit E oder der Item-Taste setzt du Turbo, Schild, Bananenschale oder Zielrakete ein.', art: { k: 'pics', items: ['🎁', '🎲'], caption: 'Jede Box würfelt ein Item – auch Möwenschwarm, Krabbe oder Sonnenkraft' } },
       { say: 'Fahre durch drei mintgrüne Tore hintereinander. Dafür bekommst du Extraschub. Halte Rückblick oder die Taste R, um hinter dein Kart zu schauen.', art: { k: 'pics', items: ['🏎️','⚡'], caption: 'Drei Tore für Extraschub' } },
       { say: 'Lege die Bananenschale in deiner Spur ab. Wer hinter dir darüberfährt, wird langsamer. Der Schild fängt einen Treffer ab.', art: { k: 'pics', items: ['🍌','🛡️'], caption: 'Bananenschale und Schild' } },
       { say: 'Die Zielrakete verfolgt das andere Kart. Mit dem Turbo beschleunigst du zum Überholen.', art: { k: 'pics', items: ['🚀','⚡'], caption: 'Zielrakete und Turbo' } },

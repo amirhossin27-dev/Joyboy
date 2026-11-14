@@ -102,6 +102,19 @@ export interface NetLink {
   absent: number[];
   publish(seq: number, s: unknown, ack: Record<string, number>): void;
   push(a: unknown): void;
+  /**
+   * Echtzeitspiele (Joy-Kart): Jedes Gerät meldet laufend seinen eigenen Stand, nur der neueste zählt.
+   * Das läuft an den Regel-Funktionen und an der Bildschirm-Aktualisierung vorbei.
+   */
+  live?: {
+    send(d: unknown): void;
+    /** Neuester Stand vom Gerät auf diesem Platz (oder null) */
+    peer(seat: number): unknown;
+    /** Eigener zuletzt gemeldeter Stand, z. B. nach dem Neuladen der App */
+    mine(): unknown;
+    /** Serverzeit in Millisekunden */
+    now(): number;
+  };
 }
 
 /** Feste Spielfarben je Platz – gut unterscheidbar, auch für Farbenschwache (dazu kommen Avatare). */

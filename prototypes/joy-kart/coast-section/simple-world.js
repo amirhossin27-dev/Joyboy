@@ -462,8 +462,8 @@ async function createSimpleCoastWorld(THREE,c){
   waterMat.bumpMap=ripples;waterMat.bumpScale=.09;
  }
  const pickupMat=mat(0xd6bd7d,{metalness:.65,roughness:.26,emissive:0x876423,emissiveIntensity:.3}),pickupGeo=geo(new THREE.OctahedronGeometry(.48));
- const colors={turbo:0xe9ae39,shield:0x3ec9ed,magnet:0xb379ef,banana:0xffdc32,rocket:0xfc503c,wave:0xf07361};
- const itemMats=circuit?Object.fromEntries(Object.entries(colors).map(([key,color])=>[key,mat(color,{metalness:.3,roughness:.26,emissive:color,emissiveIntensity:.35})])):{};
- const pickups=course.boxes.flatMap((s,row)=>(circuit?course.lanes(row):[-3.5,0,3.5]).map(lat=>{const object=kit.add(pickupGeo,pickupMat,scene);object.position.copy(at(s,lat,1));return{object,s,row};}));
- return{inspectGeometry,update(time,taken,lap=1){coast?.update(time);if(waterMat.bumpMap)waterMat.bumpMap.offset.y=time*.055;for(const q of pickups){q.object.visible=!taken.has((lap-1)*course.boxes.length+q.row);q.object.rotation.y=time*1.7;if(circuit)q.object.material=itemMats[course.pickupType(q.row,lap-1)];}}, geometry:{roadStart:start,roadEnd:end,halfWidth:6,supportHalfWidth:19,supportBottom:-3,waterY:-2,backdropOffsetZ:backdrop.position.z,backdropRotationY:Math.PI}};
+ // Überraschungskisten: drei schimmernde Farbtöne, der Inhalt wird erst beim Einsammeln gewürfelt.
+ const itemMats=circuit?[0,1,2].map(()=>mat(0xffffff,{metalness:.35,roughness:.2,emissive:0xffffff,emissiveIntensity:.42})):[];
+ const pickups=course.boxes.flatMap((s,row)=>(circuit?course.lanes(row):[-3.5,0,3.5]).map((lat,lane)=>{const object=kit.add(pickupGeo,circuit?itemMats[(row+lane)%3]:pickupMat,scene);object.position.copy(at(s,lat,1));return{object,s,row,y:object.position.y,phase:row*1.7+lane*2.1};}));
+ return{inspectGeometry,update(time,taken,lap=1){coast?.update(time);if(waterMat.bumpMap)waterMat.bumpMap.offset.y=time*.055;itemMats.forEach((m,i)=>{const hue=(time*.22+i/3)%1;m.color.setHSL(hue,.82,.6);m.emissive.setHSL(hue,.9,.34);});for(const q of pickups){q.object.visible=!taken.has((lap-1)*course.boxes.length+q.row);q.object.rotation.y=time*1.7+q.phase;if(circuit){q.object.position.y=q.y+.14*Math.sin(time*2.6+q.phase);q.object.scale.setScalar(1.12+.1*Math.sin(time*5.2+q.phase));}}}, geometry:{roadStart:start,roadEnd:end,halfWidth:6,supportHalfWidth:19,supportBottom:-3,waterY:-2,backdropOffsetZ:backdrop.position.z,backdropRotationY:Math.PI}};
 }

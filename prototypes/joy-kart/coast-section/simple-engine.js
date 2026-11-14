@@ -1,22 +1,39 @@
 /** Assisted phone driving: the road supplies heading, the player chooses lateral position. */
-function createCoastSimpleModule(circuit=null,fastRace=false){
+function createCoastSimpleModule(circuit=null,fastRace=false,options={}){
+ const rng=options.rng||Math.random,TIMERS=['shield','magnet','slow','blocked','waveFlash','roll','ice','gulls','sun','gust'],CASTS=['wave','gulls','gust','ice','crab'];
  const STEP=1/120,LENGTH=circuit?.length||300,BOUND=4.5,SPEED=fastRace?{cruise:38,turbo:56,turboSeconds:2,acceleration:3.5,turboAcceleration:8}:{cruise:24,turbo:36,turboSeconds:1.8,acceleration:2.2,turboAcceleration:7},clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
  const u=s=>clamp(s/LENGTH,0,1),baseX=s=>{const t=u(s);return 8*Math.sin(2*Math.PI*t)*Math.sin(Math.PI*t)**2;},height=s=>3.5+1.5*Math.sin(Math.PI*u(s))**2;
  function frame(s){const dx=(baseX(s+.05)-baseX(s-.05))/.1,len=Math.hypot(dx,1);return{x:baseX(s),z:55-s,angle:Math.atan2(dx,-1),nx:1/len,nz:dx/len,scale:len};}
  function point(s,lat=0){const f=frame(s);return{x:f.x+f.nx*lat,y:height(s),z:f.z+f.nz*lat,angle:f.angle};}
  const course=circuit||{length:LENGTH,halfWidth:6,centreBound:BOUND,frame,point,height,boxes:[60,145,235]};
  class SimpleRace{
-  constructor(){this.courseLength=course.lapLength||LENGTH;this.reset();}
-  reset(){this.phase='ready';this.previousPhase='running';this.time=0;this.countdown=3;this.accumulator=0;this.queued=false;this.events=[];this.taken=new Set();this.edge=false;this.k={s:0,lat:0,latV:0,v:0,y:course.height(0),steer:0,boost:0,shield:0,magnet:0,slow:0,blocked:0,waveFlash:0,banana:null,rocket:null,lastHit:null,impact:null,item:'turbo',grounded:true,lift:0,verticalSpeed:0,route:'main',routeProof:null};this.k.gateChain=0;this.stats={lines:0,lapEnds:{},turboUses:0,edgeTouches:0,boxes:0,itemUses:{turbo:0}};}
+  constructor(){this.courseLength=course.lapLength||LENGTH;this.totalLength=LENGTH;this.reset();}
+  reset(){this.phase='ready';this.previousPhase='running';this.time=0;this.countdown=3;this.accumulator=0;this.queued=false;this.events=[];this.taken=new Set();this.edge=false;this.k={s:0,lat:0,latV:0,v:0,y:course.height(0),steer:0,boost:0,shield:0,magnet:0,slow:0,blocked:0,waveFlash:0,banana:null,rocket:null,lastHit:null,impact:null,item:'turbo',grounded:true,lift:0,verticalSpeed:0,route:'main',routeProof:null};this.k.gateChain=0;
+   // Küsten-Cup: Zufallsitems, Specials und Angriffe, die das getroffene Kart selbst auswertet.
+   if(circuit)Object.assign(this.k,{roll:0,ice:0,gulls:0,sun:0,gust:0,gustDir:0,draft:0,spring:false,crab:null,incoming:null,cast:null,shot:0,done:[],lastItem:'turbo'});
+   this.startPress=null;this.rivalGap=0;this.stats={lines:0,lapEnds:{},turboUses:0,edgeTouches:0,boxes:0,itemUses:{turbo:0}};if(circuit)Object.assign(this.stats,{startBoost:0,hits:0,drafts:0});}
   begin(){this.reset();this.phase='countdown';}
   pause(){if(!['running','countdown'].includes(this.phase))return;this.previousPhase=this.phase;this.phase='paused';this.accumulator=0;this.queued=false;this.k.latV=0;this.k.steer=0;}
   resume(){if(this.phase==='paused'){this.phase=this.previousPhase;this.accumulator=0;}}
-  queueTurbo(){if(this.phase!=='running'||!this.k.item)return false;this.queued=true;return true;}
+  queueTurbo(){
+   // Im Countdown zählt der Druck als Startversuch: kurz vor „Los“ gibt es einen Blitzstart.
+   if(circuit&&this.phase==='countdown'){if(this.startPress===null)this.startPress=this.countdown;return true;}
+   if(this.phase!=='running'||!this.k.item||this.k.roll>0)return false;
+   if(this.k.item==='spring'&&!this.k.grounded)return false;
+   this.queued=true;return true;
+  }
+  /** Treffer am eigenen Kart: Sonnenkraft und Schild wehren ab, sonst bremsen und Zusatzwirkung. */
+  hit(item,seconds,apply){
+   const k=this.k,blocked=k.sun>0||k.shield>0;
+   k.impact={item,time:this.time,blocked,duration:seconds};
+   if(blocked){if(!(k.sun>0))k.shield=0;k.blocked=1.2;this.events.push('blocked');return false;}
+   this.stats.hits=(this.stats.hits||0)+1;k.lastHit=item;if(seconds>0)k.slow=Math.max(k.slow,seconds);if(apply)apply(k);this.events.push('hit');return true;
+  }
   takeEvents(){const e=this.events;this.events=[];return e;}
-  advance(seconds,steer=0,pace=1){this.stepStart=this.k.s;this.stepTime=this.time;if(!['running','countdown'].includes(this.phase)||!Number.isFinite(seconds)||seconds<=0)return;const input=Number.isFinite(steer)?clamp(steer,-1,1):0;this.accumulator+=Math.min(seconds,.25);while(this.accumulator+1e-10>=STEP){this.accumulator-=STEP;if(this.phase==='countdown'){this.countdown=Math.max(0,this.countdown-STEP);if(this.countdown<1e-8){this.countdown=0;this.phase='running';this.events.push('go');}continue;}this.tick(input,pace);if(this.phase==='finished'){this.accumulator=0;break;}}}
+  advance(seconds,steer=0,pace=1){this.stepStart=this.k.s;this.stepTime=this.time;if(!['running','countdown'].includes(this.phase)||!Number.isFinite(seconds)||seconds<=0)return;const input=Number.isFinite(steer)?clamp(steer,-1,1):0;this.accumulator+=Math.min(seconds,.25);while(this.accumulator+1e-10>=STEP){this.accumulator-=STEP;if(this.phase==='countdown'){this.countdown=Math.max(0,this.countdown-STEP);if(this.countdown<1e-8){this.countdown=0;this.phase='running';this.events.push('go');if(circuit&&this.startPress!==null){if(this.startPress<=.5){this.k.boost=1.4;this.stats.startBoost=1;this.events.push('startboost');}else this.events.push('startearly');}}continue;}this.tick(input,pace);if(this.phase==='finished'){this.accumulator=0;break;}}}
   tick(input,pace){
    const k=this.k,dt=STEP,oldS=k.s;this.time+=dt;k.boost=Math.max(0,k.boost-dt);
-   if(circuit){for(const key of ['shield','magnet','slow','blocked','waveFlash'])k[key]=Math.max(0,k[key]-dt);}
+   if(circuit){for(const key of TIMERS)k[key]=Math.max(0,k[key]-dt);}
    if(this.queued){
     this.queued=false;const item=k.item;
     if(item){
@@ -24,21 +41,24 @@ function createCoastSimpleModule(circuit=null,fastRace=false){
      if(item==='turbo'){k.boost=SPEED.turboSeconds;this.stats.turboUses++;}
      if(item==='shield'){k.shield=12;k.slow=0;}
      if(item==='magnet')k.magnet=12;
-     if(item==='banana')k.banana={s:k.s-2.5,lat:k.lat};
-     if(item==='rocket')k.rocket={s:k.s,lat:k.lat};
-     if(item==='wave')k.waveFlash=1;
+     if(item==='banana')k.banana={id:++k.shot,s:k.s-2.5,lat:k.lat};
+     if(item==='rocket')k.rocket={id:++k.shot,s:k.s,lat:k.lat};
+     if(CASTS.includes(item)){k.cast={id:++k.shot,type:item,time:this.time};k.waveFlash=1;}
+     if(item==='spring'){k.grounded=false;k.lift=.02;k.verticalSpeed=8.6;k.spring=true;this.events.push('jump');}
+     if(item==='sun'){k.sun=6;k.slow=0;k.ice=0;k.gulls=0;k.gust=0;}
     }
    }
    k.steer+=(input-k.steer)*(1-Math.exp(-dt/(input===0?.035:.06)));const outward=Math.sign(k.steer)===Math.sign(k.lat),remaining=BOUND-Math.abs(k.lat),taper=outward?clamp(remaining/.9,0,1):1;
-   const targetLatV=k.steer*(fastRace?7.5:5.5)*taper*clamp(k.v/6,0,1);k.latV+=(targetLatV-k.latV)*(1-Math.exp(-dt/(input===0?.035:.07)));k.lat=clamp(k.lat+k.latV*dt,-BOUND,BOUND);if(Math.abs(k.lat)>=BOUND-1e-6&&Math.sign(k.latV)===Math.sign(k.lat))k.latV=0;
+   const targetLatV=k.steer*(fastRace?7.5:5.5)*taper*clamp(k.v/6,0,1);k.latV+=(targetLatV-k.latV)*(1-Math.exp(-dt/(k.ice>0?.55:input===0?.035:.07)));const push=k.gust>0?k.gustDir*6.5*Math.min(1,k.gust/.3):0;k.lat=clamp(k.lat+(k.latV+push)*dt,-BOUND,BOUND);if(Math.abs(k.lat)>=BOUND-1e-6&&Math.sign(k.latV)===Math.sign(k.lat))k.latV=0;
    const atEdge=Math.abs(k.lat)>BOUND-.35&&outward&&Math.abs(input)>.15;if(atEdge&&!this.edge)this.stats.edgeTouches++;this.edge=atEdge;
-   const vmax=pace*(k.boost>0?SPEED.turbo:SPEED.cruise)*(k.slow>0?.65:1)*(atEdge?.92:1);k.v+=(vmax-k.v)*(1-Math.exp(-dt*(k.boost>0?SPEED.turboAcceleration:SPEED.acceleration)));k.s=Math.min(LENGTH,k.s+k.v/(circuit?1:course.frame(k.s).scale)*dt);k.y=course.height(k.s);
+   const pushed=push!==0&&Math.abs(k.lat)>=BOUND-.05;
+   const vmax=pace*(k.boost>0?SPEED.turbo:SPEED.cruise)*(k.slow>0?.65:1)*(atEdge?.92:1)*(pushed?.88:1)*(k.sun>0?1.12:1)*(1+.07*(k.draft||0));k.v+=(vmax-k.v)*(1-Math.exp(-dt*(k.boost>0?SPEED.turboAcceleration:SPEED.acceleration)));k.s=Math.min(LENGTH,k.s+k.v/(circuit?1:course.frame(k.s).scale)*dt);k.y=course.height(k.s);
    const lap=Math.min((course.laps||1)-1,Math.floor(oldS/this.courseLength)),offset=lap*this.courseLength;
    if(circuit){
     const pos=k.s-offset;
     if(!k.grounded){
      k.verticalSpeed-=20*dt;k.lift=Math.max(0,k.lift+k.verticalSpeed*dt);
-     if(k.lift===0){k.grounded=true;k.verticalSpeed=0;this.events.push('land');}
+     if(k.lift===0){k.grounded=true;k.verticalSpeed=0;this.events.push('land');if(k.spring){k.spring=false;k.boost=Math.max(k.boost,.9);}}
     }else{
      const previousLift=k.lift||0;k.lift=0;
      for(const zone of course.features){
@@ -67,6 +87,12 @@ function createCoastSimpleModule(circuit=null,fastRace=false){
       k.gateChain=0;
      }
     }
+    if(k.crab){
+     // Die Krabbe läuft quer über die Straße; nur wer sie beim Überfahren erwischt, schleudert.
+     const c=k.crab,lat=3.6*Math.sin(1.7*(this.time-c.time)+c.id*2.4);
+     if(k.s>=c.s){if(Math.abs(k.lat-lat)<1.6&&(k.lift||0)<.6)this.hit('crab',2.4);else this.events.push('dodge');k.crab=null;}
+     else k.crab={...c,lat};
+    }
     if(k.s>=(lap+1)*this.courseLength){
      (this.stats.lapEnds??={})[lap+1]=this.time;
     }
@@ -77,7 +103,7 @@ function createCoastSimpleModule(circuit=null,fastRace=false){
     const lanes=circuit?course.lanes(row):[-3.5,0,3.5];
     if(k.magnet<=0&&!lanes.some(l=>Math.abs(k.lat-l)<1.6))continue;
     this.taken.add(id);this.stats.boxes++;
-    if(!k.item){k.item=circuit?course.pickupType(row,lap):'turbo';this.events.push('pickup');}
+    if(!k.item){k.item=circuit?course.rollItem(this.rivalGap,rng,k.lastItem):'turbo';if(circuit){k.lastItem=k.item;k.roll=.8;}this.events.push('pickup');}
    }
    if(k.s>=LENGTH){k.routeProof='main';this.phase='finished';this.events.push('finished');}
   }

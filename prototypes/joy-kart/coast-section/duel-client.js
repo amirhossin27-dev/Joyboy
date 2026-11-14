@@ -46,7 +46,7 @@ function refreshLobby(){
  else if(resultsAt===null){resultsAt=performance.now()+1200;setTimeout(refreshLobby,1210);}
  const overlay=!!offline||phase==='ready'||(both&&performance.now()>=resultsAt);
  find('.js-overlay').hidden=!overlay;
- find('.js-controls').hidden=overlay||phase!=='running';find('.js-speed').hidden=overlay;
+ find('.js-controls').hidden=overlay||!['running','countdown'].includes(phase);find('.js-speed').hidden=overlay;
  find('.js-count').hidden=phase!=='countdown';find('.js-count').textContent=Math.max(1,Math.ceil(packet?.me.countdown||0));
  let title='Sonnenküsten-Duell',copy='Dasselbe Spiel auf beiden Geräten öffnen. Beide tippen auf Bereit.';
  if(packet){title=labels[packet.slot]+' · Startplatz '+(packet.slot+1);copy=packet.other?'Beide Fahrer sind da. Bereit für den Start?':'Öffnet diesen Link auch auf dem zweiten Gerät im selben WLAN.';}
@@ -110,7 +110,7 @@ function bindDuel(){
  pad.onpointermove=e=>{const p=held.get(e.pointerId);if(p)p.value=clamp((e.clientX-p.x)/(pad.clientWidth*.4),-1,1);};
  for(const type of ['pointerup','pointercancel','lostpointercapture'])pad.addEventListener(type,e=>held.delete(e.pointerId));
  const turbo=find('[data-action="turbo"]');turbo.onpointerdown=e=>{e.preventDefault();requestBoost();};turbo.onclick=e=>{if(!e.detail)requestBoost();};
- window.addEventListener('keydown',e=>{if(packet?.me.phase!=='running')return;if(['ArrowRight','ArrowLeft','KeyA','KeyD','KeyE'].includes(e.code)){e.preventDefault();keys.add(e.code);if(e.code==='KeyE'&&!e.repeat)requestBoost();}});
+ window.addEventListener('keydown',e=>{if(!['running','countdown'].includes(packet?.me.phase))return;if(['ArrowRight','ArrowLeft','KeyA','KeyD','KeyE'].includes(e.code)){e.preventDefault();keys.add(e.code);if(e.code==='KeyE'&&!e.repeat)requestBoost();}});
  window.addEventListener('keyup',e=>keys.delete(e.code));window.addEventListener('blur',clear);document.addEventListener('visibilitychange',()=>{if(document.hidden)clear();});
 }
 function moveKart(model,k,time,dt){

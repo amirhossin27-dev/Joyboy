@@ -1,13 +1,20 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const source=name=>fs.readFileSync(path.join(__dirname,name),'utf8');
-const build=new Function('second','fastRace',source('circuit.js')+source('simple-engine.js')+';return {...createCoastSimpleModule(createKartCircuit(second),fastRace),resolveKartWaves};');
+const build=new Function('second','fastRace',source('circuit.js')+source('simple-engine.js')+';return {...createCoastSimpleModule(createKartCircuit(second),fastRace),resolveKartWaves,KART_ITEMS};');
 for(const second of [false,true]){
  const {SimpleRace,course}=build(second);
- test(course.name+' offers exactly the four racing items on each lap',()=>{
-  for(let lap=0;lap<course.laps;lap++){
-   const items=course.boxes.map((_,row)=>course.pickupType(row,lap));
-   assert.deepEqual([...new Set(items)].sort(),['banana','rocket','shield','turbo']);
-  }
+ test(course.name+' boxes roll every item at random and favour catch-up items when trailing',()=>{
+  const {KART_ITEMS}=build(second);
+  let seed=7;const rng=()=>(seed=(seed*1664525+1013904223)>>>0)/4294967296;
+  const draw=gap=>{const count={};let last=null,repeats=0;for(let i=0;i<6000;i++){const item=course.rollItem(gap,rng,last);if(item===last)repeats++;last=item;count[item]=(count[item]||0)+1;}return {count,repeats};};
+  const lead=draw(-80),chase=draw(80);
+  assert.deepEqual(Object.keys(lead.count).sort(),Object.keys(KART_ITEMS).sort());
+  assert.deepEqual(Object.keys(chase.count).sort(),Object.keys(KART_ITEMS).sort());
+  assert(chase.count.rocket>lead.count.rocket*3);assert(chase.count.sun>lead.count.sun*3);
+  assert(lead.count.banana>chase.count.banana*2);assert(lead.count.shield>chase.count.shield*1.5);
+  assert(lead.repeats<6000*.04);
+  // Kein festes Muster: dieselbe Kiste liefert in aufeinanderfolgenden Rennen verschiedene Folgen.
+  const runs=[0,1].map(()=>Array.from({length:12},()=>course.rollItem(0,rng)).join());assert.notEqual(runs[0],runs[1]);
  });
  test(course.name+' Robo sprint finishes in about two minutes and rewards turbo',()=>{
   const {SimpleRace}=build(second,true);
@@ -82,13 +89,13 @@ test('wave hits across the timing line, respects range and consumes a shield',()
  b.k.slow=0;b.k.s+=150;fire();assert.equal(b.k.slow,0);
 });
 test('magnet collects from the opposite side and boxes refill on the next lap',()=>{
- const {SimpleRace,course}=build(false);
+ const {SimpleRace,course,KART_ITEMS}=build(false);
  const r=new SimpleRace();r.phase='running';r.k.v=24;r.k.lat=-4.5;
  const row=2,mark=course.boxes[row];
  r.k.s=mark-1;r.k.item=null;r.advance(.1);assert.equal(r.k.item,null);
- r.k.s=mark-1;r.k.item='magnet';r.queueTurbo();r.advance(.1);assert.equal(r.k.item,course.pickupType(row,0));
+ r.k.s=mark-1;r.k.item='magnet';r.queueTurbo();r.advance(.1);assert(r.k.item in KART_ITEMS);assert(r.k.roll>0);assert.equal(r.queueTurbo(),false);
  r.k.s=mark+course.lapLength-1;r.k.item=null;r.advance(.1);
- assert.equal(r.k.item,course.pickupType(row,1));assert.equal(r.stats.boxes,2);
+ assert(r.k.item in KART_ITEMS);assert.equal(r.stats.boxes,2);
 });
 test('banana crosses the timing line, misses a different lane and hits once',()=>{
  const {SimpleRace,course,resolveKartWaves}=build(false);

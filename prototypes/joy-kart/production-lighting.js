@@ -18,7 +18,7 @@ function createProductionLighting(THREE, context) {
   c.drawImage(skyImage,0,top,w,rows);
  });environment.mapping=THREE.EquirectangularReflectionMapping;
  scene.background=null;scene.environment=environment;scene.environmentIntensity=.52;scene.fog=new THREE.FogExp2(0x8496b2,.0015);renderer.setClearColor(0x8eabc4,1);renderer.toneMappingExposure=1.04;
- const domeMaterial=new THREE.ShaderMaterial({name:'JoyKartDirectPanorama',side:THREE.BackSide,depthTest:false,depthWrite:false,fog:false,toneMapped:false,blending:THREE.NoBlending,uniforms:{panorama:{value:panorama},horizonScale:{value:band}},vertexShader:'varying vec3 vDirection;void main(){vDirection=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',fragmentShader:'uniform sampler2D panorama;uniform float horizonScale;varying vec3 vDirection;void main(){vec3 d=normalize(vDirection);vec2 uv=vec2(atan(d.z,d.x)*0.159154943091895+0.5,asin(clamp(d.y,-1.0,1.0))*0.318309886183791*horizonScale+0.5);gl_FragColor=vec4(texture2D(panorama,uv).rgb,1.0);\n#include <colorspace_fragment>\n}'});materials.add(domeMaterial);
+ const domeMaterial=new THREE.ShaderMaterial({name:'JoyKartDirectPanorama',side:THREE.BackSide,depthTest:false,depthWrite:false,fog:false,toneMapped:false,blending:THREE.NoBlending,uniforms:{panorama:{value:panorama},horizonScale:{value:band},hdr:{value:0}},vertexShader:'varying vec3 vDirection;void main(){vDirection=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',fragmentShader:'uniform sampler2D panorama;uniform float horizonScale,hdr;varying vec3 vDirection;void main(){vec3 d=normalize(vDirection);vec2 uv=vec2(atan(d.z,d.x)*0.159154943091895+0.5,asin(clamp(d.y,-1.0,1.0))*0.318309886183791*horizonScale+0.5);vec3 c=texture2D(panorama,uv).rgb;if(hdr>0.0){vec3 y=min(c,vec3(0.92)),a=2.43*y-2.51,b=0.59*y-0.03;c=(-b-sqrt(max(b*b-0.56*a*y,0.0)))/(2.0*a)/hdr;}gl_FragColor=vec4(c,1.0);\n#include <colorspace_fragment>\n}'});materials.add(domeMaterial);
  const domeGeometry=new THREE.SphereGeometry(1,48,24);geometries.add(domeGeometry);const dome=new THREE.Mesh(domeGeometry,domeMaterial);dome.name='Distant painted coast';dome.scale.setScalar(460);dome.renderOrder=-10000;dome.frustumCulled=false;scene.add(dome);
  const hemisphere=context.warmBay
   ?new THREE.HemisphereLight(0xffe6cb,0xb59079,1.36)
@@ -35,5 +35,7 @@ function createProductionLighting(THREE, context) {
  function tuneWater(material){
   installCoastWaterFade(material);
  }
- return{sun,update,tuneWater,panoramaWidth:skyImage.width,panoramaHeight:skyImage.height,environmentWidth:512,environmentHeight:256};
+ // Nachbearbeitung an: Das gemalte Panorama wird auf Szenenhelligkeit gestreckt (Wert = Belichtung), 0 schaltet ab.
+ function setHdr(exposure){domeMaterial.uniforms.hdr.value=exposure;}
+ return{sun,fill,hemisphere,update,tuneWater,setHdr,panoramaWidth:skyImage.width,panoramaHeight:skyImage.height,environmentWidth:512,environmentHeight:256};
 }

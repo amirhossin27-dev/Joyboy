@@ -107,6 +107,7 @@
 /*@@PRODUCTION_MODELS@@*/
 /*@@PRODUCTION_COAST@@*/
 /*@@LIGHTING@@*/
+/*@@TRACK_DRESSING@@*/
 /*@@SIMPLE_WORLD@@*/
 const root=document.getElementById('joy-kart-simple'),find=q=>root.querySelector(q),stage=find('.js-stage'),canvas=find('canvas'),loading=find('.js-loading'),loadingText=loading.querySelector('span');
 const secondCourse=location.hash.endsWith('kap')||new URLSearchParams(location.search).get('strecke')==='kap';
@@ -205,6 +206,7 @@ function bindAppRace(){
  }
 /*@@COMPACT_ROAD@@*/
 /*@@COMBAT_EFFECTS@@*/
+/*@@POST_FX@@*/
 let compact=false;
 function useCompact(){
  if(compact)return;compact=true;stopped=false;cancelAnimationFrame(animation);
@@ -236,11 +238,12 @@ try{
  const [THREE,atlasImage,skyImage,treeImage]=await Promise.all([import('./three.module.js'),decode(/*@@MATERIAL_ATLAS@@*/),decode(course.cape?/*@@CAPE_TEXTURE@@*/:/*@@SKY_TEXTURE@@*/),decode(course.cape?/*@@SPRUCE_TEXTURE@@*/:/*@@CYPRESS_TEXTURE@@*/)]);if(compact)return;mark('download');loadingText.textContent='Fuchs und Kart werden vorbereitet …';await paintYield();
  if(compact)return;
  const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(60,1,.15,900),materials=new Set(),geometries=new Set(),textures=new Set();
- renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});const maxRatio=Math.min(devicePixelRatio,1.25);renderer.setPixelRatio(maxRatio);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+ renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});const maxRatio=Math.min(devicePixelRatio,1.5);renderer.setPixelRatio(maxRatio);renderer.info.autoReset=false;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
  function texture(w,h,paint){const c=document.createElement('canvas');c.width=w;c.height=h;paint(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;textures.add(t);return t;}
  const part=(x,y)=>{const half=atlasImage.width/2,t=texture(512,512,(c,w,h)=>c.drawImage(atlasImage,x*half,y*half,half,half,0,0,w,h));t.wrapS=t.wrapT=THREE.RepeatWrapping;t.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy());return t;};
  const artMaps={orangeFur:part(0,0),creamFur:part(1,0),asphalt:part(0,1),stone:part(1,1)};artMaps.furNeutral=texture(256,256,(c,w,h)=>{c.drawImage(artMaps.creamFur.image,0,0,w,h);const p=c.getImageData(0,0,w,h);for(let i=0;i<p.data.length;i+=4){const l=205+((p.data[i]+p.data[i+1]+p.data[i+2])/3-128)*.25;p.data[i]=p.data[i+1]=p.data[i+2]=l;}c.putImageData(p,0,0);});for(const t of[artMaps.furNeutral,artMaps.creamFur,artMaps.orangeFur]){t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(3,3);}
  artMaps.foliage=new THREE.Texture(treeImage);artMaps.foliage.colorSpace=THREE.SRGBColorSpace;artMaps.foliage.needsUpdate=true;textures.add(artMaps.foliage);
+ const post=createKartPostFx(THREE,renderer);let postOn=!!post,slowWindows=0,flash=0,wasBoost=false,roll=0;
  const lighting=createProductionLighting(THREE,{scene,renderer,skyImage,texture,textures,materials,geometries,horizonStrip:true,warmBay:!course.cape,sunOffset:course.cape?[78,42,-18]:[59,12,-69]}),kit=createKartModels(THREE,{scene,geometries,materials,texture}),assets=createProductionKarts(THREE,{scene,kit,artMaps,materials,texture}),cars=[assets.makeKart(false),assets.makeKart(true)];mark('fox-kart');loadingText.textContent='Küstenstraße wird aufgebaut …';await paintYield();
  if(compact)return;
  for(const car of cars){
@@ -325,8 +328,11 @@ try{
   frameCount=0;frameSeconds=0;
   fastWindows=fps>53?fastWindows+1:0;
   const floor=Math.min(.8,maxRatio);
-  const next=fps<35?Math.max(floor,ratio-.15):fastWindows>=4?Math.min(maxRatio,ratio+.1):ratio;
+  const next=fps<38?Math.max(floor,ratio-.15):fastWindows>=4?Math.min(maxRatio,ratio+.1):ratio;
   if(next!==ratio){renderer.setPixelRatio(next);fastWindows=0;}
+  // Reicht auch die kleinste Auflösung nicht, fällt die Nachbearbeitung weg; das Rennen bleibt flüssig.
+  slowWindows=fps<32&&ratio<=floor?slowWindows+1:0;
+  if(postOn&&slowWindows>=2){postOn=false;root.dataset.post='off';}
  }
  function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}const observer=new ResizeObserver(resize);observer.observe(stage);resize();
  let selfVisual=null,otherVisual=null,lastTaken,visibleTaken,wasRear=false,view=null;
@@ -343,7 +349,8 @@ try{
   combatEffects(slot,k,effectMotion.matches,!rear);combatEffects(1-slot,rival?otherVisual:null,effectMotion.matches);
   if(me.taken!==lastTaken){lastTaken=me.taken;visibleTaken=me.taken?new Set(me.taken):null;}
   world.update(me.time,visibleTaken||race.taken,me.lap);
-  const centre=course.point(k.s,k.lat*.93),ahead=course.point(k.s+17,k.lat*.30);cameraDesired.set(centre.x-dx*7.6,p.y+3.25+(k.lift||0)*.32,centre.z-dz*7.6);lookDesired.set(ahead.x,ahead.y+1.55,ahead.z);
+  // Tiefe Verfolgerkamera: nah am Kart, mit Blick weit genug voraus für Tore und Kisten.
+  const centre=course.point(k.s,k.lat*.93),ahead=course.point(k.s+15,k.lat*.34);cameraDesired.set(centre.x-dx*6.2,p.y+2.5+(k.lift||0)*.32,centre.z-dz*6.2);lookDesired.set(ahead.x,ahead.y+1.2,ahead.z);
   if(rear){
    const mount=course.point(k.s-1.8,k.lat),behind=course.point(k.s-28,k.lat*.35);
    cameraDesired.set(mount.x,mount.y+2.15+(k.lift||0)*.72,mount.z);
@@ -354,17 +361,29 @@ try{
   if(snapped){camera.position.copy(cameraDesired);look.copy(lookDesired);cameraSet=true;}else{const alpha=1-Math.exp(-dt*9);camera.position.lerp(cameraDesired,alpha);const along=(cameraDesired.x-camera.position.x)*dx+(cameraDesired.z-camera.position.z)*dz;camera.position.x+=dx*along;camera.position.z+=dz*along;look.lerp(lookDesired,alpha);}
   // Treffer rütteln kurz an der Kamera; die Fahrphysik bleibt unberührt.
   const jolt=motion.matches?0:kartImpact(me).blocked?0:kartImpact(me).burst;shake.set(Math.sin(me.time*71)*jolt*.16,Math.sin(me.time*93)*jolt*.11,0);camera.lookAt(look);camera.position.add(shake);
+  // In Kurven und beim Spurwechsel legt sich die Kamera leicht schräg.
+  const bend=Math.atan2(Math.sin(course.frame(k.s+14).angle-f.angle),Math.cos(course.frame(k.s+14).angle-f.angle));
+  const lean=motion.matches||rear||me.phase!=='running'?0:clamp(bend*.55+(k.latV||0)*.007,-.085,.085);
+  roll=snapped?lean:roll+(lean-roll)*(1-Math.exp(-dt*4));camera.rotateZ(roll);
   const angle=Math.atan2(look.x-camera.position.x,look.z-camera.position.z);if(render&&!snapped)maxCameraStep=Math.max(maxCameraStep,Math.abs(Math.atan2(Math.sin(angle-lastCameraAngle),Math.cos(angle-lastCameraAngle))));lastCameraAngle=angle;
   const target=me.phase!=='running'?0:k.boost>0?1:fastRace?.35*clamp(k.v/M.SPEED.cruise,0,1):0;speedVisual=motion.matches?0:speedVisual+(target-speedVisual)*(1-Math.exp(-dt*(target?10:5)));
-  const fov=55+speedVisual*8;if(Math.abs(camera.fov-fov)>.001){camera.fov=fov;camera.updateProjectionMatrix();}
+  const fov=57+speedVisual*9;if(Math.abs(camera.fov-fov)>.001){camera.fov=fov;camera.updateProjectionMatrix();}
   speedStreaks.visible=me.phase==='running'&&!rear&&!motion.matches&&speedVisual>.01;
   streakMaterial.opacity=speedVisual*.24;
   const halfHeight=Math.tan(camera.fov*Math.PI/360);speedStreaks.scale.set(halfHeight*camera.aspect,halfHeight,1);
-  lighting.update(camera,p.x,p.y,p.z);if(render)renderer.render(scene,camera);camera.position.sub(shake);
+  lighting.update(camera,p.x,p.y,p.z);
+  const boosting=me.phase==='running'&&k.boost>0;if(boosting&&!wasBoost&&!motion.matches)flash=.13;wasBoost=boosting;flash=Math.max(0,flash-dt*.9);
+  if(render){
+   renderer.info.reset();lighting.setHdr(postOn?renderer.toneMappingExposure:0);
+   if(postOn)post.render(scene,camera,{speed:motion.matches||rear?0:Math.max(0,speedVisual-.2)*1.1,flash,exposure:renderer.toneMappingExposure});
+   else{renderer.setRenderTarget(null);renderer.render(scene,camera);}
+  }
+  camera.position.sub(shake);
  }
  // Establish the rear view before shader preparation; prewarm turbo's first-use material too.
  if(compact){renderer.dispose();return;}
- place(0,false);if(renderer.compileAsync)await renderer.compileAsync(scene,camera);if(compact){renderer.dispose();return;}place(0);
+ // Shader für das Ziel vorbereiten, in das später gezeichnet wird (mit Nachbearbeitung ein Zwischenbild).
+ place(0,false);if(postOn){lighting.setHdr(renderer.toneMappingExposure);renderer.setRenderTarget(post.target);}if(renderer.compileAsync)await renderer.compileAsync(scene,camera);renderer.setRenderTarget(null);if(compact){renderer.dispose();return;}place(0);
  bindDuel();loading.hidden=true;ready=true;
  if(computerMode&&!inJoyboy){
   const alternate=document.createElement('a'),url=new URL(location.href);url.searchParams.set('strecke',secondCourse?'bucht':'kap');
@@ -382,6 +401,8 @@ try{
  }
  root.__duelSnapshot=()=>packet&&({slot:packet.slot,me:packet.me,other:packet.other,round:packet.round});
  root.__duelGeometry=world.inspectGeometry;
+ // Nur lesend, für Messungen: Zeichenaufwand des letzten Bildes.
+ root.__duelRenderInfo=()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,ratio:renderer.getPixelRatio(),post:postOn});
  lastFrame=performance.now();animation=requestAnimationFrame(loop);
  canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();clear();if(inJoyboy || computerMode){useCompact();return;}joined=false;stopped=true;cancelAnimationFrame(animation);loading.hidden=false;loadingText.textContent='Grafik unterbrochen. Bitte die Seite neu laden.';});
 }catch(error){if(inJoyboy || computerMode){renderer?.dispose();useCompact();return;}stopped=true;loading.hidden=false;loading.querySelector('strong').textContent='Küstenprobe konnte nicht starten';loadingText.textContent=error.message;console.error(error);renderer?.dispose();}

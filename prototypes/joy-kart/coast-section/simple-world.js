@@ -49,7 +49,9 @@ async function createSimpleCoastWorld(THREE,c){
   wear.colorSpace=THREE.NoColorSpace;wear.repeat.x=1/3;road.roughness=.95;road.roughnessMap=wear;
   scene.fog.color.setHex(course.cape?0x97b5c7:0x9daeb9);scene.fog.density=course.cape?.003:.0023;
  }
- strip(-19,19,stone);strip(-6,6,road,.025);strip(-6.4,-6,curb,.065,true);strip(6,6.4,curb,.065,true);
+ // Auf der Rundstrecke sind die Randsteine breit und deutlich wie auf einer Rennstrecke.
+ const kerb=circuit?6.9:6.4;
+ strip(-19,19,stone);strip(-6,6,road,.025);strip(-kerb,-6,curb,.065,true);strip(6,kerb,curb,.065,true);
  // Retaining sides and end caps extend below water: the promenade cannot float.
  for(const side of[-1,1]){
   const pos=[],uv=[],idx=[];
@@ -103,9 +105,10 @@ async function createSimpleCoastWorld(THREE,c){
  }
  const spacing=circuit?6.5:2.5;
  const railGeo=geo(new THREE.LatheGeometry([new THREE.Vector2(.14,0),new THREE.Vector2(.14,.1),new THREE.Vector2(.07,.2),new THREE.Vector2(.12,.5),new THREE.Vector2(.075,.9),new THREE.Vector2(.15,1)],12)),posts=new THREE.InstancedMesh(railGeo,stone,2*(Math.ceil((end-start)/spacing)+1)),dummy=new THREE.Object3D();let i=0;
- for(let s=start;s<=end;s+=spacing)for(const side of[-1,1]){dummy.position.copy(at(s,side*7.2));dummy.updateMatrix();posts.setMatrixAt(i++,dummy.matrix);}
+ // Die Rundstrecke bekommt ihre Steinbrüstung in dressKartTrack.
+ if(!circuit)for(let s=start;s<=end;s+=spacing)for(const side of[-1,1]){dummy.position.copy(at(s,side*7.2));dummy.updateMatrix();posts.setMatrixAt(i++,dummy.matrix);}
  posts.count=i;posts.castShadow=true;posts.receiveShadow=true;posts.computeBoundingSphere();scene.add(posts);
- for(let s=start;s<end;s+=spacing)for(const side of[-1,1])kit.rod(at(s,side*7.2,1.05).toArray(),at(Math.min(s+spacing,end),side*7.2,1.05).toArray(),.10,stone,root,10);
+ if(!circuit)for(let s=start;s<end;s+=spacing)for(const side of[-1,1])kit.rod(at(s,side*7.2,1.05).toArray(),at(Math.min(s+spacing,end),side*7.2,1.05).toArray(),.10,stone,root,10);
  const plaster=[0xd8bf91,0xc99e7d,0xe0d0a9].map(c=>mat(c,{bumpMap:artMaps.stone,bumpScale:.018,roughness:.92})),windowMat=mat(0x293c42,{metalness:.2}),leaf=mat(0x345039),treeGeo=geo(new THREE.SphereGeometry(1,18,12));
  const roofTiles=texture(128,128,(ctx,w,h)=>{
   ctx.fillStyle='#c6a08b';ctx.fillRect(0,0,w,h);
@@ -317,7 +320,7 @@ async function createSimpleCoastWorld(THREE,c){
   const s=circuit?end*(j+.4)/33:j*10-10;if(bridgeAt(s))continue;const side=j%5===0?-1:1,p=at(s,side*((side===1?shoreWidth(s):19)+2*Math.sin(j)));
   const o=kit.add(crag,lichen,root,p.x,-1.5,p.z);
   o.scale.set(5+2*Math.sin(j*.6),4+.6*Math.sin(j),7);o.rotation.y=j*.71;
-  if(course.cape||j%3===0)continue;
+  if(course.cape||j%3===0||circuit)continue;
   const bed=at(s,side*8.6);
   box(1.2,.38,3.3,stone,root,bed.x,bed.y+.18,bed.z);
   const foliage=kit.add(treeGeo,leaf,root,bed.x,bed.y+.47,bed.z);foliage.scale.set(.62,.38,1.65);
@@ -363,7 +366,7 @@ async function createSimpleCoastWorld(THREE,c){
  const flagMat=mat(0xffffff,{map:flagMap,side:THREE.DoubleSide});
  for(let i=0;i<flagPos.count;i++){const x=flagPos.getX(i);flagPos.setY(i,flagPos.getY(i)-.5*(1-(x/6.5)**2));flagPos.setZ(i,.12*Math.sin(x*1.5));}
  flagGeo.computeVertexNormals();kit.add(flagGeo,flagMat,root,finish.x,finish.y+5.4,finish.z);
- for(const sign of [-1,1])box(.18,6,.18,wood,root,finish.x+sign*6.5,finish.y+3,finish.z);
+ if(!circuit)for(const sign of [-1,1])box(.18,6,.18,wood,root,finish.x+sign*6.5,finish.y+3,finish.z);
  // Transverse start/finish markings sit above asphalt rather than intersecting it.
  for(const s of(circuit?[0]:[1,299]))for(let x=-5.5;x<6;x++)for(let z=0;z<2;z++){const p=at(s+z*.5,x);box(1,.025,.5,(Math.round(x+.5)+z)%2?stone:dark,root,p.x,p.y+.05,p.z);}
  if(circuit){
@@ -418,6 +421,7 @@ async function createSimpleCoastWorld(THREE,c){
    }
   }
  }
+ if(circuit&&typeof dressKartTrack==='function')dressKartTrack(THREE,{course,kit,root,at,strip,texture,stone,road,bridgeAt,end});
  kit.mergeStatic(root);await yieldTask();
  // The reused city rotates internally by PI. Cancel that rotation before translating it.
  const backdrop=new THREE.Group();backdrop.rotation.y=Math.PI;backdrop.position.z=circuit?45:-210;if(circuit)backdrop.scale.setScalar(.59);scene.add(backdrop);

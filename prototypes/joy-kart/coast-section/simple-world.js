@@ -421,7 +421,7 @@ async function createSimpleCoastWorld(THREE,c){
    }
   }
  }
- if(circuit&&typeof dressKartTrack==='function')dressKartTrack(THREE,{course,kit,root,at,strip,texture,stone,road,bridgeAt,end});
+ if(circuit&&typeof dressKartTrack==='function')dressKartTrack(THREE,{course,kit,root,at,strip,texture,stone,road,bridgeAt,end,treeCard,foliage});
  kit.mergeStatic(root);await yieldTask();
  // The reused city rotates internally by PI. Cancel that rotation before translating it.
  const backdrop=new THREE.Group();backdrop.rotation.y=Math.PI;backdrop.position.z=circuit?45:-210;if(circuit)backdrop.scale.setScalar(.59);scene.add(backdrop);
@@ -451,7 +451,9 @@ async function createSimpleCoastWorld(THREE,c){
   });
   return{backdropTrianglesChecked,backdropCorridorIntrusions,corridorSections:corridors.length};
  }
- const waterMat=new THREE.MeshPhysicalMaterial();materials.add(waterMat);lighting.tuneWater(waterMat);if(course.cape)waterMat.color.setHex(0x345668);const water=kit.add(geo(new THREE.PlaneGeometry(circuit?1400:700,circuit?1400:700)),waterMat,scene,0,-2,-100);water.rotation.x=-Math.PI/2;water.castShadow=false;
+ const waterMat=new THREE.MeshPhysicalMaterial();materials.add(waterMat);lighting.tuneWater(waterMat);if(course.cape)waterMat.color.setHex(0x345668);
+ // Auf der Rundstrecke spiegelt das Wasser Himmel und Sonne deutlicher.
+ if(circuit){waterMat.roughness=.2;waterMat.envMapIntensity=1.15;waterMat.clearcoat=.5;}const water=kit.add(geo(new THREE.PlaneGeometry(circuit?1400:700,circuit?1400:700)),waterMat,scene,0,-2,-100);water.rotation.x=-Math.PI/2;water.castShadow=false;
  if(circuit){
   const ripples=texture(128,128,(ctx,w,h)=>{
    const pixels=ctx.createImageData(w,h);

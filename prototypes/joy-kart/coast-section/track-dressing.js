@@ -4,11 +4,11 @@
  * je Material zu wenigen Zeichenaufrufen zusammengefasst. Die Fahrphysik bleibt unberührt.
  */
 function dressKartTrack(THREE,c){
- const {course,kit,root,at,strip,texture,stone,road,bridgeAt,end}=c,{geometry:geo,material:mat}=kit;
+ const {course,kit,root,at,strip,texture,stone,road,bridgeAt,end,treeCard,foliage}=c,{geometry:geo,material:mat}=kit;
  const cape=course.cape,offBridge=s=>!bridgeAt(s),noise=n=>{const x=Math.sin(n*127.1+31.7)*43758.5453;return x-Math.floor(x);};
  const smooth=s=>{const i=Math.floor(s),f=s-i,u=f*f*(3-2*f);return noise(i)*(1-u)+noise(i+1)*u;};
  const tile=t=>{t.wrapS=t.wrapT=THREE.RepeatWrapping;return t;};
- const unit=geo(new THREE.BoxGeometry(1,1,1)),ball=geo(new THREE.SphereGeometry(1,12,8));
+ const unit=geo(new THREE.BoxGeometry(1,1,1)),ball=geo(new THREE.SphereGeometry(1,8,5));
  const box=(w,h,d,m,x,y,z,angle=0)=>{const o=kit.add(unit,m,root,x,y,z);o.scale.set(w,h,d);o.rotation.y=angle;return o;};
 
  /** Ein Querschnitt [[Abstand zur Mitte, Höhe], …] wird der Strecke entlang gezogen. */
@@ -97,6 +97,17 @@ function dressKartTrack(THREE,c){
   const kept=[],indexArray=mesh.geometry.index.array;
   for(let i=0;i<indexArray.length;i+=6){const s=Math.floor(i/6)*2;if(offBridge(s)&&offBridge(s+2))kept.push(...indexArray.slice(i,i+6));}
   mesh.geometry.setIndex(kept);
+ }
+
+ // ── Zweite Baumreihe: mehr Tiefe hinter Hecke und Rasen ──
+ if(treeCard&&foliage){
+  const image=foliage.map.image,town=s=>!cape&&((s>end*.025-8&&s<end*.025+190)||(s>end*.69-8&&s<end*.69+176));
+  for(let s=9,n=0;s<end;s+=11.5,n++)for(const side of [-1,1]){
+   if(!offBridge(s)||noise(n*3+side)<.34||(town(s)&&noise(n*5+side)<.8))continue;
+   const lat=side*(side>0?12.3+1.9*noise(n*7+side):12.6+4.6*noise(n*7+side)),p=at(s,lat),height=(cape?5.2:4.3)+2.6*noise(n*11+side),width=height*image.width/image.height;
+   const heading=course.frame(s).angle+noise(n*13+side)*3;
+   for(const angle of [heading,heading+Math.PI/2]){const card=kit.add(treeCard,foliage,root,p.x,p.y+height/2,p.z);card.scale.set(width,height,1);card.rotation.y=angle;}
+  }
  }
 
  // ── Laternen mit Bannern ──

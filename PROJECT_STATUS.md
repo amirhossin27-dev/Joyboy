@@ -1,5 +1,26 @@
 # Joyboy – Projektstatus und Übergabe
 
+## 15.11.2026 – Joy-Kart · Grafiketappe „näher an die Vorlage“
+
+**Nutzerrückmeldung.** Zu zweit „deutlich besser“, Item-Häufigkeit „deutlich besser“. Spielgefühl soll weiter besser werden, die Strecke grafisch überarbeitet und die Spielgrafik insgesamt: „Wir sind noch weit entfernt von der Grafik, die ich haben möchte. Ich will eine ultra-gute Grafik.“ Maßstab bleibt `prototypes/joy-kart/art-reference/coast.webp`. PR #30 ist zusammengeführt; der Branch `claude/determined-hamilton-bm8hnb` wurde vom neuen `main` (2a65ad0) fortgesetzt. Noch kein neuer PR.
+
+**Umgesetzt.**
+- **Nachbearbeitung** (`coast-section/post-fx.js`): Die Szene wird mit vollem Helligkeitsumfang gezeichnet; helle Stellen (Sonne, Laternen, Auspuffflammen, Funken, Kisten) überstrahlen weich. Dazu Tonwertkurve, warme Lichter und kühle Schatten, Randabdunklung, Tempo-Unschärfe am Bildrand und ein kurzer Lichtblitz beim Turbo. Das gemalte Panorama wird dafür auf Szenenhelligkeit gestreckt (`setHdr` in `production-lighting.js`). Fehlen die Grafikfunktionen oder bleibt die Bildrate bei kleinster Auflösung unter 32, fällt die Nachbearbeitung weg und das bisherige Bild bleibt.
+- **Kamera:** tiefer und näher (6,2 m hinter dem Kart, 2,5 m hoch), legt sich in Kurven und beim Spurwechsel bis etwa 5° schräg, fällt beim Beschleunigen leicht zurück. „Bewegung reduzieren“ schaltet Schräglage, Unschärfe und Blitz ab.
+- **Strecke** (`coast-section/track-dressing.js`, beide Kurse): leicht glänzender Asphalt mit Randlinien, Spurstrichen und Bremsspuren, breite rot-weiße Randsteine, Steinbrüstung mit Pfeilern statt dünner Geländer, blühende Hecken, Rasenstreifen, Laternen mit Bannern, Wimpelketten, Starttor aus Stein, zweite Baumreihe. Die Sonnenbucht bekommt warme Blüten und rote Banner, das Kap blau-violette Blüten und blaue Banner. Wasser spiegelt stärker.
+- **Kart:** stellt sich beim Spurwechsel sichtbar quer, neigt sich, hebt beim Turbo die Nase, federt nach Sprüngen ein; Funken am kurvenäußeren Hinterrad bei hartem Lenken. Nur Darstellung, die Fahrphysik ist unverändert.
+- **Fehler behoben:** Das erste Bild nach dem Laden konnte mit negativer Zeitspanne gerechnet werden (`dt` jetzt nie unter 0).
+
+**Geprüft.** `npm test`: 152 App- und 79 Node-Tests, Produktionsbuild mit TypeScript. Fahrbilder an festen Streckenstellen vor und nach der Etappe mit `coast-section/track-tour-qa.cjs` in Chromium (Software-Rendering, 852 × 393, dazu einmal 390 × 844) angesehen; Vergleich in `coast-section/qa/ultra-grafik/vorher` und `…/nachher`. 3D-Start in der gebauten App gegen Robo ohne Seitenfehler. Zeichenaufwand je Bild einschließlich Schattendurchgang und sieben Nachbearbeitungsdurchgängen: Sonnenbucht 376 Aufrufe und 1,12 Mio. Dreiecke, Kap 342 und 0,81 Mio. Die Streckenausstattung selbst kostet 11 Aufrufe; die Dreiecksmenge blieb gegenüber dem Stand davor gleich (1,13 → 1,12 Mio.), weil die alten Geländer entfallen. Fragment 1.064.773 Byte, Budget 1.200.000.
+
+**Nicht geprüft.** Bildrate und Wärme auf dem iPhone: Die Nachbearbeitung kostet Füllrate, das lässt sich ohne Gerät nicht messen. Kein vollständiges 3D-Rennen (Software-Rendering schafft etwa ein Bild pro Sekunde), keine Safari-Prüfung. Ob das automatische Abschalten der Nachbearbeitung auf schwachen Geräten rechtzeitig greift, ist nur aus dem Code abgeleitet.
+
+**Ehrlicher Abstand zur Vorlage.** Stimmung, Licht, Streckenränder und Kamera sind deutlich näher an `coast.webp`. Es fehlen weiterhin: Felswände mit Bewuchs direkt an der Strecke, Bogenbrücken, überhöhte Kurven, feineres Fell und Kartdetails, Wasserfälle und Burg als echte Geometrie in Streckennähe. Neue gemalte Texturen oder Modelle konnten in dieser Sitzung nicht erzeugt werden; alles entstand aus Geometrie, Shadern und berechneten Texturen. Eine 1-zu-1-Übereinstimmung mit dem Konzeptbild ist nicht erreicht.
+
+**Offen.** Was am Spielgefühl konkret fehlt, hat der Nutzer noch nicht gesagt (gefragt). Anleitungstexte für die neuen Specials weiter ohne Aufnahmen (siehe unten).
+
+**Nächster Schritt.** Auf dem iPhone beide Strecken fahren: Läuft es flüssig, gefällt die Stärke von Leuchten und Tempo-Unschärfe, ist die tiefere Kamera gut lesbar? Danach je nach Befund: Leuchtstärke/Kamera nachstellen, dann Felswände und Kurvenüberhöhung als nächste Grafikbausteine.
+
 ## 14.11.2026 – Joy-Kart · flüssig zu zweit, Zufalls-Items, sechs neue Specials
 
 **Nutzerauftrag.** „Zu zweit hängt es“, dazu Spielgefühl und Grafik verbessern, Items nach Zufall statt fester Reihenfolge, neue Specials. Nach dem vorgeschlagenen Fünf-Etappen-Plan sagte der Nutzer: „Bau alle Ideen ein und leg los.“ Branch `claude/determined-hamilton-bm8hnb`, Ausgangsstand 11b23db. [PR #30](https://github.com/amirhossin27-dev/Joyboy/pull/30) gegen main, vom Nutzer mit „go“ beauftragt; Review, GitHub-Prüfungen und Gerätetest stehen aus.

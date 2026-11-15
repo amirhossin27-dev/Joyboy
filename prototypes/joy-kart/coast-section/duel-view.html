@@ -238,7 +238,8 @@ try{
  const [THREE,atlasImage,skyImage,treeImage]=await Promise.all([import('./three.module.js'),decode(/*@@MATERIAL_ATLAS@@*/),decode(course.cape?/*@@CAPE_TEXTURE@@*/:/*@@SKY_TEXTURE@@*/),decode(course.cape?/*@@SPRUCE_TEXTURE@@*/:/*@@CYPRESS_TEXTURE@@*/)]);if(compact)return;mark('download');loadingText.textContent='Fuchs und Kart werden vorbereitet …';await paintYield();
  if(compact)return;
  const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(60,1,.15,900),materials=new Set(),geometries=new Set(),textures=new Set();
- renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});const maxRatio=Math.min(devicePixelRatio,1.5);renderer.setPixelRatio(maxRatio);renderer.info.autoReset=false;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+ renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});// Start mit der bisherigen Schärfe; schafft das Gerät dauerhaft über 53 Bilder pro Sekunde, steigt sie bis 1,5.
+ const maxRatio=Math.min(devicePixelRatio,1.5);renderer.setPixelRatio(Math.min(maxRatio,1.25));renderer.info.autoReset=false;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
  function texture(w,h,paint){const c=document.createElement('canvas');c.width=w;c.height=h;paint(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;textures.add(t);return t;}
  const part=(x,y)=>{const half=atlasImage.width/2,t=texture(512,512,(c,w,h)=>c.drawImage(atlasImage,x*half,y*half,half,half,0,0,w,h));t.wrapS=t.wrapT=THREE.RepeatWrapping;t.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy());return t;};
  const artMaps={orangeFur:part(0,0),creamFur:part(1,0),asphalt:part(0,1),stone:part(1,1)};artMaps.furNeutral=texture(256,256,(c,w,h)=>{c.drawImage(artMaps.creamFur.image,0,0,w,h);const p=c.getImageData(0,0,w,h);for(let i=0;i<p.data.length;i+=4){const l=205+((p.data[i]+p.data[i+1]+p.data[i+2])/3-128)*.25;p.data[i]=p.data[i+1]=p.data[i+2]=l;}c.putImageData(p,0,0);});for(const t of[artMaps.furNeutral,artMaps.creamFur,artMaps.orangeFur]){t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(3,3);}
@@ -350,7 +351,7 @@ try{
   if(me.taken!==lastTaken){lastTaken=me.taken;visibleTaken=me.taken?new Set(me.taken):null;}
   world.update(me.time,visibleTaken||race.taken,me.lap);
   // Tiefe Verfolgerkamera: nah am Kart, mit Blick weit genug voraus für Tore und Kisten.
-  const centre=course.point(k.s,k.lat*.93),ahead=course.point(k.s+15,k.lat*.34);cameraDesired.set(centre.x-dx*6.2,p.y+2.5+(k.lift||0)*.32,centre.z-dz*6.2);lookDesired.set(ahead.x,ahead.y+1.2,ahead.z);
+  const centre=course.point(k.s,k.lat*.93),ahead=course.point(k.s+15,k.lat*.34);const trail=6.2+speedVisual*.9;cameraDesired.set(centre.x-dx*trail,p.y+2.5+(k.lift||0)*.32,centre.z-dz*trail);lookDesired.set(ahead.x,ahead.y+1.2,ahead.z);
   if(rear){
    const mount=course.point(k.s-1.8,k.lat),behind=course.point(k.s-28,k.lat*.35);
    cameraDesired.set(mount.x,mount.y+2.15+(k.lift||0)*.72,mount.z);
@@ -393,7 +394,8 @@ try{
  function loop(now){
   if(!root.isConnected||stopped)return;
   const elapsed=(now-lastFrame)/1000;adaptResolution(elapsed);
-  const dt=Math.min(.1,elapsed);lastFrame=now;if(!inJoyboy&&computerMode&&soloRound)updateComputerRace(dt);place(dt);
+  // Nach einem langen Ladeschritt kann der Zeitstempel des Bildes vor dem gemerkten liegen: nie rückwärts rechnen.
+  const dt=Math.max(0,Math.min(.1,elapsed));lastFrame=now;if(!inJoyboy&&computerMode&&soloRound)updateComputerRace(dt);place(dt);
   if(packet&&now-lastHud>75){
    updateHud(packet,now,view);lastHud=now;
   }

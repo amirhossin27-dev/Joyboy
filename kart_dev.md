@@ -1,5 +1,15 @@
 # Joy-Kart · Entwicklungsjournal
 
+## 15.11.2026 · Nachbearbeitung, tiefe Kamera, neue Streckenränder
+
+**Bildaufbau.** `post-fx.js` zeichnet die Szene in ein Zwischenbild mit Halb-Gleitkommawerten und vierfacher Kantenglättung. Ein Helligkeitsfilter (Schwelle 1,7) verkleinert auf ein Viertel, zwei Weichzeichner-Stufen (Viertel und Achtel) ergeben Schein und Schleier. Der Schlussdurchgang addiert beides (Stärke 0,42), wendet eine Filmkurve an, mischt 7 % Sättigung und 13 % Kontrast dazu, färbt Lichter warm und Schatten kühl, dunkelt den Rand ab und verwischt bei Tempo den Bildrand mit sechs versetzten Abgriffen. Das gemalte Panorama geht vorher durch die Umkehrung derselben Kurve (bis 0,92), damit es wie gemalt erscheint und nur seine hellsten Stellen überstrahlen.
+
+**Leistungsschutz.** Start mit Renderfaktor 1,25 wie bisher, Obergrenze 1,5 (vorher 1,25) nur bei dauerhaft über 53 Bildern pro Sekunde. Unter 38 sinkt der Faktor schrittweise bis 0,8; bleibt es dort zweimal in Folge unter 32, schaltet sich die Nachbearbeitung ab (`data-post="off"` am Wurzelelement). Die Shader werden für das Zwischenbild vorbereitet, damit das erste Bild nicht stockt.
+
+**Strecke.** `track-dressing.js` zieht Querschnitte der Strecke entlang (`sweep`): Brüstung, Hecken mit berechneter Blütentextur, dazu Rasen, Pfeiler, Laternen, Banner, Wimpel. Alles landet in `root` und wird je Material zusammengefasst. Auf der Brücke entfallen Hecke, Rasen, Laternen und Wimpel. Messung an denselben Stellen: Hauptdurchgang vorher 207 Aufrufe und 711.000 Dreiecke (alte Zählung ohne Schattendurchgang); nachher gesamt mit Schatten und Nachbearbeitung 376 Aufrufe und 1,12 Mio. Dreiecke, davon 11 Aufrufe für die Ausstattung.
+
+**Vergleichsbilder.** [Sonnenbucht Start vorher](prototypes/joy-kart/coast-section/qa/ultra-grafik/vorher/bucht-40.webp) · [nachher](prototypes/joy-kart/coast-section/qa/ultra-grafik/nachher/bucht-40.webp) · [Häuser vorher](prototypes/joy-kart/coast-section/qa/ultra-grafik/vorher/bucht-1150.webp) · [nachher](prototypes/joy-kart/coast-section/qa/ultra-grafik/nachher/bucht-1150.webp) · [Kap vorher](prototypes/joy-kart/coast-section/qa/ultra-grafik/vorher/kap-1150.webp) · [nachher](prototypes/joy-kart/coast-section/qa/ultra-grafik/nachher/kap-1150.webp) · [Turbo](prototypes/joy-kart/coast-section/qa/ultra-grafik/nachher/bucht-1500-turbo.webp). Aufgenommen mit `track-tour-qa.cjs` per Software-Rendering; das sagt nichts über die Bildrate am Handy.
+
 ## 14.11.2026 · Jedes Gerät fährt sein Kart, Kisten würfeln, sechs neue Specials
 
 **Warum.** Zu zweit stockte das Bild beim Gast und seine Lenkung kam verspätet an: Der Gastgeber rechnete beide Karts, der Gast bekam wenige Stände pro Sekunde und rechnete nur 0,12 s weiter.

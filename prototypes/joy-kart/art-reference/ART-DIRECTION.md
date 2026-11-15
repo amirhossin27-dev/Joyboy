@@ -48,6 +48,8 @@ Erster Nutzertest mit dieser Fassung: 46 FPS Median, 31–52 FPS und leichtes Ru
 
 `production-v9` verändert den Grafikstand bewusst: Fuchsblick mit schmaleren Lidern/Iris und geformter Nase, Haubenkontur/Panelfugen, Putzstruktur und höhenabhängige Felsfarben sowie weniger flaches Fülllicht. Echte Modell-/Fahransichten und Funktion geprüft. Der Bildgleichheitsnachweis aus `production-v8` gilt dafür nicht; die Originalvorschau bleibt sichtbar detailreicher und räumlich stimmiger. Keine erreichte 1-zu-1-Übereinstimmung und keine neue iPhone-Leistungsmessung behaupten.
 
+Etappe vom 15.11.2026 (Küsten-Cup in Joyboy): Nachbearbeitung mit Überstrahlen und Farbstimmung, tiefere Verfolgerkamera mit Schräglage, glänzender Asphalt, Steinbrüstung, Blumenhecken, Laternen mit Bannern und Wimpelketten. Tatsächliche Fahrbilder vor und nach der Etappe liegen unter `../coast-section/qa/ultra-grafik/`. Licht, Dichte der Streckenränder und Kamera sind `coast.webp` sichtbar näher; Felswände an der Strecke, Bogenbrücken, überhöhte Kurven und die Detailtiefe von Fell und Kart fehlen weiterhin. Keine 1-zu-1-Übereinstimmung, keine iPhone-Messung.
+
 ## Nachweis vor dem App-Einbau
 
 Der neue getrennte [Küstenabschnitt `coast-section-v1`](../coast-section/README.md) verwendet dieselben Fuchs-/Kart- und Bildassets aus `production-v9`, ergänzt eigene befahrbare Geometrie, Höhen und Sprung-/Drift-/Itemregeln. Tatsächliche Fahransichten über Brücke, Rampe und unteren Auslauf wurden geprüft. Die entfernte Kulisse steht außerhalb der Fahrkorridore. Dies belegt den Spielabschnitt und seine Regeln, keine erreichte filmische Originalgrafik. Figuren-, Fahrzeug-, Material- und Umgebungsproduktion bleiben offen; der physische Abschnittstest auf iPhone 15/Safari steht noch aus.

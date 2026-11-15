@@ -57,9 +57,9 @@ function createKartCombatEffects(THREE,{scene,kit,course,cars,hazards,materials,
   const sun=kit.add(kit.geometry(new THREE.SphereGeometry(1,28,18)),basic(0xff8a00,.5),group,0,1,0);sun.material.blending=THREE.AdditiveBlending;sun.castShadow=false;
   const frost=kit.add(kit.geometry(new THREE.CircleGeometry(1,40)),basic(0x7fd4ff,.5),group,0,.07,0);frost.rotation.x=-Math.PI/2;frost.castShadow=false;
   const ice=kit.add(kit.geometry(new THREE.IcosahedronGeometry(1,1)),kit.material(0x86d6ff,{transparent:true,opacity:.34,roughness:.08,metalness:.3,flatShading:true,depthWrite:false,emissive:0x2a86c8,emissiveIntensity:.6}),group,0,1,0);ice.scale.set(1.5,1.35,1.9);ice.castShadow=false;
-  const wind=particles(8,0xeafcff),dust=particles(6,0xd9c8a4);group.add(wind.mesh,dust.mesh);
+  const wind=particles(8,0xeafcff),dust=particles(6,0xd9c8a4),grind=particles(10,0xffb347,true);group.add(wind.mesh,dust.mesh,grind.mesh);
   const crabRing=kit.add(ringGeo,basic(0xff8a6a,.7),hazards[i].crab,0,.03,0);crabRing.rotation.x=-Math.PI/2;crabRing.scale.setScalar(1.5);crabRing.castShadow=false;
-  return {group,sparks,smoke,ring,halo,exhaust,sun,frost,ice,wind,dust,crabRing};
+  return {group,sparks,smoke,ring,halo,exhaust,sun,frost,ice,wind,dust,grind,crabRing};
  });
  return (slot,k,reduced,viewer=false)=>{
   const pool=pools[slot],birds=kartFlocks[slot],blinded=!!k&&k.phase==='running'&&k.gulls>0;pool.group.visible=!!k&&k.phase==='running';
@@ -131,6 +131,14 @@ function createKartCombatEffects(THREE,{scene,kit,course,cars,hazards,materials,
   if(pool.dust.mesh.visible){
    for(let n=0;n<6;n++){const age=(t*2.4+n/6)%1,size=.25+age*.7;pool.dust.set(n,(n%2?1:-1)*.85-Math.sign(k.latV||0)*age*.5,.16+age*.3,-.9-age*2.2,size,size*.7,n+age,.38*Math.sin(age*Math.PI));}
    pool.dust.flush();
+  }
+  // Beim scharfen Lenken sprühen Funken vom kurvenäußeren Hinterrad.
+  const hard=k.grounded!==false&&k.v>16&&Math.abs(k.latV||0)>5&&!(k.ice>0);
+  pool.grind.mesh.visible=hard&&!reduced;
+  if(pool.grind.mesh.visible){
+   const out=Math.sign(k.latV);
+   for(let n=0;n<10;n++){const age=(t*5.5+n/10+noise(n)*.3)%1,fly=age*age;pool.grind.set(n,-out*(.92+fly*.9*noise(n+4)),.14+age*(.5+noise(n+2)*.5)-fly*.5,-.75-age*(1.4+noise(n+6)),.07,.22+age*.2,n*1.3,(1-age)*.95);}
+   pool.grind.flush();
   }
   pool.crabRing.scale.setScalar(reduced?1.5:1.5+Math.sin(t*6)*.12);
  };

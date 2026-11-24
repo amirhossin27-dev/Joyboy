@@ -4,6 +4,7 @@ import { traceDef } from '../learn/trace/game';
 import { GAMES, type GameId } from './registry';
 import { bewegungDef } from './rules/bewegung';
 import { c4Def, memoryDef, tttDef } from './rules/classic';
+import { farbwechselDef } from './rules/farbwechsel';
 import { dameDef } from './rules/dame';
 import { ludoDef } from './rules/ludo';
 import { mauDef } from './rules/maumau';
@@ -56,6 +57,8 @@ export function defFor(id: GameId, robos: boolean[]): GameDef<unknown, unknown> 
       return any(dameDef);
     case 'bewegung':
       return any(bewegungDef);
+    case 'farbwechsel':
+      return any(farbwechselDef);
     case 'slf':
       return any(slfDef(robos));
     default:

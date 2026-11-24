@@ -22,6 +22,7 @@ export type GameId =
   | 'muehle'
   | 'dame'
   | 'bewegung'
+  | 'farbwechsel'
   | 'slf'
   | 'schlange'
   | 'kloetzchen'
@@ -486,6 +487,26 @@ export const GAMES: GameMeta[] = [
       { say: 'Mach die Übung und tippe dann auf Geschafft.', art: { k: 'pics', items: ['⭐', '✅'], caption: 'Hampelmänner – geschafft!' } },
       { say: 'Jede Runde wird es ein bisschen mehr.', art: { k: 'pics', items: ['🐰', '🐰🐰', '🐰🐰🐰'], caption: 'Jede Runde mehr' } },
       { say: 'Wer nicht mehr kann, ist raus. Wer am längsten durchhält, gewinnt!', art: { k: 'art', art: 'bewegung' } },
+    ],
+  },
+  {
+    id: 'farbwechsel',
+    name: 'Farbwechsel',
+    tagline: 'Farbe oder Zahl legen – wer zuerst keine Karten mehr hat, gewinnt!',
+    learn: 'Farben und Zahlen vergleichen, Regeln einhalten.',
+    category: 'klassiker',
+    minAge: 6,
+    players: [2, 4],
+    minutes: '5 Min',
+    art: 'farbwechsel',
+    kind: 'def',
+    robo: true,
+    levels: true,
+    tutorial: [
+      { say: 'Leg eine Karte mit der gleichen Farbe oder der gleichen Zahl.', art: { k: 'pics', items: ['🟦 7', '➡️', '🟦 3'], caption: 'Blau passt auf Blau' } },
+      { say: 'Kannst du nicht, ziehst du eine Karte.', art: { k: 'pics', items: ['🂠', '✋'], caption: 'Eine Karte ziehen' } },
+      { say: 'Mit dem Stern wünschst du dir eine Farbe. Plus 2 und plus 4 schicken Karten zum Nächsten.', art: { k: 'pics', items: ['★', '+2', '+4'], caption: 'Sonderkarten' } },
+      { say: 'Wer zuerst keine Karten mehr hat, gewinnt!', art: { k: 'art', art: 'farbwechsel' } },
     ],
   },
   {

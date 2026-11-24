@@ -16,6 +16,12 @@
 
 **Geprüft.** TypeScript, 170 App-Tests (6 neue in `bewegung.test.ts`). In Chromium (400 × 860, Nachtmodus) eine Runde gegen Robo gespielt.
 
+### Schritt 3: Farbwechsel
+
+**Umgesetzt.** `src/games/rules/farbwechsel.ts`, `src/games/views/Farbwechsel.tsx`, Spiel-Id `farbwechsel`, 2–4 Kinder (Arta: nur 2). Regeln wie Artas Uno: Farbe oder Zahl, Aussetzen, Richtungswechsel (zu zweit wie Aussetzen), +2, Farbwahl, +4; gezogene Karte darf sofort gelegt werden. Leicht: 5 Karten, ohne +4; sonst 7 Karten. Robo wie bei Mau-Mau in drei Stärken, Sichtschutz an einem Gerät. Eigenes Kartenbild im Papierwelt-Stil (kein Uno-Oval). 5 neue Tutorial-Sätze aufgenommen.
+
+**Geprüft.** TypeScript, 177 App-Tests (7 neue in `farbwechsel.test.ts`, u. a. Robo-Partien zu zweit bis viert auf allen Stufen). In Chromium (Nachtmodus) einige Züge gegen Robo gespielt.
+
 ## 15.11.2026 – Joy-Kart · Grafiketappe „näher an die Vorlage“
 
 **Nutzerrückmeldung.** Zu zweit „deutlich besser“, Item-Häufigkeit „deutlich besser“. Spielgefühl soll weiter besser werden, die Strecke grafisch überarbeitet und die Spielgrafik insgesamt: „Wir sind noch weit entfernt von der Grafik, die ich haben möchte. Ich will eine ultra-gute Grafik.“ Maßstab bleibt `prototypes/joy-kart/art-reference/coast.webp`. PR #30 ist zusammengeführt; der Branch `claude/determined-hamilton-bm8hnb` wurde vom neuen `main` (2a65ad0) fortgesetzt. [PR #31](https://github.com/amirhossin27-dev/Joyboy/pull/31) gegen main, vom Nutzer mit „go“ beauftragt; Review, GitHub-Prüfungen und Gerätetest stehen aus.

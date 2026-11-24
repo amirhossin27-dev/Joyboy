@@ -36,6 +36,8 @@ const LEVEL_SUB: Record<string, [string, string, string]> = {
   wuerfel: ['kurzer Block', 'ganzer Block', 'ganzer Block'],
   schiffe: ['8 × 8', '10 × 10', 'kleine Schiffe'],
   slf: ['3 Spalten', '4 Spalten', '6 Spalten, J, U'],
+  muehle: ['Robo übt', 'Robo denkt mit', 'Robo-Profi'],
+  dame: ['6 × 6', '8 × 8', '8 × 8 · Profi'],
 };
 
 export const seatOf = (p: Profile): SeatInfo => ({ name: p.name, avatar: p.avatar, color: p.color, robo: false, profileId: p.id });
@@ -240,7 +242,7 @@ export function GameDetail({ id, profile }: { id: GameId; profile: Profile }) {
                 onClick={() => (max > 2 ? setSetup('robo') : start([seatOf(profile), roboSeat(0)]))}
               />
             )}
-            {canTogether && id !== 'joykart' && <ModeTile icon="device" title="Zusammen" sub={`${Math.max(2, min)}–${max} Kinder an einem Gerät`} onClick={() => setSetup('together')} />}
+            {canTogether && id !== 'joykart' && <ModeTile icon="device" title="Zusammen" sub={`${Math.max(2, min) === max ? max : `${Math.max(2, min)}–${max}`} Kinder an einem Gerät`} onClick={() => setSetup('together')} />}
             {canTogether && (
               <ModeTile
                 icon="globe"

@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 /** Illustrationen der Spiele im Papierwelt-Stil. Arcade-Spiele bekommen ein großes Bild-Symbol. */
 import kartCover from '../../prototypes/joy-kart/art-reference/hero.webp';
 
-export type ArtKind = 'joykart' | 'rechnen' | 'buchstaben' | 'uhr' | 'welt' | 'woerter' | 'englisch' | 'zahlenspur' | 'schwung' | 'paare' | 'vier' | 'ttt' | 'ludo' | 'maumau' | 'wuerfel' | 'schiffe' | 'muehle' | 'dame' | 'bewegung' | 'slf' | { emoji: string; bg: string };
+export type ArtKind = 'joykart' | 'rechnen' | 'buchstaben' | 'uhr' | 'welt' | 'woerter' | 'englisch' | 'zahlenspur' | 'schwung' | 'paare' | 'vier' | 'ttt' | 'ludo' | 'maumau' | 'wuerfel' | 'schiffe' | 'muehle' | 'dame' | 'bewegung' | 'farbwechsel' | 'slf' | { emoji: string; bg: string };
 
 const C = { sky: '#6FA8D6', plum: '#8E6BA8', terra: '#D9774F', butter: '#F2C94C', sage: '#5E9C6B', peach: '#E58F7A', ink: '#2D3A31', paper: '#FFFDF8' };
 
@@ -26,6 +26,7 @@ const BG: Record<string, string> = {
   muehle: '#F7EDC8',
   dame: '#F6E1D8',
   bewegung: '#DDEBDD',
+  farbwechsel: '#F7EDC8',
   slf: '#F7EDC8',
 };
 
@@ -305,6 +306,25 @@ function art(kind: Exclude<ArtKind, object>): ReactNode {
             ))}
           </g>
           <path d="M20 22 q6 -8 12 0 M128 18 q6 -8 12 0" fill="none" stroke={C.terra} strokeWidth="2.5" strokeLinecap="round" />
+        </>
+      );
+    case 'farbwechsel':
+      return (
+        <>
+          {[
+            ['#2f7fd0', -16, 46, '3'],
+            ['#2f9a55', -4, 66, '7'],
+            ['#f2b51c', 8, 86, '+2'],
+            ['#e5533d', 20, 106, '7'],
+          ].map(([fill, rot, x, t]) => (
+            <g key={String(x)} transform={`rotate(${rot} ${Number(x) + 15} 90)`}>
+              <rect x={Number(x)} y="28" width="32" height="48" rx="6" fill={String(fill)} stroke={C.ink} strokeWidth="2" />
+              <rect x={Number(x) + 5} y="38" width="22" height="28" rx="7" fill={C.paper} />
+              <text x={Number(x) + 16} y="58" textAnchor="middle" fontSize="15" fontWeight="800" fontFamily={FONT} fill={String(fill)}>
+                {t}
+              </text>
+            </g>
+          ))}
         </>
       );
     case 'slf':

@@ -22,6 +22,7 @@ import { JoyKart } from './views/JoyKart';
 import { Memory, ConnectFour, TicTacToe } from './views/Classic';
 import { Dame, Muehle } from './views/Boards';
 import { Bewegung } from './views/Bewegung';
+import { Farbwechsel } from './views/Farbwechsel';
 import { MauMau } from './views/Cards';
 import { Ludo } from './views/Ludo';
 import { Quiz } from './views/Quiz';
@@ -91,6 +92,8 @@ export function GameView({ id, props }: { id: GameId; props: PlayProps }) {
       return <Dame {...props} />;
     case 'bewegung':
       return <Bewegung {...props} />;
+    case 'farbwechsel':
+      return <Farbwechsel {...props} />;
     case 'slf':
       return <Slf {...props} />;
   }

@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 /** Illustrationen der Spiele im Papierwelt-Stil. Arcade-Spiele bekommen ein großes Bild-Symbol. */
 import kartCover from '../../prototypes/joy-kart/art-reference/hero.webp';
 
-export type ArtKind = 'joykart' | 'rechnen' | 'buchstaben' | 'uhr' | 'welt' | 'woerter' | 'englisch' | 'zahlenspur' | 'schwung' | 'paare' | 'vier' | 'ttt' | 'ludo' | 'maumau' | 'wuerfel' | 'schiffe' | 'muehle' | 'dame' | 'slf' | { emoji: string; bg: string };
+export type ArtKind = 'joykart' | 'rechnen' | 'buchstaben' | 'uhr' | 'welt' | 'woerter' | 'englisch' | 'zahlenspur' | 'schwung' | 'paare' | 'vier' | 'ttt' | 'ludo' | 'maumau' | 'wuerfel' | 'schiffe' | 'muehle' | 'dame' | 'bewegung' | 'slf' | { emoji: string; bg: string };
 
 const C = { sky: '#6FA8D6', plum: '#8E6BA8', terra: '#D9774F', butter: '#F2C94C', sage: '#5E9C6B', peach: '#E58F7A', ink: '#2D3A31', paper: '#FFFDF8' };
 
@@ -25,6 +25,7 @@ const BG: Record<string, string> = {
   schiffe: '#DCE9F3',
   muehle: '#F7EDC8',
   dame: '#F6E1D8',
+  bewegung: '#DDEBDD',
   slf: '#F7EDC8',
 };
 
@@ -285,6 +286,27 @@ function art(kind: Exclude<ArtKind, object>): ReactNode {
         </>
       );
     }
+    case 'bewegung':
+      return (
+        <>
+          <g transform="rotate(-10 52 58)">
+            <rect x="26" y="32" width="52" height="52" rx="12" fill={C.butter} stroke={C.ink} strokeWidth="2.5" />
+            <text x="52" y="68" textAnchor="middle" fontSize="28">🐸</text>
+          </g>
+          <g transform="rotate(10 112 58)">
+            <rect x="88" y="36" width="46" height="46" rx="10" fill={C.paper} stroke={C.ink} strokeWidth="2.5" />
+            {[
+              [100, 48],
+              [122, 48],
+              [100, 70],
+              [122, 70],
+            ].map(([x, y]) => (
+              <circle key={`${x}${y}`} cx={x} cy={y} r="4" fill={C.sage} />
+            ))}
+          </g>
+          <path d="M20 22 q6 -8 12 0 M128 18 q6 -8 12 0" fill="none" stroke={C.terra} strokeWidth="2.5" strokeLinecap="round" />
+        </>
+      );
     case 'slf':
       return (
         <>

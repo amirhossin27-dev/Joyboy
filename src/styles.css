@@ -4433,3 +4433,149 @@ body {
   outline-offset: 2px;
   transform: scale(1.1);
 }
+
+/* ───── Bewegungs-Würfel ───── */
+
+.move-round {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: min(100%, 400px);
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+.move-bar {
+  flex: 1;
+  height: 12px;
+  border-radius: 99px;
+  border: 2px solid var(--ink);
+  background: var(--card);
+  overflow: hidden;
+}
+
+.move-bar span {
+  display: block;
+  height: 100%;
+  width: var(--p);
+  background: var(--sage-l);
+  transition: width 0.4s ease;
+}
+
+.move-dice {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  align-items: center;
+}
+
+.move-ex-die {
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+  border: 2px solid var(--ink);
+  background: var(--butter-soft);
+  box-shadow: 3px 4px 0 var(--ink);
+  display: grid;
+  place-items: center;
+  font-size: 2.2rem;
+}
+
+.move-ex-die.rolling {
+  animation: shake 0.4s ease;
+}
+
+.move-card {
+  width: min(100%, 400px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 16px 16px;
+  border-radius: 18px;
+  border: 2px solid var(--ink);
+  border-top: 8px solid var(--pc, var(--sky));
+  background: var(--card);
+  box-shadow: 3px 4px 0 var(--ink);
+  text-align: center;
+  animation: pop-in 0.25s ease;
+}
+
+.move-card p {
+  margin: 0;
+}
+
+.move-emoji {
+  font-size: 3.4rem;
+  line-height: 1;
+}
+
+.move-amount {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+}
+
+.move-timer {
+  font-size: 1.1rem;
+}
+
+.move-timer.running {
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.move-timer.over {
+  background: var(--sage-soft);
+}
+
+.move-dots {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 7px;
+  max-width: 320px;
+  padding: 8px;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.move-dots i {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--ink);
+  background: var(--card);
+}
+
+.move-dots i.on {
+  background: var(--sage-l);
+}
+
+.move-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(100%, 400px);
+}
+
+.move-faces {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  width: min(100%, 400px);
+  font-size: 0.85rem;
+}
+
+.move-faces span {
+  padding: 6px 8px;
+  border-radius: 10px;
+  border: 1.5px solid var(--line);
+  opacity: 0.75;
+}
+
+.move-faces span.on {
+  opacity: 1;
+  border-color: var(--ink);
+  background: var(--butter-soft);
+  color: var(--ink);
+}

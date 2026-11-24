@@ -21,6 +21,7 @@ export type GameId =
   | 'schiffe'
   | 'muehle'
   | 'dame'
+  | 'bewegung'
   | 'slf'
   | 'schlange'
   | 'kloetzchen'
@@ -464,6 +465,27 @@ export const GAMES: GameMeta[] = [
       { say: 'Steht ein fremder Stein schräg vor dir und dahinter ist frei, springst du drüber und schlägst ihn. Schlagen ist Pflicht!', art: { k: 'grid', cols: 4, cells: [null, DK, null, DK, DK, null, DK, null, null, '🔵', null, DK, DK, null, '🔴', null], mark: [4], point: 4 } },
       { say: 'Kommst du auf der anderen Seite an, wird dein Stein eine Dame. Sie zieht schräg beliebig weit, auch rückwärts.', art: { k: 'pics', items: ['🔴', '➡️', '👑'], caption: 'Dame: schräg, so weit sie will' } },
       { say: 'Wer keinen Stein mehr hat oder nicht mehr ziehen kann, verliert.', art: { k: 'art', art: 'dame' } },
+    ],
+  },
+  {
+    id: 'bewegung',
+    name: 'Bewegungs-Würfel',
+    tagline: 'Würfeln, hüpfen, durchhalten – wer macht am längsten mit?',
+    learn: 'Bewegen, mitzählen und durchhalten.',
+    category: 'klassiker',
+    minAge: 4,
+    players: [1, 4],
+    minutes: '5–10 Min',
+    art: 'bewegung',
+    kind: 'def',
+    robo: true,
+    levels: true,
+    scoreLabel: 'Runden',
+    tutorial: [
+      { say: 'Ein Würfel zeigt dir eine Übung, der andere, wie oft.', art: { k: 'pics', items: ['🐸', '🎲'], caption: 'Übung und Anzahl' } },
+      { say: 'Mach die Übung und tippe dann auf Geschafft.', art: { k: 'pics', items: ['⭐', '✅'], caption: 'Hampelmänner – geschafft!' } },
+      { say: 'Jede Runde wird es ein bisschen mehr.', art: { k: 'pics', items: ['🐰', '🐰🐰', '🐰🐰🐰'], caption: 'Jede Runde mehr' } },
+      { say: 'Wer nicht mehr kann, ist raus. Wer am längsten durchhält, gewinnt!', art: { k: 'art', art: 'bewegung' } },
     ],
   },
   {

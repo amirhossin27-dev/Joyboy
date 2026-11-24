@@ -38,6 +38,7 @@ const LEVEL_SUB: Record<string, [string, string, string]> = {
   slf: ['3 Spalten', '4 Spalten', '6 Spalten, J, U'],
   muehle: ['Robo übt', 'Robo denkt mit', 'Robo-Profi'],
   dame: ['6 × 6', '8 × 8', '8 × 8 · Profi'],
+  bewegung: ['5 Runden', '6 Runden', '8 Runden'],
 };
 
 export const seatOf = (p: Profile): SeatInfo => ({ name: p.name, avatar: p.avatar, color: p.color, robo: false, profileId: p.id });

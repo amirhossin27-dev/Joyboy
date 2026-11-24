@@ -2,6 +2,7 @@ import type { GameDef } from '../engine/game';
 import { quizDef } from '../learn/quiz';
 import { traceDef } from '../learn/trace/game';
 import { GAMES, type GameId } from './registry';
+import { bewegungDef } from './rules/bewegung';
 import { c4Def, memoryDef, tttDef } from './rules/classic';
 import { dameDef } from './rules/dame';
 import { ludoDef } from './rules/ludo';
@@ -53,6 +54,8 @@ export function defFor(id: GameId, robos: boolean[]): GameDef<unknown, unknown> 
       return any(millDef);
     case 'dame':
       return any(dameDef);
+    case 'bewegung':
+      return any(bewegungDef);
     case 'slf':
       return any(slfDef(robos));
     default:

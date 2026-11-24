@@ -10,6 +10,12 @@
 
 **Offen / nächster Schritt.** Amirs Test von Mühle und Dame am Handy, dann Schritt 2 (Bewegungs-Würfel). Online-Partien von Mühle und Dame mit zwei Geräten nicht geprüft.
 
+### Schritt 2: Bewegungs-Würfel
+
+**Umgesetzt.** `src/games/rules/bewegung.ts`, `src/games/views/Bewegung.tsx`, Spiel-Id `bewegung`, 1–4 Kinder, allein, gegen Robo, zusammen und online. Nach Artas Fitness-Würfel, aber mit kindgerechten Übungen (Hampelmänner, Froschsprünge, Flamingo, Auf der Stelle rennen, Hasenhüpfer, Adler-Kreise) statt Liegestützen und Sit-ups. Stufen: 5, 6 oder 8 Runden; auf Leicht halbe Mengen. Wer nicht mehr kann, ist raus; wer zuletzt übrig ist oder alle Runden schafft, gewinnt. Allein zählen die Runden als Rekord. Mitzähl-Punkte zum Antippen, Uhr für Sekunden-Übungen. 5 neue Tutorial-Sätze aufgenommen.
+
+**Geprüft.** TypeScript, 170 App-Tests (6 neue in `bewegung.test.ts`). In Chromium (400 × 860, Nachtmodus) eine Runde gegen Robo gespielt.
+
 ## 15.11.2026 – Joy-Kart · Grafiketappe „näher an die Vorlage“
 
 **Nutzerrückmeldung.** Zu zweit „deutlich besser“, Item-Häufigkeit „deutlich besser“. Spielgefühl soll weiter besser werden, die Strecke grafisch überarbeitet und die Spielgrafik insgesamt: „Wir sind noch weit entfernt von der Grafik, die ich haben möchte. Ich will eine ultra-gute Grafik.“ Maßstab bleibt `prototypes/joy-kart/art-reference/coast.webp`. PR #30 ist zusammengeführt; der Branch `claude/determined-hamilton-bm8hnb` wurde vom neuen `main` (2a65ad0) fortgesetzt. [PR #31](https://github.com/amirhossin27-dev/Joyboy/pull/31) gegen main, vom Nutzer mit „go“ beauftragt; Review, GitHub-Prüfungen und Gerätetest stehen aus.
